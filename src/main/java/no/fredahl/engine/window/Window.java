@@ -70,7 +70,7 @@ public class Window implements GLFWindow {
         if (!glfwInit()) { // Initialize the GLFW library
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-        System.out.println("Window: configure");
+        System.out.println("Window: configuring...");
         lockAspectRatio = options.lockAspectRatio();
         compatibleProfile = options.compatibleProfile();
         vsync = options.verticalSynchronization();
@@ -101,23 +101,23 @@ public class Window implements GLFWindow {
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         }
-        System.out.println("Window: detecting primary monitor..");
+        System.out.println("Window: detecting primary monitor...");
         monitor = glfwGetPrimaryMonitor();
         if (monitor == NULL) {
             throw new IllegalStateException("Window: failed to locate monitor");
         }
         GLFWVidMode vidMode = getVidMode();
-        System.out.println("Window: monitor vidMode default resolution: " + vidMode.width() + ", " + vidMode.height());
-        System.out.println("Window: monitor vidMode default refresh rate: " + vidMode.refreshRate() + " Hz");
+        System.out.println("Window: monitor default resolution: " + vidMode.width() + ":" + vidMode.height());
+        System.out.println("Window: monitor default refresh rate: " + vidMode.refreshRate() + " Hz");
         monitorDefaultVidMode = vidModeBeforeWindowed = vidMode;
         
-        System.out.println("Window: creating the engine.window.. ");
+        System.out.println("Window: creating the GLFW window... ");
         
         if (windowed) {
-            System.out.println("Window: creating windowed mode engine.window with desired resolution: " + desiredWidth + ", " + desiredHeight);
+            System.out.println("Window: creating windowed-mode window with desired resolution: " + desiredWidth + ":" + desiredHeight);
             window = glfwCreateWindow(desiredWidth,desiredHeight,windowTitle,NULL,NULL);
             if ( window == NULL ) throw new IllegalStateException("Failed to create the GLFW engine.window");
-            System.out.println("Window: windowed mode engine.window created");
+            System.out.println("Window: windowed-mode window created");
         }
         else {
             // We stick with the "go-to" resolution of the primary monitor if the monitor don't have support
@@ -139,18 +139,18 @@ public class Window implements GLFWindow {
             }
             else {
                 System.out.println("Window: resolution NOT supported by monitor");
-                System.out.println("Window: using default monitor resolution..");
+                System.out.println("Window: using default monitor resolution");
                 resolutionWidth = monitorDefaultVidMode.width();
                 resolutionHeight = monitorDefaultVidMode.height();
             }
             
-            System.out.println("Window: creating fullScreen engine.window with resolution: " + resolutionWidth + ", " + resolutionHeight);
+            System.out.println("Window: creating fullScreen window with resolution: " + resolutionWidth + ":" + resolutionHeight);
             window = glfwCreateWindow(resolutionWidth,resolutionHeight,windowTitle,monitor,NULL);
             if ( window == NULL ) throw new IllegalStateException("Failed to create the GLFW engine.window");
             vidModeBeforeWindowed = vidMode = getVidMode();
-            System.out.println("Window: fullScreen engine.window created");
-            System.out.println("Window: monitor vidMode resolution: " + vidMode.width() + ", " + vidMode.height());
-            System.out.println("Window: monitor vidMode refresh rate: " + vidMode.refreshRate() + " Hz");
+            System.out.println("Window: fullScreen window created");
+            System.out.println("Window: monitor resolution: " + vidMode.width() + ":" + vidMode.height());
+            System.out.println("Window: monitor refresh rate: " + vidMode.refreshRate() + " Hz");
         }
     
         tmpBuffer1 = BufferUtils.createIntBuffer(1);
@@ -159,12 +159,12 @@ public class Window implements GLFWindow {
         getWindowSize(tmpBuffer1,tmpBuffer2);
         int windowW = tmpBuffer1.get(0);
         int windowH = tmpBuffer2.get(0);
-        System.out.println("Window: engine.window size: " + windowW + ", " + windowH);
+        System.out.println("Window: window size: " + windowW + ":" + windowH);
     
         getFrameBufferSize(tmpBuffer1,tmpBuffer2);
         int frameBufferW = tmpBuffer1.get(0);
         int frameBufferH = tmpBuffer2.get(0);
-        System.out.println("Window: framebuffer size: " + frameBufferW + ", " + frameBufferH);
+        System.out.println("Window: framebuffer size: " + frameBufferW + ":" + frameBufferH);
         
         viewport.update(frameBufferW,frameBufferH); // double check
         
@@ -194,7 +194,6 @@ public class Window implements GLFWindow {
         whbfs = windowH;
         
         if (windowed) centerWindow();
-        
         glfwShowWindow(window);
     }
     
@@ -206,29 +205,32 @@ public class Window implements GLFWindow {
         long currentThread = currentThread();
         if (currentThread == mainThread) {
             contextThread = mainThread;
-            System.out.println("Window: initializing on main thread..");
+            System.out.println("Window: initializing on main thread...");
         }
         else {
             contextThread = currentThread;
-            System.out.println("Window: initializing on different thread than main..");
+            System.out.println("Window: initializing on separate thread...");
         }
         glfwMakeContextCurrent(window);
         glfwSwapInterval(vsync ? 1 : 0);
         GL.createCapabilities();
         glEnable(GL_BLEND);
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if (showTriangles) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         if (cullFace) {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
         }
-    
+        System.out.println("Window: window initialized");
     }
     
     @Override
     public void terminate() {
+        System.out.println("Window: terminating...");
+        System.out.println("Window: destroying window");
         glfwDestroyWindow(window);
+        System.out.println("Window: freeing callbacks");
         windowPosition.free();
         windowSize.free();
         iconifiedStatus.free();
@@ -238,6 +240,7 @@ public class Window implements GLFWindow {
         mouseScroll.free();
         mouseButtons.free();
         mousePosition.free();
+        System.out.println("Window: terminating glfw");
         glfwTerminate();
         errorCallback.free();
     }

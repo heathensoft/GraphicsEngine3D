@@ -23,9 +23,12 @@ public class FrameBufferSize extends GLFWFramebufferSizeCallback {
     
     @Override
     public void invoke(long window, int w, int h) {
-        v.update(this.w, this.h);
-        this.h = h;
-        this.w = w;
+        if (w > 0 && h > 0) {
+            v.update(w, h);
+            this.h = h;
+            this.w = w;
+        }
+        
     }
     
     public int height() {

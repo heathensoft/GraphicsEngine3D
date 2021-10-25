@@ -6,8 +6,6 @@ import org.lwjgl.Version;
 
 import static java.lang.System.nanoTime;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 
 /**
  * @author Frederik Dahl
@@ -16,7 +14,6 @@ import static org.lwjgl.opengl.GL11.glClear;
 
 
 public class Engine {
-    
     
     private static final int TARGET_UPS = 30;
     private static final int TARGET_FPS = 60;
@@ -36,41 +33,57 @@ public class Engine {
         lock = new Object();
         frames = new Time();
         GLContext = new Thread(() -> {
-            window.initialize();
-            frames.init();
-            application.start(window);
-            running = true;
-            float alpha;
-            float frameTime;
-            float accumulator = 0f;
-            float delta = 1f / TARGET_UPS;
-            while (running) {
-                glClear(GL_COLOR_BUFFER_BIT);
-                frameTime = frames.frameTime();
-                accumulator += frameTime;
-                while (accumulator >= delta) {
-                    application.update(delta);
-                    frames.incUpsCount();
-                    accumulator -= delta;
-                }
-                alpha = accumulator / delta;
-                window.updateViewport();
-                application.render(alpha);
-                synchronized (lock) {
-                    if (running) {
-                        window.swapBuffers();
+            try {
+                window.initialize();
+                frames.init();
+                application.start(window);
+                running = true;
+                float alpha;
+                float frameTime;
+                float accumulator = 0f;
+                float delta = 1f / TARGET_UPS;
+                while (running) {
+                    frameTime = frames.frameTime();
+                    accumulator += frameTime;
+                    while (accumulator >= delta) {
+                        application.update(delta);
+                        frames.incUpsCount();
+                        accumulator -= delta;
                     }
-                }
-                frames.incFpsCount();
-                frames.update();
-                if (!window.vsyncEnabled()) {
-                    if (CAP_FPS) {
-                        sync(TARGET_FPS);
+                    synchronized (lock) {
+                        if (running) {
+                            alpha = accumulator / delta;
+                            if (!window.isMinimized()) {
+                                window.updateViewport();
+                                application.render(alpha);
+                                window.swapBuffers();
+                            }
+                        }
+                    }
+                    frames.incFpsCount();
+                    frames.update();
+                    if (!window.vsyncEnabled()) {
+                        if (CAP_FPS) {
+                            sync(TARGET_FPS);
+                        }
                     }
                 }
             }
-            application.exit();
-        });
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                synchronized (lock) {
+                    if (running) {
+                        exit();
+                    }
+                }
+                System.out.println("\nTERMINATE\n");
+                System.out.println("Engine: exiting application...");
+                application.exit();
+                System.out.println("Engine: " + Thread.currentThread() + " ended");
+            }
+        },"GL_Context_Thread");
     }
     
     
@@ -81,8 +94,8 @@ public class Engine {
         int JREMemoryMb = (int)(Runtime.getRuntime().maxMemory() / 1000000L);
         String jre = System.getProperty("java.version");
     
-        System.out.println("\nWelcome!\n");
-        System.out.println("SYSTEM INFO\n");
+        System.out.println("\nWelcome!");
+        System.out.println("\nSYSTEM\n");
     
         System.out.println("---Running on: " + platform);
         System.out.println("---jre: " + jre);
@@ -90,16 +103,17 @@ public class Engine {
         System.out.println("---Reserved memory: " + JREMemoryMb + " Mb");
     
         System.out.println("---LWJGL version: " + Version.getVersion());
-        System.out.println("---GLFW version: " + glfwGetVersionString() + "\n");
-        
+        System.out.println("---GLFW version: " + glfwGetVersionString());
+    
+        System.out.println("\nINITIALIZE\n");
         synchronized (this) {
             try {
                 application = app;
                 window.create(options);
+                // Context-Thread
                 GLContext.start();
                 while (!window.shouldClose()) {
-                    // Main-Thread sleeps, awaiting
-                    // input from the OS
+                    // Main-Thread
                     window.waitEvents();
                 }
                 synchronized (lock) {
@@ -108,7 +122,7 @@ public class Engine {
                 window.hide();
                 GLContext.join(300);
             }
-            catch (InterruptedException e) {
+            catch (Exception e) {
                 e.printStackTrace();
             }finally {
                 window.terminate();
@@ -141,7 +155,13 @@ public class Engine {
         return instance == null ? instance = new Engine() : instance;
     }
     
+    public synchronized void requestTask(Runnable runnable) {
+        
+        // new Thread().start();
+    }
+    
     public void exit() {
+        System.out.println("Engine: window signalled to close..");
         instance.window.signalToClose();
     }
     

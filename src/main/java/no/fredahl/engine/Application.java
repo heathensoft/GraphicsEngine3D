@@ -11,10 +11,8 @@ import no.fredahl.engine.window.Window;
 
 public interface Application {
     
-    void start(Window window);
+    void start(Window window) throws Exception;
     void update(float delta);
     void render(float alpha);
-    void pause();
-    void resume();
     void exit();
 }

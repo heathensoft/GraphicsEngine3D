@@ -17,24 +17,27 @@ public class Viewport {
         update(width, height);
     }
     
+    // todo: why did I make this synchronized again?
+    // should not be any reason to.
     public synchronized void update(int width, int height) {
         if (!aspectLocked) {
             ar = (float) width / height;
         }
         int aw = width;
-        int ah = (int)((float)aw / ar);
+        int ah = Math.round ((float)aw / ar);
         if (ah > height) {
             ah = height;
-            aw = (int)((float)ah * ar);
+            aw = Math.round((float)ah * ar);
         }
-        x = (int) (((float) width / 2f) - ((float)aw / 2f));
-        y = (int) (((float) height / 2f) - ((float)ah / 2f));
+        x = Math.round(((float) width / 2f) - ((float)aw / 2f));
+        y = Math.round(((float) height / 2f) - ((float)ah / 2f));
         w = aw;
         h = ah;
         iw = 1f / w;
         ih = 1f / h;
     }
     
+    // why did I make this synchronized again?
     public synchronized void lockAspectRatio(boolean on) {
         aspectLocked = on;
     }

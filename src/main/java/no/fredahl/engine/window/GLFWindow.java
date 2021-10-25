@@ -1,5 +1,6 @@
 package no.fredahl.engine.window;
 
+import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -17,10 +18,6 @@ public interface GLFWindow {
     void initialize(); // Makes context current in calling thread
     
     // Any thread
-    default void makeContextCurrent() {
-        glfwMakeContextCurrent(windowHandle());
-    }
-    // Any thread
     default void signalToClose() {
         glfwSetWindowShouldClose(windowHandle(),true);
     }
@@ -33,20 +30,12 @@ public interface GLFWindow {
         glfwSwapBuffers(windowHandle());
     }
     // Context thread
-    default void setClearColor(float r, float g, float b, float a) {
-        glClearColor(r,g,b,a);
-    }
-    // Main thread only
-    default void pollEvents() {
-        glfwPollEvents();
+    default void setClearColor(Color color) {
+        glClearColor(color.r(),color.g(),color.b(),color.a());
     }
     // Main thread only
     default void waitEvents() {
         glfwWaitEvents();
-    }
-    // Main thread only
-    default void setTitle(CharSequence title) {
-        glfwSetWindowTitle(windowHandle(), title);
     }
     // Main thread only
     default void show() {

@@ -80,9 +80,6 @@ public class VertexAttribute {
         }
     }
     
-    public int sizeBytes() {
-        return size() * Float.BYTES;
-    }
     
 
 }

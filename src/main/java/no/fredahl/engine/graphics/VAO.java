@@ -60,6 +60,10 @@ public class VAO {
         this.capacity = capacity;
     }
     
+    public void storeData(VertexAttribute attribute, float[] data) {
+        manager.storeDataInAttributeList(this,attribute,data);
+    }
+    
     public void bind() {
         manager.bind(this);
     }

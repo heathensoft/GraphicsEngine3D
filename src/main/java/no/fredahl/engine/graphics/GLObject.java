@@ -49,7 +49,7 @@ public class GLObject {
         bind(vao);
         FloatBuffer buffer = null;
         final int dataLength = data.length;
-        final int attributeSize = attribute.size();
+        final int attributeSize = attribute.components;
         if (dataLength % attributeSize != 0) {
             freeAll();
             throw new IllegalStateException("Attribute not matching data");
@@ -73,7 +73,7 @@ public class GLObject {
             glBufferData(GL_ARRAY_BUFFER,buffer,GL_STATIC_DRAW);
             glVertexAttribPointer(
                     attribute.index,
-                    attributeSize,
+                    attribute.components,
                     attribute.type,
                     attribute.normalized,
                     0,
