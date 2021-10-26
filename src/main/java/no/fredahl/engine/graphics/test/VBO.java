@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.engine.graphics.test;
 
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
@@ -20,10 +20,10 @@ public class VBO {
         this.id = id;
     }
     
-    protected int stride() {
+    protected int strideBytes() {
         int stride = 0;
         for (VertexAttribute attribute : attributes) {
-            stride += attribute.size();
+            stride += attribute.bytes();
         }
         return stride;
     }

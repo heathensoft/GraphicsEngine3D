@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.engine.graphics.test;
 
 import org.lwjgl.system.MemoryUtil;
 
@@ -49,15 +49,24 @@ public class GLObject {
         bind(vao);
         FloatBuffer buffer = null;
         final int dataLength = data.length;
+        
+        int attribTypeSize = attribute.componentSizeBytes();
+        int attribSize = attribute.bytes();
+        
+        if (attribSize % Float.BYTES != 0) {
+            // we are checking that the attributeSize is dividable by 4.
+            
+        }
+        
         final int attributeSize = attribute.components;
         if (dataLength % attributeSize != 0) {
             freeAll();
             throw new IllegalStateException("Attribute not matching data");
         }
         final int vertexCount = dataLength / attributeSize;
-        final int vaoVertices = vao.vertexCount();
+        final int vaoVertices = vao.numVertices();
         if (vaoVertices == 0) {
-            vao.setVertexCount(vertexCount);
+            vao.setNumVertices(vertexCount);
             vao.setCapacity(dataLength);
         }
         else if (vaoVertices != vertexCount) {

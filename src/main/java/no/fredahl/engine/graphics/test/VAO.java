@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.engine.graphics.test;
 
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class VAO {
     
     private final int id;
     private int capacity;
-    private int vertexCount;
+    private int numVertices;
     private final GLObject manager;
     private final List<VBO> bufferObjects;
     private final boolean[] slots;
@@ -52,15 +52,15 @@ public class VAO {
         return bufferObjects;
     }
     
-    protected void setVertexCount(int count) {
-        this.vertexCount = count;
+    protected void setNumVertices(int count) {
+        this.numVertices = count;
     }
     
     protected void setCapacity(int capacity) {
         this.capacity = capacity;
     }
     
-    public void storeData(VertexAttribute attribute, float[] data) {
+    public void storeVBO(VertexAttribute attribute, float[] data) {
         manager.storeDataInAttributeList(this,attribute,data);
     }
     
@@ -68,28 +68,24 @@ public class VAO {
         manager.bind(this);
     }
     
-    public int vertexCount() {
-        return vertexCount;
+    public int numVertices() {
+        return numVertices;
     }
     
     public int capacity() {
         return capacity;
     }
     
-    public int vertexSize() {
+    public int vertexSizeBytes() {
         int size = 0;
         for (VBO vbo: bufferObjects) {
-            size += vbo.stride();
+            size += vbo.strideBytes();
         }
         return size;
     }
     
-    public int sizeFloats() {
-        return vertexSize() * vertexCount;
-    }
-    
     public int sizeBytes() {
-        return sizeFloats() * Float.BYTES;
+        return vertexSizeBytes() * numVertices;
     }
     
     

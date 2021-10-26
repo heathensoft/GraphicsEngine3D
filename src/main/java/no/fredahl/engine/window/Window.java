@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
@@ -62,13 +63,13 @@ public class Window implements GLFWindow {
      * Follow up with initialize() to create capabilities and make context current
      * @param options Window creation options
      */
-    public void create(Options options) {
+    public void create(Options options) throws Exception {
         
         mainThread = currentThread();
         
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
         if (!glfwInit()) { // Initialize the GLFW library
-            throw new IllegalStateException("Unable to initialize GLFW");
+            throw new Exception("Unable to initialize GLFW");
         }
         System.out.println("Window: configuring...");
         lockAspectRatio = options.lockAspectRatio();
@@ -104,7 +105,7 @@ public class Window implements GLFWindow {
         System.out.println("Window: detecting primary monitor...");
         monitor = glfwGetPrimaryMonitor();
         if (monitor == NULL) {
-            throw new IllegalStateException("Window: failed to locate monitor");
+            throw new Exception("Window: failed to locate monitor");
         }
         GLFWVidMode vidMode = getVidMode();
         System.out.println("Window: monitor default resolution: " + vidMode.width() + ":" + vidMode.height());
@@ -116,7 +117,7 @@ public class Window implements GLFWindow {
         if (windowed) {
             System.out.println("Window: creating windowed-mode window with desired resolution: " + desiredWidth + ":" + desiredHeight);
             window = glfwCreateWindow(desiredWidth,desiredHeight,windowTitle,NULL,NULL);
-            if ( window == NULL ) throw new IllegalStateException("Failed to create the GLFW engine.window");
+            if ( window == NULL ) throw new Exception("Failed to create the GLFW engine.window");
             System.out.println("Window: windowed-mode window created");
         }
         else {
@@ -146,7 +147,7 @@ public class Window implements GLFWindow {
             
             System.out.println("Window: creating fullScreen window with resolution: " + resolutionWidth + ":" + resolutionHeight);
             window = glfwCreateWindow(resolutionWidth,resolutionHeight,windowTitle,monitor,NULL);
-            if ( window == NULL ) throw new IllegalStateException("Failed to create the GLFW engine.window");
+            if ( window == NULL ) throw new Exception("Failed to create the GLFW engine.window");
             vidModeBeforeWindowed = vidMode = getVidMode();
             System.out.println("Window: fullScreen window created");
             System.out.println("Window: monitor resolution: " + vidMode.width() + ":" + vidMode.height());
@@ -231,18 +232,18 @@ public class Window implements GLFWindow {
         System.out.println("Window: destroying window");
         glfwDestroyWindow(window);
         System.out.println("Window: freeing callbacks");
-        windowPosition.free();
-        windowSize.free();
-        iconifiedStatus.free();
-        frameBufferSize.free();
-        charInput.free();
-        keyInput.free();
-        mouseScroll.free();
-        mouseButtons.free();
-        mousePosition.free();
+        Objects.requireNonNull(windowPosition).free();
+        Objects.requireNonNull(windowSize).free();
+        Objects.requireNonNull(iconifiedStatus).free();
+        Objects.requireNonNull(frameBufferSize).free();
+        Objects.requireNonNull(charInput).free();
+        Objects.requireNonNull(keyInput).free();
+        Objects.requireNonNull(mouseScroll).free();
+        Objects.requireNonNull(mouseButtons).free();
+        Objects.requireNonNull(mousePosition).free();
         System.out.println("Window: terminating glfw");
         glfwTerminate();
-        errorCallback.free();
+        Objects.requireNonNull(errorCallback).free();
     }
     
     @Override

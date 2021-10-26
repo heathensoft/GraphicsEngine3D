@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.engine.graphics.test;
 
 /**
  * @author Frederik Dahl

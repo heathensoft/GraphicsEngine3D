@@ -3,9 +3,15 @@ package no.fredahl.examples.triangle;
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
 import no.fredahl.engine.graphics.*;
+import no.fredahl.engine.graphics.Attribute;
+import no.fredahl.engine.graphics.BufferObject;
+import no.fredahl.engine.graphics.VertexAttributeArray;
 import no.fredahl.engine.utils.IO;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
+import org.lwjgl.system.MemoryUtil;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -18,7 +24,9 @@ import static org.lwjgl.opengl.GL20.*;
 public class HelloTriangle implements Application {
     
     ShaderProgram program;
-    VAO vao;
+    VertexAttributeArray vao;
+    Attribute positions;
+    BufferObject vbo;
     
     @Override
     public void start(Window window) throws Exception{
@@ -40,9 +48,33 @@ public class HelloTriangle implements Application {
                 -0.5f, -0.5f, 0.0f,
                 0.5f, -0.5f, 0.0f
         };
+        
+        
     
-        vao = GLObject.get().VAO();
-        vao.storeData(VertexAttribute.position(0),vertices);
+        FloatBuffer verticesBuffer = null;
+        
+        try {
+            verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
+            verticesBuffer.put(vertices).flip();
+    
+            vao = new VertexAttributeArray();
+            vao.bind();
+            vbo = new BufferObject(GL_ARRAY_BUFFER,GL_STATIC_DRAW);
+            vbo.bind();
+            vbo.bufferData(verticesBuffer);
+            
+            positions = new Attribute(0,Attribute.Type.POSITION_3D);
+            positions.enable();
+            positions.attributePointer(0,0);
+            
+            vbo.unbind();
+            vao.unbind();
+            
+        } finally {
+            if (verticesBuffer != null) {
+                MemoryUtil.memFree(verticesBuffer);
+            }
+        }
     }
     
     @Override
@@ -53,14 +85,19 @@ public class HelloTriangle implements Application {
     @Override
     public void render(float alpha) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        vao.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        vao.unbind();
     }
     
     @Override
     public void exit() {
         if (program != null)
             program.delete();
-        GLObject.get().freeAll();
+        vbo.unbind();
+        vbo.free();
+        vao.unbind();
+        vao.free();
     }
     
     public static void main(String[] args) {

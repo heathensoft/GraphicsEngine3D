@@ -62,8 +62,9 @@ public interface GLFWindow {
         glfwRestoreWindow(windowHandle());
     }
     
-    // Main thread only.
-    void terminate();
+    void create(Options options) throws Exception; // Main thread only.
+    
+    void terminate(); // Main thread only.
     
     void toggleVsync(boolean on); // context thread
     
