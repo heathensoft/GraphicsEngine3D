@@ -9,7 +9,7 @@ import org.lwjgl.glfw.GLFWCursorPosCallback;
  */
 
 
-public class MousePosition extends GLFWCursorPosCallback {
+public class MouseHoverEvents extends GLFWCursorPosCallback {
     
     private final Vector2d position = new Vector2d();
     

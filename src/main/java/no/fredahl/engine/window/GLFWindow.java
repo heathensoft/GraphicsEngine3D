@@ -76,15 +76,15 @@ public interface GLFWindow {
     // Display related callbacks are executed independently from glfwPollEvents.
     // i.e. an engine.window resize callback is not triggered on pollEvents
     
-    KeyInput keyInput(); // any thread
-    CharInput charInput(); // any thread
-    MouseButtons mouseButtons(); // any thread
-    MousePosition mousePosition(); // any thread
-    MouseScroll mouseScroll(); // any thread
-    void setKeyInput(KeyInput callback);
-    void setCharInput(CharInput callback);
-    void setMouseButtons(MouseButtons callback);
-    void setMousePosition(MousePosition callback);
-    void setMouseScroll(MouseScroll callback);
+    KeyPressEvents keyPressEvents(); // any thread
+    CharPressEvents charPressEvents(); // any thread
+    MousePressEvents mousePressEvents(); // any thread
+    MouseHoverEvents mouseHoverEvents(); // any thread
+    MouseScrollEvents mouseScrollEvents(); // any thread
+    void setKeyPressCallback(KeyPressEvents callback);
+    void setCharPressCallback(CharPressEvents callback);
+    void setMousePressCallback(MousePressEvents callback);
+    void setMouseHoverCallback(MouseHoverEvents callback);
+    void setMouseScrollCallback(MouseScrollEvents callback);
     
 }

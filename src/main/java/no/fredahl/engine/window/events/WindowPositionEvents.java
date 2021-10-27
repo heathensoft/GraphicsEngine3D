@@ -8,11 +8,11 @@ import org.lwjgl.glfw.GLFWWindowPosCallback;
  */
 
 
-public class WindowPos extends GLFWWindowPosCallback {
+public class WindowPositionEvents extends GLFWWindowPosCallback {
     
     private int x, y;
     
-    public WindowPos() {
+    public WindowPositionEvents() {
         x = 0;
         y = 0;
     }

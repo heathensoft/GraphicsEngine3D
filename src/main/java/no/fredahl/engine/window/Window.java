@@ -38,15 +38,15 @@ public class Window implements GLFWindow {
     private GLFWErrorCallback errorCallback;
     private GLFWVidMode monitorDefaultVidMode;
     private GLFWVidMode vidModeBeforeWindowed;
-    private KeyInput keyInput;
-    private CharInput charInput;
-    private MouseButtons mouseButtons;
-    private MousePosition mousePosition;
-    private MouseScroll mouseScroll;
-    private WindowSize windowSize;
-    private WindowPos windowPosition;
-    private FrameBufferSize frameBufferSize;
-    private IconifiedStatus iconifiedStatus;
+    private KeyPressEvents keyPressEvents;
+    private CharPressEvents charPressEvents;
+    private MousePressEvents mousePressEvents;
+    private MouseHoverEvents mouseHoverEvents;
+    private MouseScrollEvents mouseScrollEvents;
+    private WindowResizeEvents windowResizeEvents;
+    private WindowPositionEvents windowPositionEvents;
+    private FrameBufferEvents frameBufferEvents;
+    private WindowIconifyEvents windowIconifyEvents;
     private final IntBuffer tmpBuffer1;
     private final IntBuffer tmpBuffer2;
     
@@ -213,14 +213,14 @@ public class Window implements GLFWindow {
             int frameBufferH = tmpBuffer2.get(0);
             System.out.println("Window: framebuffer size: " + frameBufferW + ":" + frameBufferH);
             viewport.update(frameBufferW,frameBufferH); // double check
-            windowSize = new WindowSize();
-            windowPosition = new WindowPos();
-            iconifiedStatus = new IconifiedStatus();
-            frameBufferSize = new FrameBufferSize(viewport);
-            glfwSetWindowSizeCallback(window,windowSize);
-            glfwSetWindowPosCallback(window,windowPosition);
-            glfwSetWindowIconifyCallback(window,iconifiedStatus);
-            glfwSetFramebufferSizeCallback(window,frameBufferSize);
+            windowResizeEvents = new WindowResizeEvents();
+            windowPositionEvents = new WindowPositionEvents();
+            windowIconifyEvents = new WindowIconifyEvents();
+            frameBufferEvents = new FrameBufferEvents(viewport);
+            glfwSetWindowSizeCallback(window, windowResizeEvents);
+            glfwSetWindowPosCallback(window, windowPositionEvents);
+            glfwSetWindowIconifyCallback(window, windowIconifyEvents);
+            glfwSetFramebufferSizeCallback(window, frameBufferEvents);
             wwbfs = windowW;
             whbfs = windowH;
             if (windowed) centerWindow();
@@ -253,24 +253,24 @@ public class Window implements GLFWindow {
             System.out.println("Window: destroying window");
             glfwDestroyWindow(window);
             System.out.println("Window: freeing callbacks");
-            if (windowPosition != null)
-                windowPosition.free();
-            if (windowSize != null)
-                windowSize.free();
-            if (iconifiedStatus != null)
-                iconifiedStatus.free();
-            if (frameBufferSize != null)
-                frameBufferSize.free();
-            if (charInput != null)
-                charInput.free();
-            if (keyInput != null)
-                keyInput.free();
-            if (mouseScroll != null)
-                mouseScroll.free();
-            if (mouseButtons != null)
-                mouseButtons.free();
-            if (mousePosition != null)
-                mousePosition.free();
+            if (windowPositionEvents != null)
+                windowPositionEvents.free();
+            if (windowResizeEvents != null)
+                windowResizeEvents.free();
+            if (windowIconifyEvents != null)
+                windowIconifyEvents.free();
+            if (frameBufferEvents != null)
+                frameBufferEvents.free();
+            if (charPressEvents != null)
+                charPressEvents.free();
+            if (keyPressEvents != null)
+                keyPressEvents.free();
+            if (mouseScrollEvents != null)
+                mouseScrollEvents.free();
+            if (mousePressEvents != null)
+                mousePressEvents.free();
+            if (mouseHoverEvents != null)
+                mouseHoverEvents.free();
             System.out.println("Window: terminating glfw");
             glfwTerminate();
             if (errorCallback != null)
@@ -327,97 +327,97 @@ public class Window implements GLFWindow {
     }
     
     @Override
-    public synchronized KeyInput keyInput() {
-        if (keyInput == null) {
-            keyInput = new KeyInput();
-            requestQueue.newRequest(() -> glfwSetKeyCallback(windowHandle(),keyInput));
-        }return keyInput;
+    public synchronized KeyPressEvents keyPressEvents() {
+        if (keyPressEvents == null) {
+            keyPressEvents = new KeyPressEvents();
+            requestQueue.newRequest(() -> glfwSetKeyCallback(windowHandle(), keyPressEvents));
+        }return keyPressEvents;
     }
     
     @Override
-    public synchronized CharInput charInput() {
-        if (charInput == null) {
-            charInput = new CharInput();
-            requestQueue.newRequest(() -> glfwSetCharCallback(windowHandle(),charInput));
-        }return charInput;
+    public synchronized CharPressEvents charPressEvents() {
+        if (charPressEvents == null) {
+            charPressEvents = new CharPressEvents();
+            requestQueue.newRequest(() -> glfwSetCharCallback(windowHandle(), charPressEvents));
+        }return charPressEvents;
     }
     
     @Override
-    public synchronized MouseButtons mouseButtons() {
-        if (mouseButtons == null) {
-            mouseButtons = new MouseButtons();
-            requestQueue.newRequest(() -> glfwSetMouseButtonCallback(windowHandle(),mouseButtons));
-        }return mouseButtons;
+    public synchronized MousePressEvents mousePressEvents() {
+        if (mousePressEvents == null) {
+            mousePressEvents = new MousePressEvents();
+            requestQueue.newRequest(() -> glfwSetMouseButtonCallback(windowHandle(), mousePressEvents));
+        }return mousePressEvents;
     }
     
     @Override
-    public synchronized MousePosition mousePosition() {
-        if (mousePosition == null) {
-            mousePosition = new MousePosition();
-            requestQueue.newRequest(() -> glfwSetCursorPosCallback(windowHandle(),mousePosition));
-        }return mousePosition;
+    public synchronized MouseHoverEvents mouseHoverEvents() {
+        if (mouseHoverEvents == null) {
+            mouseHoverEvents = new MouseHoverEvents();
+            requestQueue.newRequest(() -> glfwSetCursorPosCallback(windowHandle(), mouseHoverEvents));
+        }return mouseHoverEvents;
     }
     
     @Override
-    public synchronized MouseScroll mouseScroll() {
-        if (mouseScroll == null) {
-            mouseScroll = new MouseScroll();
-            requestQueue.newRequest(() -> glfwSetScrollCallback(windowHandle(),mouseScroll));
-        }return mouseScroll;
+    public synchronized MouseScrollEvents mouseScrollEvents() {
+        if (mouseScrollEvents == null) {
+            mouseScrollEvents = new MouseScrollEvents();
+            requestQueue.newRequest(() -> glfwSetScrollCallback(windowHandle(), mouseScrollEvents));
+        }return mouseScrollEvents;
     }
     
     @Override
-    public synchronized void setKeyInput(KeyInput callback) {
-        if (keyInput == callback) return;
-        if (keyInput != null)
-            keyInput.free();
-        keyInput = callback;
-        if (keyInput != null) {
-            requestQueue.newRequest(() -> glfwSetKeyCallback(windowHandle(),keyInput));
+    public synchronized void setKeyPressCallback(KeyPressEvents callback) {
+        if (keyPressEvents == callback) return;
+        if (keyPressEvents != null)
+            keyPressEvents.free();
+        keyPressEvents = callback;
+        if (keyPressEvents != null) {
+            requestQueue.newRequest(() -> glfwSetKeyCallback(windowHandle(), keyPressEvents));
         }
     }
     
     @Override
-    public synchronized void setCharInput(CharInput callback) {
-        if (charInput == callback) return;
-        if (charInput != null)
-            charInput.free();
-        charInput = callback;
-        if (charInput != null) {
-            requestQueue.newRequest(() -> glfwSetCharCallback(windowHandle(),charInput));
+    public synchronized void setCharPressCallback(CharPressEvents callback) {
+        if (charPressEvents == callback) return;
+        if (charPressEvents != null)
+            charPressEvents.free();
+        charPressEvents = callback;
+        if (charPressEvents != null) {
+            requestQueue.newRequest(() -> glfwSetCharCallback(windowHandle(), charPressEvents));
         }
     }
     
     @Override
-    public synchronized void setMouseButtons(MouseButtons callback) {
-        if (mouseButtons == callback) return;
-        if (mouseButtons != null)
-            mouseButtons.free();
-        mouseButtons = callback;
-        if (mouseButtons != null) {
-            requestQueue.newRequest(() -> glfwSetMouseButtonCallback(windowHandle(),mouseButtons));
+    public synchronized void setMousePressCallback(MousePressEvents callback) {
+        if (mousePressEvents == callback) return;
+        if (mousePressEvents != null)
+            mousePressEvents.free();
+        mousePressEvents = callback;
+        if (mousePressEvents != null) {
+            requestQueue.newRequest(() -> glfwSetMouseButtonCallback(windowHandle(), mousePressEvents));
         }
     }
     
     @Override
-    public synchronized void setMousePosition(MousePosition callback) {
-        if (mousePosition == callback) return;
-        if (mousePosition != null)
-            mousePosition.free();
-        mousePosition = callback;
-        if (mousePosition != null) {
-            requestQueue.newRequest(() -> glfwSetCursorPosCallback(windowHandle(),mousePosition));
+    public synchronized void setMouseHoverCallback(MouseHoverEvents callback) {
+        if (mouseHoverEvents == callback) return;
+        if (mouseHoverEvents != null)
+            mouseHoverEvents.free();
+        mouseHoverEvents = callback;
+        if (mouseHoverEvents != null) {
+            requestQueue.newRequest(() -> glfwSetCursorPosCallback(windowHandle(), mouseHoverEvents));
         }
     }
     
     @Override
-    public synchronized void setMouseScroll(MouseScroll callback) {
-        if (mouseScroll == callback) return;
-        if (mouseScroll != null)
-            mouseScroll.free();
-        mouseScroll = callback;
-        if (mouseScroll != null) {
-            requestQueue.newRequest(() -> glfwSetScrollCallback(windowHandle(),mouseScroll));
+    public synchronized void setMouseScrollCallback(MouseScrollEvents callback) {
+        if (mouseScrollEvents == callback) return;
+        if (mouseScrollEvents != null)
+            mouseScrollEvents.free();
+        mouseScrollEvents = callback;
+        if (mouseScrollEvents != null) {
+            requestQueue.newRequest(() -> glfwSetScrollCallback(windowHandle(), mouseScrollEvents));
         }
     }
     
@@ -496,7 +496,7 @@ public class Window implements GLFWindow {
     
     @Override
     public boolean isMinimized() {
-        return iconifiedStatus.isMinimized();
+        return windowIconifyEvents.isMinimized();
     }
     
     @Override
@@ -511,32 +511,32 @@ public class Window implements GLFWindow {
     
     @Override
     public int windowW() {
-        return windowSize.width();
+        return windowResizeEvents.width();
     }
     
     @Override
     public int windowH() {
-        return windowSize.height();
+        return windowResizeEvents.height();
     }
     
     @Override
     public int windowX() {
-        return windowPosition.x();
+        return windowPositionEvents.x();
     }
     
     @Override
     public int windowY() {
-        return windowPosition.y();
+        return windowPositionEvents.y();
     }
     
     @Override
     public int frameBufferW() {
-        return frameBufferSize.width();
+        return frameBufferEvents.width();
     }
     
     @Override
     public int frameBufferH() {
-        return frameBufferSize.height();
+        return frameBufferEvents.height();
     }
     
     @Override

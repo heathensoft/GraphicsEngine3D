@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
  */
 
 
-public class MouseButtons extends GLFWMouseButtonCallback {
+public class MousePressEvents extends GLFWMouseButtonCallback {
     
     private final static int NUM_BUTTONS = 3;
     private final boolean[] pressed = new boolean[NUM_BUTTONS];

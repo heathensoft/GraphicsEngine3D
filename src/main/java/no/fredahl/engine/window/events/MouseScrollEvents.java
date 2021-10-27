@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFWScrollCallback;
  */
 
 
-public class MouseScroll extends GLFWScrollCallback {
+public class MouseScrollEvents extends GLFWScrollCallback {
     
     private int scroll = 0;
     

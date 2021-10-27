@@ -45,8 +45,8 @@ public class Engine {
                 while (running) {
                     frameTime = frames.frameTime();
                     accumulator += frameTime;
-                    application.input();
                     while (accumulator >= delta) {
+                        application.input();
                         application.update(delta);
                         frames.incUpsCount();
                         accumulator -= delta;

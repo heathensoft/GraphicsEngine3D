@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
  */
 
 
-public class WindowSize extends GLFWWindowSizeCallback {
+public class WindowResizeEvents extends GLFWWindowSizeCallback {
     
     private int w;
     private int h;

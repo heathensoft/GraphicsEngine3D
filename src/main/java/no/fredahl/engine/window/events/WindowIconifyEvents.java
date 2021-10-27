@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFWWindowIconifyCallback;
  */
 
 
-public class IconifiedStatus extends GLFWWindowIconifyCallback {
+public class WindowIconifyEvents extends GLFWWindowIconifyCallback {
     
     private boolean minimized;
     

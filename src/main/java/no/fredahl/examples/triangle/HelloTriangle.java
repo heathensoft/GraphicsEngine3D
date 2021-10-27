@@ -9,11 +9,12 @@ import no.fredahl.engine.graphics.VertexAttributeArray;
 import no.fredahl.engine.utility.IO;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
-import no.fredahl.engine.window.events.KeyInput;
+import no.fredahl.engine.window.processors.Keyboard;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL20.*;
 
 /**
@@ -28,9 +29,11 @@ public class HelloTriangle implements Application {
     VertexAttributeArray vao;
     VertexAttribute positions;
     BufferObject vbo;
+    Keyboard keyboard;
     
     @Override
     public void start(Window window) throws Exception{
+        keyboard = new Keyboard(window.keyPressEvents(),window.charPressEvents());
         String vertexShaderPath = IO.projectPath("vertex.glsl","res","triangle");
         String fragmentShaderPath = IO.projectPath("fragment.glsl","res","triangle");
         ShaderSource fragmentShader = new ShaderSource(GL_FRAGMENT_SHADER,fragmentShaderPath);
@@ -72,12 +75,21 @@ public class HelloTriangle implements Application {
     
     @Override
     public void input() {
-    
+        keyboard.collect();
     }
     
     @Override
     public void update(float delta) {
+        
+        if (keyboard.justPressed(GLFW_KEY_E))
+            System.out.println("E");
     
+        if (keyboard.justReleased(GLFW_KEY_F))
+            System.out.println("F");
+    
+        if (keyboard.justPressed(GLFW_KEY_F,GLFW_KEY_LEFT_CONTROL))
+            System.out.println("ctrl-F");
+        
     }
     
     @Override

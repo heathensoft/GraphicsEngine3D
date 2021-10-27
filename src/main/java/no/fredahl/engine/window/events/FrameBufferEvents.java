@@ -9,13 +9,13 @@ import no.fredahl.engine.window.Viewport;
  */
 
 
-public class FrameBufferSize extends GLFWFramebufferSizeCallback {
+public class FrameBufferEvents extends GLFWFramebufferSizeCallback {
     
     private final Viewport v;
     private int w;
     private int h;
     
-    public FrameBufferSize(Viewport viewport) {
+    public FrameBufferEvents(Viewport viewport) {
         this.w = viewport.width();
         this.h = viewport.height();
         this.v = viewport;
