@@ -45,6 +45,7 @@ public class Engine {
                 while (running) {
                     frameTime = frames.frameTime();
                     accumulator += frameTime;
+                    application.input();
                     while (accumulator >= delta) {
                         application.update(delta);
                         frames.incUpsCount();
@@ -110,11 +111,10 @@ public class Engine {
             try {
                 application = app;
                 window.create(options);
-                // Context-Thread
                 GLContext.start();
                 while (!window.shouldClose()) {
-                    // Main-Thread
-                    window.waitEvents();
+                    window.waitEvents(0.1f);
+                    window.handleRequests();
                 }
                 synchronized (lock) {
                     running = false;

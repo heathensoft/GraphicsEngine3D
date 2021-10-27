@@ -14,7 +14,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class CharInput extends GLFWCharCallback {
     
-    private volatile boolean containsEvents;
+    private boolean containsEvents;
     private final BlockingQueue<Integer> eventQueue = new ArrayBlockingQueue<>(16);
     
     @Override

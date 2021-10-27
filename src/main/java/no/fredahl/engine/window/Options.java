@@ -8,8 +8,7 @@ package no.fredahl.engine.window;
 
 public interface Options {
     
-    // You could use default options if engine.window creation fails..
-    default String windowTitle() { return "Java engine.Application";}
+    default String windowTitle() { return "Application";}
     default int desiredResolutionWidth() { return 1280; }
     default int desiredResolutionHeight() { return 720; }
     default boolean compatibleProfile() {

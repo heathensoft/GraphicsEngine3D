@@ -1,4 +1,4 @@
-package no.fredahl.engine.utils;
+package no.fredahl.engine.utility;
 
 import org.lwjgl.BufferUtils;
 

@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL41.GL_FIXED;
  */
 
 
-public class Attribute implements Comparable<Attribute>{
+public class VertexAttribute implements Comparable<VertexAttribute>{
     
     
     public enum Type {
@@ -43,11 +43,11 @@ public class Attribute implements Comparable<Attribute>{
     private final int comp;
     private final boolean norm;
     
-    public Attribute(int index, Type type) {
+    public VertexAttribute(int index, Type type) {
         this(index,type.type,type.comp,type.norm);
     }
     
-    private Attribute(int index, int type, int comp, boolean norm) {
+    private VertexAttribute(int index, int type, int comp, boolean norm) {
         this.index = index;
         this.type = type;
         this.comp = comp;
@@ -102,7 +102,7 @@ public class Attribute implements Comparable<Attribute>{
     }
     
     @Override
-    public int compareTo(Attribute o) {
+    public int compareTo(VertexAttribute o) {
         return Integer.compare(this.index,o.index);
     }
     

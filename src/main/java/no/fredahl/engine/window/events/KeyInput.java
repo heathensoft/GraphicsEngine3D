@@ -9,6 +9,10 @@ import java.util.concurrent.BlockingQueue;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
+ *
+ * Enqueues key state-changes only.
+ * On release the enqueued key-value is negative
+ *
  * @author Frederik Dahl
  * 21/10/2021
  */
@@ -16,20 +20,25 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class KeyInput extends GLFWKeyCallback {
     
-    private volatile boolean containsEvents;
-    private final BlockingQueue<KeyEvent> eventQueue = new ArrayBlockingQueue<>(16);
+    private boolean active;
+    private boolean containsEvents;
+    private final BlockingQueue<Integer> eventQueue = new ArrayBlockingQueue<>(16);
+    private int lastKey = 0;
     
     @Override
     public void invoke(long window, int key, int scancode, int action, int mods) {
-    
-        if (key == GLFW_KEY_E && action == GLFW_REPEAT) {
         
+        if (key != GLFW_KEY_UNKNOWN && action != GLFW_REPEAT) {
+            
+            key = action == GLFW_PRESS ? key : -key;
+            
+            if (key == lastKey) return;
+            
+            if (eventQueue.offer(lastKey = key)) containsEvents = true;
         }
-        
-        if (eventQueue.offer(new KeyEvent(key, scancode, action, mods))) containsEvents = true;
     }
     
-    public void collect(Collection<KeyEvent> collection) {
+    public void collect(Collection<Integer> collection) {
         eventQueue.drainTo(collection);
         containsEvents = false;
     }

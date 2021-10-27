@@ -3,12 +3,13 @@ package no.fredahl.examples.triangle;
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
 import no.fredahl.engine.graphics.*;
-import no.fredahl.engine.graphics.Attribute;
+import no.fredahl.engine.graphics.VertexAttribute;
 import no.fredahl.engine.graphics.BufferObject;
 import no.fredahl.engine.graphics.VertexAttributeArray;
-import no.fredahl.engine.utils.IO;
+import no.fredahl.engine.utility.IO;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
+import no.fredahl.engine.window.events.KeyInput;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -25,18 +26,15 @@ public class HelloTriangle implements Application {
     
     ShaderProgram program;
     VertexAttributeArray vao;
-    Attribute positions;
+    VertexAttribute positions;
     BufferObject vbo;
     
     @Override
     public void start(Window window) throws Exception{
-        
         String vertexShaderPath = IO.projectPath("vertex.glsl","res","triangle");
         String fragmentShaderPath = IO.projectPath("fragment.glsl","res","triangle");
-    
         ShaderSource fragmentShader = new ShaderSource(GL_FRAGMENT_SHADER,fragmentShaderPath);
         ShaderSource vertexShader = new ShaderSource(GL_VERTEX_SHADER,vertexShaderPath);
-        
         program = new ShaderProgram();
         program.attach(fragmentShader,vertexShader);
         program.compile();
@@ -49,24 +47,19 @@ public class HelloTriangle implements Application {
                 0.5f, -0.5f, 0.0f
         };
         
-        
-    
         FloatBuffer verticesBuffer = null;
         
         try {
             verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
             verticesBuffer.put(vertices).flip();
-    
             vao = new VertexAttributeArray();
             vao.bind();
             vbo = new BufferObject(GL_ARRAY_BUFFER,GL_STATIC_DRAW);
             vbo.bind();
             vbo.bufferData(verticesBuffer);
-            
-            positions = new Attribute(0,Attribute.Type.POSITION_3D);
+            positions = new VertexAttribute(0, VertexAttribute.Type.POSITION_3D);
             positions.enable();
             positions.attributePointer(0,0);
-            
             vbo.unbind();
             vao.unbind();
             
@@ -75,6 +68,11 @@ public class HelloTriangle implements Application {
                 MemoryUtil.memFree(verticesBuffer);
             }
         }
+    }
+    
+    @Override
+    public void input() {
+    
     }
     
     @Override
@@ -106,6 +104,7 @@ public class HelloTriangle implements Application {
             public String windowTitle() {
                 return "Triangle";
             }
+            
         });
     }
 }

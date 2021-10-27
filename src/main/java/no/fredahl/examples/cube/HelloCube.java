@@ -21,6 +21,11 @@ public class HelloCube implements Application {
     }
     
     @Override
+    public void input() {
+    
+    }
+    
+    @Override
     public void update(float delta) {
     
     }

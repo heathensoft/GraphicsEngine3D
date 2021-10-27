@@ -17,6 +17,8 @@ public class Color {
     protected Vector4f normalized;
     private float packed;
     
+    public static final Color BLACK = new Color(0,0,0,1);
+    
     public Color() {
         this(1.0f,1.0f,1.0f,1.0f);
     }

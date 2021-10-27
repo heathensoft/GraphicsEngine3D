@@ -14,122 +14,77 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 
 public interface GLFWindow {
     
+    /**
+     * Makes OpenGL-context current in the calling thread
+     */
+    void initialize();
     
-    void initialize(); // Makes context current in calling thread
-    
-    // Any thread
     default void signalToClose() {
         glfwSetWindowShouldClose(windowHandle(),true);
     }
-    // Any thread
     default boolean shouldClose() {
         return glfwWindowShouldClose(windowHandle());
     }
-    // Any thread
     default void swapBuffers() {
         glfwSwapBuffers(windowHandle());
     }
-    // Context thread
     default void setClearColor(Color color) {
         glClearColor(color.r(),color.g(),color.b(),color.a());
     }
-    // Main thread only
-    default void waitEvents() {
-        glfwWaitEvents();
-    }
-    // Main thread only
-    default void show() {
-        glfwShowWindow(windowHandle());
-    }
-    // Main thread only
-    default void hide() {
-        glfwHideWindow(windowHandle());
-    }
-    // Main thread only
-    default void focus() {
-        glfwFocusWindow(windowHandle());
-    }
-    // Main thread only
-    default void maximize() {
-        glfwMaximizeWindow(windowHandle());
-    }
-    // Main thread only
-    default void minimize() {
-        glfwIconifyWindow(windowHandle());
-    }
-    // Main thread only
-    default void restore() {
-        glfwRestoreWindow(windowHandle());
-    }
-    
-    void create(Options options) throws Exception; // Main thread only.
-    
-    void terminate(); // Main thread only.
-    
-    void toggleVsync(boolean on); // context thread
-    
-    void lockAspectRatio(boolean lock); // any thread
-    
-    void updateViewport(); // any thread
-    
-    void centerWindow(); // Main thread
-    
-    void windowed(int width, int height); // Main thread
-    
-    void fullscreen(int width, int height); // Main thread
-    
-    boolean isWindowed(); // any thread
-    
-    boolean vsyncEnabled(); // any thread
-    
-    boolean isMinimized(); // any thread
-    
-    long windowHandle(); // any thread
-    
-    long monitorHandle(); // any thread
-    
+    void waitEvents(float seconds);
+    void show();
+    void hide();
+    void focus();
+    void maximize();
+    void minimize();
+    void restore();
+    void create(Options options) throws Exception;
+    void terminate();
+    void setWindowTitle(String title);
+    void toggleVsync(boolean on);
+    void lockAspectRatio(boolean lock);
+    void updateViewport();
+    void centerWindow();
+    void windowed(int width, int height);
+    void fullscreen(int width, int height);
+    boolean isWindowed();
+    boolean vsyncEnabled();
+    boolean isMinimized();
+    long windowHandle();
+    long monitorHandle();
     int windowW();
-    
     int windowH();
-    
     int windowX();
-    
     int windowY();
-    
     int frameBufferW();
-    
     int frameBufferH();
-    
     int viewportW();
-    
     int viewportH();
-    
     int viewportX();
-    
     int viewportY();
-    
     float aspectRatio();
-    
     float viewportInvW();
-    
     float viewportInvH();
     
-    Viewport viewport(); // any thread
-    
-    // options is used for engine.window initialization only.
-    // changing options will not change the engine.window.
-    // but you could set options, and save on exit.
-    // the options will take effect after restart.
+    // options is used for initialization only.
+    // changing options will not change the window.
+    // but you could set options then and save on exit.
+    // the options would then take effect after restart.
     
     Options options(); // any thread
     
     // Display related callbacks are executed independently from glfwPollEvents.
-    // i.e. a engine.window resize callback is not triggered on pollEvents
+    // i.e. an engine.window resize callback is not triggered on pollEvents
     
     KeyInput keyInput(); // any thread
     CharInput charInput(); // any thread
     MouseButtons mouseButtons(); // any thread
     MousePosition mousePosition(); // any thread
     MouseScroll mouseScroll(); // any thread
+    void setKeyInput(KeyInput callback);
+    void setCharInput(CharInput callback);
+    void setMouseButtons(MouseButtons callback);
+    void setMousePosition(MousePosition callback);
+    void setMouseScroll(MouseScroll callback);
     
 }
