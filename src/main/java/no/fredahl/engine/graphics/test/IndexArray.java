@@ -1,5 +1,6 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.engine.graphics.test;
 
+import no.fredahl.engine.graphics.BufferObject;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
@@ -16,13 +17,13 @@ import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
  */
 
 
-public class IndexArray extends BufferObject{
+public class IndexArray extends BufferObject {
     
     private final int mode;
-    private final int type;
+    private int type;
     
     
-    protected IndexArray(byte[] indices, int mode) {
+    public IndexArray(byte[] indices, int mode) {
         super(GL_ELEMENT_ARRAY_BUFFER,GL_STATIC_DRAW);
         this.type = GL_UNSIGNED_BYTE;
         this.mode = mode;
@@ -38,7 +39,7 @@ public class IndexArray extends BufferObject{
         }
     }
     
-    protected IndexArray(short[] indices, int mode) {
+    public IndexArray(short[] indices, int mode) {
         super(GL_ELEMENT_ARRAY_BUFFER,GL_STATIC_DRAW);
         this.type = GL_UNSIGNED_SHORT;
         this.mode = mode;
@@ -55,7 +56,7 @@ public class IndexArray extends BufferObject{
         
     }
     
-    protected IndexArray(int[] indices, int mode) {
+    public IndexArray(int[] indices, int mode) {
         super(GL_ELEMENT_ARRAY_BUFFER,GL_STATIC_DRAW);
         this.type = GL_UNSIGNED_INT;
         this.mode = mode;

@@ -1,6 +1,8 @@
 package no.fredahl.engine.graphics;
 
 
+import org.lwjgl.system.MemoryUtil;
+
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -25,6 +27,58 @@ public class BufferObject {
         this.id = glGenBuffers();
         this.target = target;
         this.usage = usage;
+    }
+    
+    public void bufferData(byte[] data) {
+        ByteBuffer buffer = null;
+        try {
+            buffer = MemoryUtil.memAlloc(data.length);
+            buffer.put(data).flip();
+            bufferData(buffer);
+            
+        }finally {
+            if (buffer != null)
+                MemoryUtil.memFree(buffer);
+        }
+    }
+    
+    public void bufferData(short[] data) {
+        ShortBuffer buffer = null;
+        try {
+            buffer = MemoryUtil.memAllocShort(data.length);
+            buffer.put(data).flip();
+            bufferData(buffer);
+            
+        }finally {
+            if (buffer != null)
+                MemoryUtil.memFree(buffer);
+        }
+    }
+    
+    public void bufferData(int[] data) {
+        IntBuffer buffer = null;
+        try {
+            buffer = MemoryUtil.memAllocInt(data.length);
+            buffer.put(data).flip();
+            bufferData(buffer);
+        }finally {
+            if (buffer != null){
+                MemoryUtil.memFree(buffer);
+            }
+            
+        }
+    }
+    
+    public void bufferData(float[] data) {
+        FloatBuffer buffer = null;
+        try {
+            buffer = MemoryUtil.memAllocFloat(data.length);
+            buffer.put(data).flip();
+            bufferData(buffer);
+        }finally {
+            if (buffer != null)
+                MemoryUtil.memFree(buffer);
+        }
     }
     
     public void bufferData(int bytes) {
@@ -68,7 +122,7 @@ public class BufferObject {
     }
     
     public void unbind() {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(target, 0);
     }
     
     public void free() {
