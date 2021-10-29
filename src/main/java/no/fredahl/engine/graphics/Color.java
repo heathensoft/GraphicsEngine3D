@@ -12,19 +12,22 @@ import org.joml.Vector4f;
 
 public class Color {
     
-    private static final float INV = 0.003921569f; // (1 / 255)
-
+    public static final Color WHITE = new Color(1.0f,1.0f,1.0f,1.0f);
+    public static final Color BLACK = new Color(0.0f,0.0f,0.0f,1.0f);
+    public static final Color RED = new Color(1.0f,0.0f,0.0f,1.0f);
+    public static final Color GREEN = new Color(0.0f,1.0f,0.0f,1.0f);
+    public static final Color BLUE = new Color(0.0f,0.0f,1.0f,1.0f);
+    
+    private static final float INV = 0.003921569f;
     protected Vector4f normalized;
     private float packed;
-    
-    public static final Color BLACK = new Color(0,0,0,1);
     
     public Color() {
         this(1.0f,1.0f,1.0f,1.0f);
     }
     
     public Color(Vector4f v) {
-        this(v.x,v.y,v.x,v.w);
+        this(v.x,v.y,v.z,v.w);
     }
     
     public Color(int r, int g, int b, int a) {
@@ -62,7 +65,7 @@ public class Color {
     }
     
     private int rgba(float c) {
-        return (int) c * 255;
+        return (int) (c * 255);
     }
     
     /* Encodes the ABGR int color as a float. The alpha is compressed to use only even numbers between 0-254 to avoid using bits
@@ -71,9 +74,9 @@ public class Color {
     
     private void setFloatBits() {
         final int r = rgba(normalized.x);
-        final int g = rgba(normalized.x);
-        final int b = rgba(normalized.x);
-        final int a = rgba(normalized.x);
+        final int g = rgba(normalized.y);
+        final int b = rgba(normalized.z);
+        final int a = rgba(normalized.w);
         final int color = a << 24 | b << 16 | g << 8 | r;
         packed = Float.intBitsToFloat(color & 0xfeffffff);
     }
@@ -110,6 +113,7 @@ public class Color {
         return this;
     }
     
+    // todo: these are not correct.
     public Color mix(Color color) {
         normalized.add(color.normalized);
         normalized.mul(0.5f);
@@ -177,9 +181,9 @@ public class Color {
     @Override
     public int hashCode () {
         final float r = normalized.x;
-        final float g = normalized.x;
-        final float b = normalized.x;
-        final float a = normalized.x;
+        final float g = normalized.y;
+        final float b = normalized.z;
+        final float a = normalized.w;
         int result = (r != +0.0f ? Float.floatToIntBits(r) : 0);
         result = 31 * result + (g != +0.0f ? Float.floatToIntBits(g) : 0);
         result = 31 * result + (b != +0.0f ? Float.floatToIntBits(b) : 0);

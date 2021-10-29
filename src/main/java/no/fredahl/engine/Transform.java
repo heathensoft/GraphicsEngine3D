@@ -11,6 +11,7 @@ import org.joml.Vector3f;
 
 public class Transform {
     
+    private final Vector3f axis;
     private final Matrix4f model;
     private final Vector3f pos;
     private final Vector3f rot;
@@ -23,6 +24,7 @@ public class Transform {
         this.pos = position;
         this.rot = rotation;
         this.scale = scale;
+        this.axis = new Vector3f();
         this.model = new Matrix4f();
         this.dirty = true;
     }
@@ -47,6 +49,7 @@ public class Transform {
     public Matrix4f modelView(Matrix4f view, Matrix4f dest) {
         return dest.set(view).mul(model());
     }
+    
     
     public void translate(float x, float y, float z) {
         pos.x += x;

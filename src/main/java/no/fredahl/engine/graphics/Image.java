@@ -38,19 +38,27 @@ public class Image {
     
     
     public static Image fromResource(String imagePath) {
+        return fromResource(imagePath,false);
+    }
+    
+    public static Image fromResource(String imagePath, boolean v_flip) {
         
         Image image = new Image();
         ByteBuffer imageBuffer;
+        
+        
         try {
             imageBuffer = resourceToBuffer(imagePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        
         try (MemoryStack stack = stackPush()) {
             IntBuffer w = stack.mallocInt(1);
             IntBuffer h = stack.mallocInt(1);
             IntBuffer c = stack.mallocInt(1);
     
+            
             if (!stbi_info_from_memory(imageBuffer, w, h, c)) {
                 throw new RuntimeException("Failed to read image information: " + stbi_failure_reason());
             } else System.out.println("OK with reason: " + stbi_failure_reason());
@@ -58,13 +66,17 @@ public class Image {
             System.out.println("Image height: " + h.get(0));
             System.out.println("Image components: " + c.get(0));
             System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer));
-    
-            stbi_set_flip_vertically_on_load(true);
+            
+            stbi_set_flip_vertically_on_load(v_flip);
+            
             // Decode the image
             image.data = stbi_load_from_memory(imageBuffer, w, h, c, 0);
             if (image.get() == null) {
                 throw new RuntimeException("Failed to load image: " + stbi_failure_reason());
             }
+            
+            
+            
             image.w = w.get(0);
             image.h = h.get(0);
             image.c = c.get(0);

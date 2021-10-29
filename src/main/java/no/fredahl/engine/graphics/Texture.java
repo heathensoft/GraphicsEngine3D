@@ -74,14 +74,15 @@ public class Texture {
                 }
                 break;
             case 4:
-                f = GL_RGBA8;
-                fi = GL_RGBA;
+                f = GL_RGBA;
+                fi = GL_RGBA8;
                 break;
             default: throw new RuntimeException("Unsupported format");
         }
         id = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, id);
         glPixelStorei(GL_UNPACK_ALIGNMENT,stride);
+        System.out.println(fi + " " + f);
         config.upload(fi, w, h, f, image.get());
         glBindTexture(GL_TEXTURE_2D,0);
         image.free();
