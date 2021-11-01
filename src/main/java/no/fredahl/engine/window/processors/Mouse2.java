@@ -17,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Mouse2 {
     
-    public static final int NUM_BUTTONS = 3;
+    public static final int BUTTONS = 3;
     
     public static final int LEFT  = GLFW_MOUSE_BUTTON_LEFT;
     public static final int RIGHT = GLFW_MOUSE_BUTTON_RIGHT;
@@ -25,113 +25,96 @@ public class Mouse2 {
     
     private final Window window;
     
-    private final MouseEnterEvents mouseEnterEvents; // enterEvents
-    private final MouseHoverEvents mouseHoverEvents;
-    private final MousePressEvents mousePressEvents;
-    private final MouseScrollEvents mouseScrollEvents;
+    private final MouseEnterEvents enterEvents;
+    private final MouseHoverEvents hoverEvents;
+    private final MousePressEvents pressEvents;
+    private final MouseScrollEvents scrollEvents;
     
-    private final Vector2d currentScreenPos = new Vector2d();
-    private final Vector2d previousScreenPos = new Vector2d();
-    private final Vector2d currentViewportPos = new Vector2d();
-    private final Vector2d previousViewportPos = new Vector2d();
-    private final Vector2d deltaViewportVec = new Vector2d();
-    private final Vector2d deltaScreenVec = new Vector2d();
+    private final Vector2d currentScreen = new Vector2d();
+    private final Vector2d prevScreen = new Vector2d();
+    private final Vector2d currentVP = new Vector2d();
+    private final Vector2d prevVP = new Vector2d();
+    private final Vector2d tmp1 = new Vector2d();
+    private final Vector2d ndc = new Vector2d();
+    private final Vector2d dt = new Vector2d();
     
-    private final boolean[] buttonPressedCurrent = new boolean[NUM_BUTTONS];
-    private final boolean[] buttonPressedPrevious = new boolean[NUM_BUTTONS];
-    private final boolean[] mouseDragging = new boolean[NUM_BUTTONS];
+    private final boolean[] current = new boolean[BUTTONS];
+    private final boolean[] previous = new boolean[BUTTONS];
+    private final boolean[] dragging = new boolean[BUTTONS];
     
-    private final Vector2d[] dragOriginsViewport = new Vector2d[NUM_BUTTONS];
-    private final Vector2d[] dragOriginsScreen = new Vector2d[NUM_BUTTONS];
+    private final Vector2d[] dragOrigin = new Vector2d[BUTTONS];
     
-    private final float[] dragTimers = new float[NUM_BUTTONS];
+    private final float[] timer = new float[BUTTONS];
     public float dragSensitivity = 5.0f;
     
-    private final Vector2d tmp1 = new Vector2d();
+    
     
     private MouseListener listener;
     
     private boolean cursorInWindow;
-    private int scroll;
     
     public Mouse2(Window window) {
-        
         this.window = window;
-        
-        this.mouseEnterEvents = window.mouseEnterEvents();
-        this.mouseHoverEvents = window.mouseHoverEvents();
-        this.mousePressEvents = window.mousePressEvents();
-        this.mouseScrollEvents = window.mouseScrollEvents();
-        
-        for (int button = 0; button < NUM_BUTTONS; button++) {
-            dragOriginsScreen[button] = new Vector2d();
-        }
+        this.enterEvents = window.mouseEnterEvents();
+        this.hoverEvents = window.mouseHoverEvents();
+        this.pressEvents = window.mousePressEvents();
+        this.scrollEvents = window.mouseScrollEvents();
     }
     
     public void collect(float delta) {
-    
-        scroll = mouseScrollEvents.value();
-        cursorInWindow = mouseEnterEvents.isInWindow();
-    
-        boolean buttonStateChange = false;
-        boolean cursorStateChange = false;
-    
-        System.arraycopy(
-                buttonPressedCurrent, 0,
-                buttonPressedPrevious, 0,
-                NUM_BUTTONS);
-    
-        for (int button = 0; button < NUM_BUTTONS; button++) {
-            buttonPressedCurrent[button] = mousePressEvents.isPressed(button);
-            if (buttonPressedCurrent[button] != buttonPressedPrevious[button]){
-                buttonStateChange = true;
-            }
-        }
-    
-        previousScreenPos.set(currentScreenPos);
-        currentScreenPos.set(mouseHoverEvents.x(),window.windowH() - mouseHoverEvents.y());
-        // When dragging, the mouse vector seems to register when off-screen.
-        // So we bind the position to our window. We do the same for viewport coordinates below
-        currentScreenPos.x = Math.min(window.windowW(),Math.max(currentScreenPos.x,0));
-        currentScreenPos.y = Math.min(window.windowH(),Math.max(currentScreenPos.y,0));
-    
-        if (!previousScreenPos.equals(currentScreenPos,0.000d))
-            cursorStateChange = true;
-    
-        if (cursorStateChange) {
-            previousViewportPos.set(currentViewportPos);
-            // if the viewport fits the window (integer values)
-            // we set the viewport coordinates to equal screen coordinates
-            if (window.windowW() == window.viewportW() && window.windowH() == window.viewportH()) {
-                currentViewportPos.set(currentScreenPos);
-            
-            } else {
-                final double viewportOffsetX = currentScreenPos.x - window.viewportX();
-                final double viewportOffsetY = currentScreenPos.y - window.viewportY();
-                final double screenToViewportRatioX = window.windowW() * (double)window.viewportInvW();
-                final double screenToViewportRatioY = window.windowH() * (double)window.viewportInvH();
-            
-                currentViewportPos.set(
-                        viewportOffsetX * screenToViewportRatioX,
-                        viewportOffsetY * screenToViewportRatioY);
-            
-                final double maxX = window.viewportW() * screenToViewportRatioX;
-                final double maxY = window.viewportH() * screenToViewportRatioY;
-                currentViewportPos.x = Math.min(maxX,Math.max(currentViewportPos.x,0));
-                currentViewportPos.y = Math.min(maxY,Math.max(currentViewportPos.y,0));
-            }
-            tmp1.set(currentScreenPos);
-            deltaScreenVec.set(tmp1.sub(previousScreenPos));
-            tmp1.set(currentViewportPos);
-            deltaViewportVec.set(tmp1.sub(previousViewportPos));
-        }
-        else {
-            deltaScreenVec.zero();
-            deltaViewportVec.zero();
-        }
-    
         
-    
+        prevScreen.set(currentScreen);
+        currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
+        currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
+        currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
+        
+        if (!prevScreen.equals(currentScreen,0.0001d)) {
+            prevVP.set(currentVP);
+            if (window.windowW() == window.viewportW() && window.windowH() == window.viewportH()) {
+                currentVP.set(currentScreen);
+            } else {
+                final double offsetX = currentScreen.x - window.viewportX();
+                final double offsetY = currentScreen.y - window.viewportY();
+                final double ratioX = window.windowW() * (double)window.viewportInvW();
+                final double ratioY = window.windowH() * (double)window.viewportInvH();
+                final double maxX = window.viewportW() * ratioX;
+                final double maxY = window.viewportH() * ratioY;
+                currentVP.set(offsetX * ratioX, offsetY * ratioY);
+                currentVP.x = Math.min(maxX,Math.max(currentVP.x,0));
+                currentVP.y = Math.min(maxY,Math.max(currentVP.y,0));
+            }
+            tmp1.set(currentVP);
+            dt.set(tmp1.sub(prevVP));
+            ndc.x = 2 * currentVP.x * window.viewportInvW() - 1;
+            ndc.y = 2 * currentVP.y * window.viewportInvH() - 1;
+            listener.hover(currentVP.x,currentVP.y,dt.x,dt.y,ndc.x,ndc.y);
+        }
+        else dt.zero();
+        
+        for (int b = 0; b < BUTTONS; b++) {
+            previous[b] = current[b];
+            current[b] = pressEvents.isPressed(b);
+            if (current[b]) {
+                timer[b] += delta * dragSensitivity;
+                if (!previous[b]) {
+                    listener.click(b,currentVP.x,currentVP.y,ndc.x,ndc.y);
+                    dragOrigin[b] = currentVP;
+                }
+                else if (timer[b] > 1) {
+                    if (!dragging[b]) {
+                        dragging[b] = true;
+                        listener.dragStart(b, currentVP.x, currentVP.y);
+                    } else {
+                        tmp1.set(currentVP).sub(dragOrigin[b]);
+                        listener.dragging(b,tmp1.x,tmp1.y,dt.x,dt.y);
+                    }
+                }
+            } else if (dragging[b]) {
+                dragging[b] = false;
+                listener.dragRelease(b,currentVP.x,currentVP.y);
+            }
+        }
+        listener.scroll(scrollEvents.value(),currentVP.x,currentVP.y);
     }
     
     
