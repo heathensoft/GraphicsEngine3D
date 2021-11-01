@@ -77,6 +77,8 @@ Input Event handling layers:
 OS | GLFW  | Engine | Engine | Application
 ------------ | ------------- | ------------- | ------------- | -------------
 Event --> | Polling -->|Callback -->|Event -->|Prosessor
+
+
 This layering is somewhat blurred, but the event-chain is more or less:
 
 
