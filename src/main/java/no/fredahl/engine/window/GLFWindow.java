@@ -79,11 +79,13 @@ public interface GLFWindow {
     KeyPressEvents keyPressEvents(); // any thread
     CharPressEvents charPressEvents(); // any thread
     MousePressEvents mousePressEvents(); // any thread
+    MouseEnterEvents mouseEnterEvents(); // any thread
     MouseHoverEvents mouseHoverEvents(); // any thread
     MouseScrollEvents mouseScrollEvents(); // any thread
     void setKeyPressCallback(KeyPressEvents callback);
     void setCharPressCallback(CharPressEvents callback);
     void setMousePressCallback(MousePressEvents callback);
+    void setMouseEnterCallback(MouseEnterEvents callback);
     void setMouseHoverCallback(MouseHoverEvents callback);
     void setMouseScrollCallback(MouseScrollEvents callback);
     

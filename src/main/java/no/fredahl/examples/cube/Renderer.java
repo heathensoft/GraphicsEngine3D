@@ -1,11 +1,10 @@
 package no.fredahl.examples.cube;
 
-import no.fredahl.engine.Camera;
+import no.fredahl.engine.math.Camera;
 import no.fredahl.engine.graphics.ShaderProgram;
 import no.fredahl.engine.graphics.ShaderSource;
 import no.fredahl.engine.utility.IO;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 public class Renderer {
     
     private final ShaderProgram program;
-    private final Matrix4f projectionMatrix;
     private final Matrix4f modelView;
     
     public Renderer() throws Exception{
@@ -41,7 +39,6 @@ public class Renderer {
         program.createUniform("modelViewMatrix");
         program.createUniform("texture_sampler");
         
-        projectionMatrix = new Matrix4f();
         modelView = new Matrix4f();
         glEnable(GL_DEPTH_TEST);
     
@@ -49,13 +46,11 @@ public class Renderer {
     
     public void render(List<Cube> entities, Camera camera) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
         program.bind();
         program.setUniform("texture_sampler", 0);
-        camera.perspective(projectionMatrix);
-        program.setUniform("projectionMatrix", projectionMatrix);
+        program.setUniform("projectionMatrix", camera.projection);
         for (Cube cube : entities) {
-            camera.modelView(cube.transform.model(),modelView);
+            cube.transform.modelView(camera.view,modelView);
             program.setUniform("modelViewMatrix", modelView);
             cube.mesh.render();
         }

@@ -16,9 +16,23 @@ plugins {
 
 version 'SNAPSHOT'
 
+import org.gradle.internal.os.OperatingSystem
+
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.10.2"
-project.ext.lwjglNatives = "natives-windows"
+project.ext.jomlPrimitives = "1.10.0"
+
+switch (OperatingSystem.current()) {
+    case OperatingSystem.LINUX:
+        project.ext.lwjglNatives = "natives-linux"
+        break
+    case OperatingSystem.MAC_OS:
+        project.ext.lwjglNatives = "natives-macos"
+        break
+    case OperatingSystem.WINDOWS:
+        project.ext.lwjglNatives = "natives-windows"
+        break
+}
 
 repositories {
 
@@ -43,6 +57,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     implementation "org.joml:joml:${jomlVersion}"
+    implementation "org.joml:joml-primitives:${jomlPrimitives}"
 
     /*
     // This dependency is used by the application.

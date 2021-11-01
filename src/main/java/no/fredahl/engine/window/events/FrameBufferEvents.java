@@ -12,6 +12,7 @@ import no.fredahl.engine.window.Viewport;
 public class FrameBufferEvents extends GLFWFramebufferSizeCallback {
     
     private final Viewport v;
+    private boolean viewportEvent = true;
     private int w;
     private int h;
     
@@ -24,9 +25,10 @@ public class FrameBufferEvents extends GLFWFramebufferSizeCallback {
     @Override
     public void invoke(long window, int w, int h) {
         if (w > 0 && h > 0) {
-            v.update(w, h);
+            this.v.update(w, h);
             this.h = h;
             this.w = w;
+            this.viewportEvent = true;
         }
         
     }
@@ -37,5 +39,13 @@ public class FrameBufferEvents extends GLFWFramebufferSizeCallback {
     
     public int width() {
         return w;
+    }
+    
+    public boolean viewportEvent() {
+        return viewportEvent;
+    }
+    
+    public void reset() {
+        viewportEvent = false;
     }
 }

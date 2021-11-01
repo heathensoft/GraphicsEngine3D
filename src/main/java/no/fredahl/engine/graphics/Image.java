@@ -75,8 +75,6 @@ public class Image {
                 throw new RuntimeException("Failed to load image: " + stbi_failure_reason());
             }
             
-            
-            
             image.w = w.get(0);
             image.h = h.get(0);
             image.c = c.get(0);

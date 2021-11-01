@@ -13,8 +13,8 @@ public class MouseScrollEvents extends GLFWScrollCallback {
     private int scroll = 0;
     
     @Override
-    public void invoke(long window, double xoffset, double yoffset) {
-        synchronized (this) { scroll += (int) yoffset; }
+    public void invoke(long window, double x, double y) {
+        synchronized (this) { scroll += (int) y; }
     }
     
     /**

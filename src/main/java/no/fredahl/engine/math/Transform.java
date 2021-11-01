@@ -1,4 +1,4 @@
-package no.fredahl.engine;
+package no.fredahl.engine.math;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -11,7 +11,6 @@ import org.joml.Vector3f;
 
 public class Transform {
     
-    private final Vector3f axis;
     private final Matrix4f model;
     private final Vector3f pos;
     private final Vector3f rot;
@@ -24,7 +23,6 @@ public class Transform {
         this.pos = position;
         this.rot = rotation;
         this.scale = scale;
-        this.axis = new Vector3f();
         this.model = new Matrix4f();
         this.dirty = true;
     }
@@ -71,7 +69,7 @@ public class Transform {
     }
     
     public void rotate(Vector3f rot) {
-        rotate(rot.x, rot.y,rot.z);
+        rotate(rot.x,rot.y,rot.z);
     }
     
     public void setPosition(float x, float y, float z) {
@@ -95,6 +93,11 @@ public class Transform {
     
     public void setRotation(Vector3f rot) {
         this.rot.set(rot);
+        dirty = true;
+    }
+    
+    public void setScale(float x, float y, float z) {
+        scale.set(x,y,z);
         dirty = true;
     }
     

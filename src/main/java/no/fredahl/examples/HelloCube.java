@@ -1,17 +1,16 @@
 package no.fredahl.examples;
 
-import no.fredahl.engine.Application;
-import no.fredahl.engine.Camera;
-import no.fredahl.engine.Engine;
+import no.fredahl.engine.*;
 import no.fredahl.engine.graphics.Texture;
+import no.fredahl.engine.math.PerspectiveCamera;
 import no.fredahl.engine.utility.IO;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.processors.Keyboard;
+import no.fredahl.engine.window.processors.Mouse;
 import no.fredahl.examples.cube.Cube;
 import no.fredahl.examples.cube.Mesh;
 import no.fredahl.examples.cube.Renderer;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,26 +25,19 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class HelloCube implements Application {
     
-    private Camera camera;
-    private Camera camera_1;
-    private Camera camera_2;
-    private Renderer renderer;
+    
+    private Mouse mouse;
     private Keyboard keyboard;
+    private PerspectiveCamera camera;
+    private Renderer renderer;
     private List<Cube> cubes;
     
     @Override
     public void start(Window window) throws Exception {
-        
-        keyboard = new Keyboard(window.keyPressEvents(),window.charPressEvents());
-        camera_1 = new Camera(window);
-        camera_2 = new Camera(
-                window,
-                new Vector3f(0,1.7f,1),
-                new Vector3f(25,0,0),
-                0.01f,
-                1000f,
-                (float)Math.toRadians(60.0f));
-        camera = camera_2;
+        mouse = new Mouse(window);
+        keyboard = new Keyboard(window);
+        camera = new PerspectiveCamera(window);
+        camera.update();
         renderer = new Renderer();
         cubes = new ArrayList<>();
     
@@ -72,27 +64,44 @@ public class HelloCube implements Application {
     }
     
     @Override
-    public void input() {
-        
+    public void input(float delta) {
         keyboard.collect();
-        if (keyboard.pressed(GLFW_KEY_ESCAPE)) Engine.get().exit();
-        if (keyboard.justPressed(GLFW_KEY_C,GLFW_KEY_LEFT_CONTROL)) {
-            if (camera == camera_1)
-                camera = camera_2;
-            else camera = camera_1;
+        mouse.collect(delta);
+        if (keyboard.justPressed(GLFW_KEY_ESCAPE)) Engine.get().exit();
+        if (keyboard.pressed(GLFW_KEY_D))
+            camera.strafeLeft(0.03f);
+        if (keyboard.pressed(GLFW_KEY_W))
+            camera.forward(0.03f);
+        if (keyboard.pressed(GLFW_KEY_S))
+            camera.backward(0.03f);
+        if (keyboard.pressed(GLFW_KEY_A))
+            camera.strafeRight(0.03f);
+    
+        for (int buttons = 0; buttons < Mouse.NUM_BUTTONS; buttons++) {
+            
+                //System.out.println(buttons);
+            //if (mouse.isDragging(buttons)) System.out.println(mouse.dragOriginScreenLeft);
         }
+        
     }
     
     @Override
     public void update(float delta) {
-        
-        float r = delta * 20;
+    
+        /*
+        float r = delta * 10;
         for (Cube cube : cubes)
             cube.transform.rotate(0,r,0);
+         */
+        
+        camera.update();
+    
+    
     }
     
     @Override
     public void render(float alpha) {
+        
         renderer.render(cubes, camera);
     }
     

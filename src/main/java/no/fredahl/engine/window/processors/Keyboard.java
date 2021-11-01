@@ -1,5 +1,6 @@
 package no.fredahl.engine.window.processors;
 
+import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.events.CharPressEvents;
 import no.fredahl.engine.window.events.KeyPressEvents;
 
@@ -23,11 +24,12 @@ public class Keyboard {
     private final CharPressEvents charPressEvents;
     private TextProcessor textProcessor;
     
-    public Keyboard(KeyPressEvents keyPressEvents, CharPressEvents charPressEvents) {
+    
+    public Keyboard(Window window) {
         this.keys = new boolean[GLFW_KEY_LAST];
         this.pkeys = new boolean[GLFW_KEY_LAST];
-        this.keyPressEvents = keyPressEvents;
-        this.charPressEvents = charPressEvents;
+        this.keyPressEvents = window.keyPressEvents();
+        this.charPressEvents = window.charPressEvents();
         this.charPressEvents.ignore(true);
         this.charPressEvents.clear();
     }

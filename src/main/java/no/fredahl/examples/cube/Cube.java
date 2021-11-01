@@ -1,6 +1,6 @@
 package no.fredahl.examples.cube;
 
-import no.fredahl.engine.Transform;
+import no.fredahl.engine.math.Transform;
 
 /**
  * @author Frederik Dahl

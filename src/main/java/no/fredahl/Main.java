@@ -1,7 +1,5 @@
 package no.fredahl;
 
-import org.joml.Math;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
@@ -13,38 +11,19 @@ import java.util.Arrays;
 
 public class Main {
     
-    public static class Attribute implements Comparable<Attribute> {
     
-        public int index;
-        
-        public Attribute(int index) {
-            this.index = index;
-        }
-        
-        @Override
-        public int compareTo(Attribute o) {
-            return Integer.compare(this.index,o.index);
-        }
+    public static boolean compare(float f1, float f2, float epsilon) {
+        return Math.abs(f1-f2) <= epsilon * Math.max(1.0f, Math.max(Math.abs(f1),Math.abs(f2)));
     }
     
     public static void main(String[] args) {
     
-        Attribute[] array;
+        float one = 0.0001f;
+        float two = 0.00009f;
         
-        array = sort(
-                new Attribute(2),
-                new Attribute(3),
-                new Attribute(0),
-                new Attribute(1));
-        
-        for (Attribute attribute : array) {
-            System.out.println(attribute.index);
-        }
-        
+        boolean equals = compare(one,two,0.00001f);
+        System.out.println(equals);
     }
     
-    public static Attribute[] sort(Attribute... attributes) {
-        Arrays.sort(attributes);
-        return attributes;
-    }
+    
 }

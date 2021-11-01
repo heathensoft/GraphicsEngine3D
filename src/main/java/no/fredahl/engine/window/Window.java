@@ -33,7 +33,6 @@ public class Window implements GLFWindow {
     private long monitor;
     private String windowTitle;
     private Viewport viewport;
-    private Options options;
     private final RequestQueue requestQueue;
     private GLFWErrorCallback errorCallback;
     private GLFWVidMode monitorDefaultVidMode;
@@ -42,6 +41,7 @@ public class Window implements GLFWindow {
     private CharPressEvents charPressEvents;
     private MousePressEvents mousePressEvents;
     private MouseHoverEvents mouseHoverEvents;
+    private MouseEnterEvents mouseEnterEvents;
     private MouseScrollEvents mouseScrollEvents;
     private WindowResizeEvents windowResizeEvents;
     private WindowPositionEvents windowPositionEvents;
@@ -121,6 +121,7 @@ public class Window implements GLFWindow {
     }
     
     public void create(Options options) throws Exception {
+        
         long current = Thread.currentThread().getId();
         if (current == glfwThread) {
             glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -137,7 +138,6 @@ public class Window implements GLFWindow {
             windowTitle = options.windowTitle();
             windowed = options.windowedMode();
             cullFace = options.cullFace();
-            this.options = options;
     
             final int desiredWidth = options.desiredResolutionWidth();
             final int desiredHeight = options.desiredResolutionHeight();
@@ -269,6 +269,8 @@ public class Window implements GLFWindow {
                 mouseScrollEvents.free();
             if (mousePressEvents != null)
                 mousePressEvents.free();
+            if (mouseEnterEvents != null)
+                mouseEnterEvents.free();
             if (mouseHoverEvents != null)
                 mouseHoverEvents.free();
             System.out.println("Window: terminating glfw");
@@ -351,6 +353,14 @@ public class Window implements GLFWindow {
     }
     
     @Override
+    public MouseEnterEvents mouseEnterEvents() {
+        if (mouseEnterEvents == null) {
+            mouseEnterEvents = new MouseEnterEvents();
+            requestQueue.newRequest(() -> glfwSetCursorEnterCallback(windowHandle(), mouseEnterEvents));
+        }return mouseEnterEvents;
+    }
+    
+    @Override
     public synchronized MouseHoverEvents mouseHoverEvents() {
         if (mouseHoverEvents == null) {
             mouseHoverEvents = new MouseHoverEvents();
@@ -407,6 +417,17 @@ public class Window implements GLFWindow {
         mouseHoverEvents = callback;
         if (mouseHoverEvents != null) {
             requestQueue.newRequest(() -> glfwSetCursorPosCallback(windowHandle(), mouseHoverEvents));
+        }
+    }
+    
+    @Override
+    public void setMouseEnterCallback(MouseEnterEvents callback) {
+        if (mouseEnterEvents == callback) return;
+        if (mouseEnterEvents != null)
+            mouseEnterEvents.free();
+        mouseEnterEvents = callback;
+        if (mouseEnterEvents != null) {
+            requestQueue.newRequest(() -> glfwSetCursorEnterCallback(windowHandle(), mouseEnterEvents));
         }
     }
     
@@ -476,12 +497,14 @@ public class Window implements GLFWindow {
     
     @Override
     public void updateViewport() {
-        glViewport(
-                viewport.x(),
-                viewport.y(),
-                viewport.width(),
-                viewport.height()
-        );
+        if (frameBufferEvents.viewportEvent()) {
+            glViewport(
+                    viewport.x(),
+                    viewport.y(),
+                    viewport.width(),
+                    viewport.height());
+            frameBufferEvents.reset();
+        }
     }
     
     @Override
@@ -576,9 +599,64 @@ public class Window implements GLFWindow {
     
     @Override
     public Options options() {
-        return options;
-    }
+        return new Options() {
+            
+            @Override
+            public String windowTitle() {
+                return windowTitle;
+            }
     
+            @Override
+            public int desiredResolutionWidth() {
+                return frameBufferW();
+            }
+    
+            @Override
+            public int desiredResolutionHeight() {
+                return frameBufferH();
+            }
+    
+            @Override
+            public boolean compatibleProfile() {
+                return compatibleProfile;
+            }
+    
+            @Override
+            public boolean verticalSynchronization() {
+                return vsync;
+            }
+    
+            @Override
+            public boolean lockAspectRatio() {
+                return lockAspectRatio;
+            }
+    
+            @Override
+            public boolean resizableWindow() {
+                return resizable;
+            }
+    
+            @Override
+            public boolean windowedMode() {
+                return windowed;
+            }
+    
+            @Override
+            public boolean showTriangles() {
+                return showTriangles;
+            }
+    
+            @Override
+            public boolean antialiasing() {
+                return antialiasing;
+            }
+    
+            @Override
+            public boolean cullFace() {
+                return cullFace;
+            }
+        };
+    }
     
     
     private boolean resolutionSupportedByMonitor(int resWidth, int resHeight) {

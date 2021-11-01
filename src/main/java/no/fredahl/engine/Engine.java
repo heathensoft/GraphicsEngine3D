@@ -15,7 +15,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Engine {
     
-    private static final int TARGET_UPS = 30;
+    private static final int TARGET_UPS = 60;
     private static final int TARGET_FPS = 60;
     private static final boolean CAP_FPS = true;
     private static final boolean SLEEP_ON_SYNC = true;
@@ -46,7 +46,8 @@ public class Engine {
                     frameTime = frames.frameTime();
                     accumulator += frameTime;
                     while (accumulator >= delta) {
-                        application.input();
+                        if (!window.isMinimized())
+                            application.input(delta);
                         application.update(delta);
                         frames.incUpsCount();
                         accumulator -= delta;
@@ -64,9 +65,7 @@ public class Engine {
                     frames.incFpsCount();
                     frames.update();
                     if (!window.vsyncEnabled()) {
-                        if (CAP_FPS) {
-                            sync(TARGET_FPS);
-                        }
+                        if (CAP_FPS) sync();
                     }
                 }
             }
@@ -131,11 +130,11 @@ public class Engine {
     }
     
     
-    private void sync(int targetFPS) {
+    private void sync() {
         
         double lastFrame = frames.lastFrame();
         double now = frames.timeSeconds();
-        float targetTime = 0.96f / targetFPS;
+        float targetTime = 0.96f / TARGET_FPS;
         
         while (now - lastFrame < targetTime) {
             if (SLEEP_ON_SYNC) {
