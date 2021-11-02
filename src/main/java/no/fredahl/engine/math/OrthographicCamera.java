@@ -25,8 +25,8 @@ public class OrthographicCamera extends Camera {
         final float bottom = - zoom * (window.viewportH() / 2f);
         final float top = zoom * (window.viewportH() / 2f);
         projection.ortho(left,right,bottom,top,Math.abs(near),Math.abs(far),false);
-        tmp2.set(position).add(direction);
-        view.lookAt(position,tmp2,up);
+        tmpV2.set(position).add(direction);
+        view.lookAt(position, tmpV2,up);
         combined.set(projection).mul(view);
         inverseCombined.set(combined).invert();
     }

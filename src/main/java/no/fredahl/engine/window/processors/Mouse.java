@@ -63,7 +63,6 @@ public class Mouse {
     private final Vector2d[] dragOrigin = new Vector2d[BUTTONS];
     private final float[] timer = new float[BUTTONS];
     public float dragSensitivity = 5.0f;
-    private boolean cursorInWindow;
     
     public Mouse(Window window) {
         this.window = window;
@@ -90,31 +89,22 @@ public class Mouse {
         currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
         currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
         currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
+    
+        if (!prevScreen.equals(currentScreen,0.0001d)) {
+            final double x = (currentScreen.x - window.viewportX()) * window.viewportInvW();
+            final double y = (currentScreen.y - window.viewportY()) * window.viewportInvH();
+            prevVP.set(currentVP);
+            currentVP.x = Math.min(1,Math.max(x,0));
+            currentVP.y = Math.min(1,Math.max(y,0));
+            ndc.x = 2 * currentVP.x - 1;
+            ndc.y = 2 * currentVP.y - 1;
+            currentVP.y /= window.aspectRatio();
+            tmp1.set(currentVP);
+            dt.set(tmp1.sub(prevVP));
+            listener.hover(currentVP.x,currentVP.y,dt.x,dt.y,ndc.x,ndc.y);
         
-        if (enterEvents.isInWindow()) {
-            if (!cursorInWindow) {
-                listener.onEnter();
-                cursorInWindow = true;
-            }
-            if (!prevScreen.equals(currentScreen,0.0001d)) {
-                final double x = (currentScreen.x - window.viewportX()) * window.viewportInvW();
-                final double y = (currentScreen.y - window.viewportY()) * window.viewportInvH();
-                prevVP.set(currentVP);
-                currentVP.x = Math.min(1,Math.max(x,0));
-                currentVP.y = Math.min(1,Math.max(y,0));
-                ndc.x = 2 * currentVP.x - 1;
-                ndc.y = 2 * currentVP.y - 1;
-                currentVP.y /= window.aspectRatio();
-                tmp1.set(currentVP);
-                dt.set(tmp1.sub(prevVP));
-                listener.hover(currentVP.x,currentVP.y,dt.x,dt.y,ndc.x,ndc.y);
-            }
-            else dt.zero();
-        }
-        else if (cursorInWindow) {
-            listener.onLeave();
-            cursorInWindow = false;
-        }
+        }else dt.zero();
+        
         for (int b = 0; b < BUTTONS; b++) {
             previous[b] = current[b];
             current[b] = pressEvents.isPressed(b);
@@ -195,12 +185,8 @@ public class Mouse {
         return 2 * currentScreen.y / window.windowH() - 1;
     }
     
-    public boolean cursorInWindow() {
-        return cursorInWindow;
-    }
-    
     /**
-     * For avoiding null-checks.
+     * to avoid null-checks.
      */
     private final static MouseListener defaultListener = new MouseListener() {
         
@@ -221,11 +207,6 @@ public class Mouse {
     
         @Override
         public void dragRelease(int button, double pX, double pY) {}
-    
-        @Override
-        public void onEnter() {}
-    
-        @Override
-        public void onLeave() {}
+        
     };
 }

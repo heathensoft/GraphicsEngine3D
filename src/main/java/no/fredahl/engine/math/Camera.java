@@ -26,8 +26,9 @@ public abstract class Camera {
     public final Vector3f direction = new Vector3f(0,0,-1);
     public final Vector3f up = new Vector3f(0,1,0);
     
-    protected final Vector3f tmp1 = new Vector3f();
-    protected final Vector3f tmp2 = new Vector3f();
+    protected final Vector3f tmpV1 = new Vector3f();
+    protected final Vector3f tmpV2 = new Vector3f();
+    protected final Matrix4f tmpM1 = new Matrix4f();
     
     public float near = 0.01f;
     public float far = 1000;
@@ -52,6 +53,13 @@ public abstract class Camera {
         up.rotateAxis(angle,xAxis,yAxis,zAxis);
     }
     
+    public void rotate(float x, float y) {
+        tmpV1.set(direction).cross(up);
+        tmpM1.identity().rotateY(x).rotate(y, tmpV1);
+        direction.mulProject(tmpM1);
+        up.mulProject(tmpM1);
+    }
+    
     public void rotate(float angle, Vector3f axis) {
         rotate(angle,axis.x,axis.y,axis.z);
     }
@@ -71,18 +79,18 @@ public abstract class Camera {
     }
     
     public void lookAt(float x, float y, float z) {
-        tmp1.set(x,y,z).sub(position).normalize();
-        if (tmp1.x != 0 && tmp1.y != 0 && tmp1.z != 0) {
-            float dot = tmp1.dot(up);
+        tmpV1.set(x,y,z).sub(position).normalize();
+        if (tmpV1.x != 0 && tmpV1.y != 0 && tmpV1.z != 0) {
+            float dot = tmpV1.dot(up);
             if (Math.abs(dot - 1f) < 0.000000001f) {
                 up.set(direction).mul(-1);
             }
             else if (Math.abs(dot + 1f) < 0.000000001f) {
                 up.set(direction);
             }
-            direction.set(tmp1);
-            tmp1.set(direction).cross(up);
-            up.set(tmp1).cross(direction).normalize();
+            direction.set(tmpV1);
+            tmpV1.set(direction).cross(up);
+            up.set(tmpV1).cross(direction).normalize();
         }
     }
     

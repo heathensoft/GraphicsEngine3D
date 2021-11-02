@@ -46,6 +46,8 @@ public class Renderer {
     
     public void render(List<Cube> entities, Camera camera) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Matrix4f test = new Matrix4f().rotate((float) Math.PI/4,0,0,1);
+        Matrix4f test2 = new Matrix4f();
         program.bind();
         program.setUniform("texture_sampler", 0);
         program.setUniform("projectionMatrix", camera.projection);

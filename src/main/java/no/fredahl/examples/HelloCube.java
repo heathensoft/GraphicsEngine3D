@@ -8,16 +8,13 @@ import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.processors.Keyboard;
 import no.fredahl.engine.window.processors.Mouse;
-import no.fredahl.engine.window.processors.MouseListener;
-import no.fredahl.engine.window.processors.MouseOld;
+import no.fredahl.examples.cube.Controller;
 import no.fredahl.examples.cube.Cube;
 import no.fredahl.examples.cube.Mesh;
 import no.fredahl.examples.cube.Renderer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * @author Frederik Dahl
@@ -27,20 +24,21 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class HelloCube implements Application {
     
-    
     private Mouse mouse;
-    private Keyboard keyboard;
+    private Controller controller;
     private PerspectiveCamera camera;
     private Renderer renderer;
     private List<Cube> cubes;
     
     @Override
     public void start(Window window) throws Exception {
-        mouse = new Mouse(window);
-        mouse.setListener(mouseListener);
-        keyboard = new Keyboard(window);
+        
+        Keyboard keyboard = new Keyboard(window);
         camera = new PerspectiveCamera(window);
         camera.update();
+        controller = new Controller(camera,keyboard);
+        mouse = new Mouse(window);
+        mouse.setListener(controller);
         renderer = new Renderer();
         cubes = new ArrayList<>();
     
@@ -68,38 +66,19 @@ public class HelloCube implements Application {
     
     @Override
     public void input(float delta) {
-        keyboard.collect();
+        controller.update(delta);
         mouse.collect(delta);
-        if (keyboard.justPressed(GLFW_KEY_ESCAPE)) Engine.get().exit();
-        if (keyboard.pressed(GLFW_KEY_D))
-            camera.strafeLeft(0.03f);
-        if (keyboard.pressed(GLFW_KEY_W))
-            camera.forward(0.03f);
-        if (keyboard.pressed(GLFW_KEY_S))
-            camera.backward(0.03f);
-        if (keyboard.pressed(GLFW_KEY_A))
-            camera.strafeRight(0.03f);
-        
-        
     }
     
     @Override
     public void update(float delta) {
-    
-        /*
         float r = delta * 10;
         for (Cube cube : cubes)
             cube.transform.rotate(0,r,0);
-         */
-        
-        camera.update();
-    
-    
     }
     
     @Override
     public void render(float alpha) {
-        
         renderer.render(cubes, camera);
     }
     
@@ -110,47 +89,6 @@ public class HelloCube implements Application {
             cube.mesh.free();
     }
     
-    private final MouseListener mouseListener = new MouseListener() {
-        @Override
-        public void hover(double x, double y, double dX, double dY, double nX, double nY) {
-        
-        }
-    
-        @Override
-        public void click(int button, double x, double y, double nX, double nY) {
-            //System.out.println(x + " , " + y);
-        }
-    
-        @Override
-        public void scroll(int value, double x, double y) {
-            //System.out.println(value);
-        }
-    
-        @Override
-        public void dragging(int button, double vX, double vY, double dX, double dY) {
-            System.out.println(vX + " , " + vY);
-        }
-    
-        @Override
-        public void dragStart(int button, double pX, double pY) {
-            //System.out.println(pX + " , " + pY);
-        }
-    
-        @Override
-        public void dragRelease(int button, double pX, double pY) {
-            //System.out.println(pX + " , " + pY);
-        }
-    
-        @Override
-        public void onEnter() {
-            //System.out.println("Enter");
-        }
-    
-        @Override
-        public void onLeave() {
-            System.out.println("Leave");
-        }
-    };
     
     public static void main(String[] args) {
         
@@ -158,7 +96,7 @@ public class HelloCube implements Application {
     
             @Override
             public boolean antialiasing() {
-                return false;
+                return true;
             }
     
             @Override

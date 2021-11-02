@@ -18,25 +18,6 @@ public class PerspectiveCamera extends Camera {
     }
     
     
-    public void forward(float amount) {
-        position.add(tmp1.set(direction).mul(amount));
-        
-    }
-    
-    public void backward(float amount) {
-        position.add(tmp1.set(direction).mul(-amount));
-    }
-    
-    public void strafeRight(float amount) {
-        tmp1.set(direction).rotateY(PI_HALF).mul(amount);
-        position.add(tmp1);
-    }
-    
-    public void strafeLeft(float amount) {
-        tmp1.set(direction).rotateY(PI_HALF).mul(-amount);
-        position.add(tmp1);
-    }
-    
     @Override
     public void update() {
         
@@ -46,8 +27,8 @@ public class PerspectiveCamera extends Camera {
                 Math.abs(near),
                 Math.abs(far),
                 false);
-        tmp2.set(position).add(direction);
-        view.identity().lookAt(position,tmp2,up);
+        tmpV2.set(position).add(direction);
+        view.identity().lookAt(position, tmpV2,up);
         combined.set(projection).mul(view);
         inverseCombined.set(combined).invert();
     }

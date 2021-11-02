@@ -20,9 +20,4 @@ public interface MouseListener {
     
     void dragRelease(int button, double pX, double pY);
     
-    void onEnter();
-    
-    void onLeave();
-    
-    
 }
