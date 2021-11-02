@@ -10,285 +10,222 @@ import org.joml.Vector2d;
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
+ * Versatile cursor-input processor.
+ *
+ * Used with the MouseListener interface, but can also be queried
+ * directly.
+ *
+ * Three coordinate-systems:
+ *
+ *  1. Screen.
+ *      Position in pixels. 0,0 in the lower left corner of the window
+ *  2. Viewport.
+ *      Position relative to the viewport. 0,0 in the lower left corner of the viewport.
+ *      Width: 0 -> 1, Height: 0 -> (1 / aspect-ratio)
+ *  3. NDC.
+ *      Normalized device coordinates. -1 to 1 with 0,0 as origin in the center of the window.
+ *      Both Screen NDC and viewport relative NDC
+ *
  * @author Frederik Dahl
- * 27/10/2021
+ * 01/11/2021
  */
 
 
 public class Mouse {
     
-    public static final int NUM_BUTTONS = 3;
+    public static final int BUTTONS = 3;
     
     public static final int LEFT  = GLFW_MOUSE_BUTTON_LEFT;
     public static final int RIGHT = GLFW_MOUSE_BUTTON_RIGHT;
     public static final int WHEEL = GLFW_MOUSE_BUTTON_MIDDLE;
     
+    private final boolean[] current = new boolean[BUTTONS];
+    private final boolean[] previous = new boolean[BUTTONS];
+    private final boolean[] dragging = new boolean[BUTTONS];
+    
+    private final MouseEnterEvents enterEvents;
+    private final MouseHoverEvents hoverEvents;
+    private final MousePressEvents pressEvents;
+    private final MouseScrollEvents scrollEvents;
+    
+    private final Vector2d currentScreen = new Vector2d();
+    private final Vector2d prevScreen = new Vector2d();
+    private final Vector2d currentVP = new Vector2d();
+    private final Vector2d prevVP = new Vector2d();
+    private final Vector2d tmp1 = new Vector2d();
+    private final Vector2d ndc = new Vector2d();
+    private final Vector2d dt = new Vector2d();
+    
     private final Window window;
     
-    private final MouseEnterEvents mouseEnterEvents;
-    private final MouseHoverEvents mouseHoverEvents;
-    private final MousePressEvents mousePressEvents;
-    private final MouseScrollEvents mouseScrollEvents;
+    private MouseListener listener = defaultListener;
     
-    private final Vector2d deltaScreenVec = new Vector2d();
-    private final Vector2d currentScreenPos = new Vector2d();
-    private final Vector2d previousScreenPos = new Vector2d();
-    private final Vector2d currentViewportPos = new Vector2d();
-    private final Vector2d previousViewportPos = new Vector2d();
-    private final Vector2d deltaViewportVec = new Vector2d();
-    
-    public final Vector2d dragOriginScreenLeft = new Vector2d();
-    public final Vector2d dragOriginScreenRight = new Vector2d();
-    public final Vector2d dragOriginScreenWheel = new Vector2d();
-    public final Vector2d dragOriginViewportLeft = new Vector2d();
-    public final Vector2d dragOriginViewportRight = new Vector2d();
-    public final Vector2d dragOriginViewportWheel = new Vector2d();
-    
-    private final boolean[] buttonPressedCurrent = new boolean[NUM_BUTTONS];
-    private final boolean[] buttonPressedPrevious = new boolean[NUM_BUTTONS];
-    private final boolean[] mouseDragging = new boolean[NUM_BUTTONS];
-    
-    private final float[] dragTimers = new float[NUM_BUTTONS];
+    private final Vector2d[] dragOrigin = new Vector2d[BUTTONS];
+    private final float[] timer = new float[BUTTONS];
     public float dragSensitivity = 5.0f;
-    
-    private final Vector2d tmp1 = new Vector2d();
-    
-    private int scroll;
     private boolean cursorInWindow;
     
-    
     public Mouse(Window window) {
-        this.mouseEnterEvents = window.mouseEnterEvents();
-        this.mouseHoverEvents = window.mouseHoverEvents();
-        this.mousePressEvents = window.mousePressEvents();
-        this.mouseScrollEvents = window.mouseScrollEvents();
         this.window = window;
-        
+        this.enterEvents = window.mouseEnterEvents();
+        this.hoverEvents = window.mouseHoverEvents();
+        this.pressEvents = window.mousePressEvents();
+        this.scrollEvents = window.mouseScrollEvents();
+        for (int b = 0; b < BUTTONS; b++) {
+            dragOrigin[b] = new Vector2d();
+        }
     }
     
+    public void setListener(MouseListener listener) {
+        if (listener == null) this.listener = defaultListener;
+        else this.listener = listener;
+        for (int b = 0; b < BUTTONS; b++) {
+            dragOrigin[b].set(currentVP);
+        }
+    }
     
     public void collect(float delta) {
         
-        scroll = mouseScrollEvents.value();
-        cursorInWindow = mouseEnterEvents.isInWindow();
+        prevScreen.set(currentScreen);
+        currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
+        currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
+        currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
         
-        boolean buttonStateChange = false;
-        boolean cursorStateChange = false;
-        
-        System.arraycopy(
-                buttonPressedCurrent,
-                0,
-                buttonPressedPrevious,
-                0,
-                NUM_BUTTONS);
-    
-        buttonPressedCurrent[LEFT] = mousePressEvents.isPressed(LEFT);
-        buttonPressedCurrent[RIGHT] = mousePressEvents.isPressed(RIGHT);
-        buttonPressedCurrent[WHEEL] = mousePressEvents.isPressed(WHEEL);
-    
-        for (int button = 0; button < NUM_BUTTONS; button++) {
-            if (buttonPressedCurrent[button] != buttonPressedPrevious[button]) {
-                buttonStateChange = true;
-                break;
+        if (enterEvents.isInWindow()) {
+            if (!cursorInWindow) {
+                listener.onEnter();
+                cursorInWindow = true;
             }
-        }
-        
-        previousScreenPos.set(currentScreenPos);
-        currentScreenPos.set(mouseHoverEvents.x(),window.windowH() - mouseHoverEvents.y());
-        // When dragging, the mouse vector seems to register when off-screen.
-        // So we bind the position to our window. We do the same for viewport coordinates below
-        currentScreenPos.x = Math.min(window.windowW(),Math.max(currentScreenPos.x,0));
-        currentScreenPos.y = Math.min(window.windowH(),Math.max(currentScreenPos.y,0));
-        
-        if (!previousScreenPos.equals(currentScreenPos,0.000d))
-            cursorStateChange = true;
-        
-        if (cursorStateChange) {
-            previousViewportPos.set(currentViewportPos);
-            // if the viewport fits the window (integer values)
-            // we set the viewport coordinates to equal screen coordinates
-            if (window.windowW() == window.viewportW() && window.windowH() == window.viewportH()) {
-                currentViewportPos.set(currentScreenPos);
-        
-            } else {
-                final double viewportOffsetX = currentScreenPos.x - window.viewportX();
-                final double viewportOffsetY = currentScreenPos.y - window.viewportY();
-                final double screenToViewportRatioX = window.windowW() * (double)window.viewportInvW();
-                final double screenToViewportRatioY = window.windowH() * (double)window.viewportInvH();
-        
-                currentViewportPos.set(
-                        viewportOffsetX * screenToViewportRatioX,
-                        viewportOffsetY * screenToViewportRatioY);
-        
-                final double maxX = window.viewportW() * screenToViewportRatioX;
-                final double maxY = window.viewportH() * screenToViewportRatioY;
-                currentViewportPos.x = Math.min(maxX,Math.max(currentViewportPos.x,0));
-                currentViewportPos.y = Math.min(maxY,Math.max(currentViewportPos.y,0));
+            if (!prevScreen.equals(currentScreen,0.0001d)) {
+                final double x = (currentScreen.x - window.viewportX()) * window.viewportInvW();
+                final double y = (currentScreen.y - window.viewportY()) * window.viewportInvH();
+                prevVP.set(currentVP);
+                currentVP.x = Math.min(1,Math.max(x,0));
+                currentVP.y = Math.min(1,Math.max(y,0));
+                ndc.x = 2 * currentVP.x - 1;
+                ndc.y = 2 * currentVP.y - 1;
+                currentVP.y /= window.aspectRatio();
+                tmp1.set(currentVP);
+                dt.set(tmp1.sub(prevVP));
+                listener.hover(currentVP.x,currentVP.y,dt.x,dt.y,ndc.x,ndc.y);
             }
-            tmp1.set(currentScreenPos);
-            deltaScreenVec.set(tmp1.sub(previousScreenPos));
-            tmp1.set(currentViewportPos);
-            deltaViewportVec.set(tmp1.sub(previousViewportPos));
+            else dt.zero();
         }
-        else {
-            deltaScreenVec.zero();
-            deltaViewportVec.zero();
+        else if (cursorInWindow) {
+            listener.onLeave();
+            cursorInWindow = false;
         }
-        
-        if (buttonStateChange) {
-            for (int button = 0; button < NUM_BUTTONS; button++) {
-                if (!buttonPressedCurrent[button]) {
-                    switch (button) {
-                        case LEFT:
-                            dragOriginScreenLeft.set(currentScreenPos);
-                            dragOriginViewportLeft.set(currentViewportPos);
-                            break;
-                        case RIGHT:
-                            dragOriginScreenRight.set(currentScreenPos);
-                            dragOriginViewportRight.set(currentViewportPos);
-                            break;
-                        case WHEEL:
-                            dragOriginScreenWheel.set(currentScreenPos);
-                            dragOriginViewportWheel.set(currentViewportPos);
-                            break;
-                    }
-                    // Drag just released
-                    if (buttonPressedPrevious[button]) {
-                        mouseDragging[button] = false;
-                        dragTimers[button] = 0.0f;
+        for (int b = 0; b < BUTTONS; b++) {
+            previous[b] = current[b];
+            current[b] = pressEvents.isPressed(b);
+            if (current[b]) {
+                timer[b] += delta * dragSensitivity;
+                if (!previous[b]) {
+                    listener.click(b,currentVP.x,currentVP.y,ndc.x,ndc.y);
+                    dragOrigin[b].set(currentVP);
+                }
+                else if (timer[b] > 1) {
+                    if (!dragging[b]) {
+                        dragging[b] = true;
+                        listener.dragStart(b, currentVP.x, currentVP.y);
+                    } else {
+                        tmp1.set(currentVP).sub(dragOrigin[b]);
+                        listener.dragging(b,tmp1.x,tmp1.y,dt.x,dt.y);
                     }
                 }
-                else {
-                    if (!buttonPressedPrevious[button]) {
-                        switch (button) {
-                            case LEFT:
-                                dragOriginScreenLeft.set(currentScreenPos);
-                                dragOriginViewportLeft.set(currentViewportPos);
-                                break;
-                            case RIGHT:
-                                dragOriginScreenRight.set(currentScreenPos);
-                                dragOriginViewportRight.set(currentViewportPos);
-                                break;
-                            case WHEEL:
-                                dragOriginScreenWheel.set(currentScreenPos);
-                                dragOriginViewportWheel.set(currentViewportPos);
-                                break;
-                        }
-                    }
-                    dragTimers[button] += dragSensitivity * delta;
-                    // Dragging
-                    if (dragTimers[button] > 1.0f) {
-                        mouseDragging[button] = true;
-                    }
-                }
+            } else if (dragging[b]) {
+                dragging[b] = false;
+                listener.dragRelease(b,currentVP.x,currentVP.y);
             }
         }
-        else {
-            // if no button-state change, we still increase timers if pressed
-            for (int button = 0; button < NUM_BUTTONS; button++) {
-                if (buttonPressedCurrent[button]) {
-                    dragTimers[button] += dragSensitivity * delta;
-                    if (dragTimers[button] > 1.0f) {
-                        mouseDragging[button] = true;
-                    }
-                }
-            }
-        }
+        int scroll = scrollEvents.value(); // this sets value to 0
+        if (scroll != 0)
+            listener.scroll(scroll,currentVP.x,currentVP.y);
     }
     
     public boolean isDragging(int button) {
-        if (button >= NUM_BUTTONS || button < 0) return false;
-        return mouseDragging[button];
+        if (button >= BUTTONS || button < 0) return false;
+        return dragging[button];
     }
     
     public boolean isPressed(int button) {
-        if (button >= NUM_BUTTONS || button < 0) return false;
-        return buttonPressedCurrent[button];
+        if (button >= BUTTONS || button < 0) return false;
+        return current[button];
     }
     
     public boolean justPressed(int button) {
-        if (button >= NUM_BUTTONS || button < 0) return false;
-        return buttonPressedCurrent[button] && !buttonPressedPrevious[button];
+        if (button >= BUTTONS || button < 0) return false;
+        return current[button] && !previous[button];
     }
     
     public boolean justReleased(int button) {
-        if (button >= NUM_BUTTONS || button < 0) return false;
-        return buttonPressedPrevious[button] && !buttonPressedCurrent[button];
-    }
-    
-    public Vector2d screenNDC() {
-        final double nX = 2 * currentScreenPos.x / window.windowW() - 1;
-        final double nY = 2 * currentScreenPos.y / window.windowH() - 1;
-        return tmp1.set(nX,nY);
-    }
-    
-    public Vector2d viewportNDC() {
-        final double nx = 2 * currentViewportPos.x * window.viewportInvW() - 1;
-        final double ny = 2 * currentViewportPos.y * window.viewportInvH() - 1;
-        return tmp1.set(nx,ny);
-    }
-    
-    public Vector2d deltaScreenVec() {
-        return deltaScreenVec;
-    }
-    
-    public Vector2d deltaViewportVec() {
-        return deltaViewportVec;
-    }
-    
-    public double deltaScreenX() {
-        return deltaScreenVec.x;
-    }
-    
-    public double deltaScreenY() {
-        return deltaScreenVec.y;
-    }
-    
-    public double deltaViewportX() {
-        return deltaViewportVec.x;
-    }
-    
-    public double deltaViewportY() {
-        return deltaViewportVec.y;
+        if (button >= BUTTONS || button < 0) return false;
+        return !current[button] && previous[button];
     }
     
     public double screenX() {
-        return currentScreenPos.x;
+        return currentScreen.x;
     }
     
     public double screenY() {
-        return currentScreenPos.y;
+        return currentScreen.y;
     }
     
     public double viewportX() {
-        return currentViewportPos.x;
+        return currentVP.x;
     }
     
     public double viewportY() {
-        return currentViewportPos.y;
+        return currentVP.y;
     }
     
     public double viewportNDCx() {
-        return 2 * currentViewportPos.x * window.viewportInvW() - 1;
+        return ndc.x;
     }
     
     public double viewportNDCy() {
-        return 2 * currentViewportPos.y * window.viewportInvH() - 1;
+        return ndc.y;
     }
     
     public double screenNDCx() {
-        return 2 * currentScreenPos.x / window.windowW() - 1;
+        return 2 * currentScreen.x / window.windowW() - 1;
     }
     
     public double screenNDCy() {
-        return 2 * currentScreenPos.y / window.windowH() - 1;
-    }
-    
-    public int getScroll() {
-        return scroll;
+        return 2 * currentScreen.y / window.windowH() - 1;
     }
     
     public boolean cursorInWindow() {
         return cursorInWindow;
     }
+    
+    /**
+     * For avoiding null-checks.
+     */
+    private final static MouseListener defaultListener = new MouseListener() {
+        
+        @Override
+        public void hover(double x, double y, double dX, double dY, double nX, double nY) {}
+    
+        @Override
+        public void click(int button, double x, double y, double nX, double nY) {}
+    
+        @Override
+        public void scroll(int value, double x, double y) {}
+    
+        @Override
+        public void dragging(int button, double vX, double vY, double dX, double dY) {}
+    
+        @Override
+        public void dragStart(int button, double pX, double pY) {}
+    
+        @Override
+        public void dragRelease(int button, double pX, double pY) {}
+    
+        @Override
+        public void onEnter() {}
+    
+        @Override
+        public void onLeave() {}
+    };
 }

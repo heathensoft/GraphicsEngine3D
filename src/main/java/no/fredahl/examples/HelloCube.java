@@ -8,6 +8,8 @@ import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.processors.Keyboard;
 import no.fredahl.engine.window.processors.Mouse;
+import no.fredahl.engine.window.processors.MouseListener;
+import no.fredahl.engine.window.processors.MouseOld;
 import no.fredahl.examples.cube.Cube;
 import no.fredahl.examples.cube.Mesh;
 import no.fredahl.examples.cube.Renderer;
@@ -35,6 +37,7 @@ public class HelloCube implements Application {
     @Override
     public void start(Window window) throws Exception {
         mouse = new Mouse(window);
+        mouse.setListener(mouseListener);
         keyboard = new Keyboard(window);
         camera = new PerspectiveCamera(window);
         camera.update();
@@ -76,12 +79,7 @@ public class HelloCube implements Application {
             camera.backward(0.03f);
         if (keyboard.pressed(GLFW_KEY_A))
             camera.strafeRight(0.03f);
-    
-        for (int buttons = 0; buttons < Mouse.NUM_BUTTONS; buttons++) {
-            
-                //System.out.println(buttons);
-            //if (mouse.isDragging(buttons)) System.out.println(mouse.dragOriginScreenLeft);
-        }
+        
         
     }
     
@@ -111,6 +109,48 @@ public class HelloCube implements Application {
         for (Cube cube : cubes)
             cube.mesh.free();
     }
+    
+    private final MouseListener mouseListener = new MouseListener() {
+        @Override
+        public void hover(double x, double y, double dX, double dY, double nX, double nY) {
+        
+        }
+    
+        @Override
+        public void click(int button, double x, double y, double nX, double nY) {
+            //System.out.println(x + " , " + y);
+        }
+    
+        @Override
+        public void scroll(int value, double x, double y) {
+            //System.out.println(value);
+        }
+    
+        @Override
+        public void dragging(int button, double vX, double vY, double dX, double dY) {
+            System.out.println(vX + " , " + vY);
+        }
+    
+        @Override
+        public void dragStart(int button, double pX, double pY) {
+            //System.out.println(pX + " , " + pY);
+        }
+    
+        @Override
+        public void dragRelease(int button, double pX, double pY) {
+            //System.out.println(pX + " , " + pY);
+        }
+    
+        @Override
+        public void onEnter() {
+            //System.out.println("Enter");
+        }
+    
+        @Override
+        public void onLeave() {
+            System.out.println("Leave");
+        }
+    };
     
     public static void main(String[] args) {
         
