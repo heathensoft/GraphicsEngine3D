@@ -1,8 +1,10 @@
 package no.fredahl.engine.window;
 
+import no.fredahl.engine.Application;
 import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -56,6 +58,7 @@ public class Window implements GLFWindow {
     private boolean resizable;
     private boolean antialiasing;
     private boolean showTriangles;
+    private boolean cursorDisabled;
     private boolean lockAspectRatio;
     private boolean compatibleProfile;
     
@@ -485,6 +488,19 @@ public class Window implements GLFWindow {
     }
     
     @Override
+    public void disableCursor(boolean disable) {
+        requestQueue.newRequest(() -> {
+            glfwSetInputMode(window, GLFW_CURSOR, disable ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+            cursorDisabled = disable;
+        });
+    }
+    
+    @Override
+    public void centerCursor() {
+        requestQueue.newRequest(() -> glfwSetCursorPos(window,windowW()/2d,windowH()/2d));
+    }
+    
+    @Override
     public void toggleVsync(boolean on) {
         glfwSwapInterval(on ? 1 : 0);
         vsync = on;
@@ -495,8 +511,9 @@ public class Window implements GLFWindow {
         viewport.lockAspectRatio(lock);
     }
     
+    
     @Override
-    public void updateViewport() {
+    public void updateViewport(Application app) {
         if (frameBufferEvents.viewportEvent()) {
             glViewport(
                     viewport.x(),
@@ -504,12 +521,18 @@ public class Window implements GLFWindow {
                     viewport.width(),
                     viewport.height());
             frameBufferEvents.reset();
+            app.resize(viewport.x(), viewport.y(), viewport.width(),viewport.height());
         }
     }
     
     @Override
     public boolean isWindowed() {
         return windowed;
+    }
+    
+    @Override
+    public boolean cursorDisabled() {
+        return cursorDisabled;
     }
     
     @Override
@@ -554,12 +577,12 @@ public class Window implements GLFWindow {
     
     @Override
     public int frameBufferW() {
-        return frameBufferEvents.width();
+        return frameBufferEvents.viewportWidth();
     }
     
     @Override
     public int frameBufferH() {
-        return frameBufferEvents.height();
+        return frameBufferEvents.viewportHeight();
     }
     
     @Override

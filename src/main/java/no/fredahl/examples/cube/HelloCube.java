@@ -1,17 +1,13 @@
-package no.fredahl.examples;
+package no.fredahl.examples.cube;
 
 import no.fredahl.engine.*;
 import no.fredahl.engine.graphics.Texture;
-import no.fredahl.engine.math.PerspectiveCamera;
+import no.fredahl.engine.math.Camera;
 import no.fredahl.engine.utility.IO;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.processors.Keyboard;
 import no.fredahl.engine.window.processors.Mouse;
-import no.fredahl.examples.cube.Controller;
-import no.fredahl.examples.cube.Cube;
-import no.fredahl.examples.cube.Mesh;
-import no.fredahl.examples.cube.Renderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +20,9 @@ import java.util.List;
 
 public class HelloCube implements Application {
     
+    private FPSControl FPSControl;
     private Mouse mouse;
-    private Controller controller;
-    private PerspectiveCamera camera;
+    private Camera camera;
     private Renderer renderer;
     private List<Cube> cubes;
     
@@ -34,11 +30,12 @@ public class HelloCube implements Application {
     public void start(Window window) throws Exception {
         
         Keyboard keyboard = new Keyboard(window);
-        camera = new PerspectiveCamera(window);
-        camera.update();
-        controller = new Controller(camera,keyboard);
+        camera = new Camera(window.aspectRatio());
+        camera.updateProjection();
+        camera.updateWorldToView();
+        FPSControl = new FPSControl(camera,keyboard);
         mouse = new Mouse(window);
-        mouse.setListener(controller);
+        mouse.setListener(FPSControl);
         renderer = new Renderer();
         cubes = new ArrayList<>();
     
@@ -62,11 +59,12 @@ public class HelloCube implements Application {
         Cube cube3 = new Cube(mesh);
         cube3.transform.setPosition(-2,0,-4);
         cubes.add(cube3);
+        
     }
     
     @Override
     public void input(float delta) {
-        controller.update(delta);
+        FPSControl.update(delta);
         mouse.collect(delta);
     }
     
@@ -75,7 +73,16 @@ public class HelloCube implements Application {
         float r = delta * 10;
         for (Cube cube : cubes)
             cube.transform.rotate(0,r,0);
+        
+        
     }
+    
+    @Override
+    public void resize(int viewportX, int viewportY, int viewportW, int viewportH) {
+        camera.aspectRatio = (float) viewportW / viewportH;
+        camera.updateProjection();
+    }
+    
     
     @Override
     public void render(float alpha) {
@@ -106,7 +113,18 @@ public class HelloCube implements Application {
     
             @Override
             public boolean showTriangles() {
-                return false;
+                return Options.super.showTriangles();
+            }
+            
+    
+            @Override
+            public boolean windowedMode() {
+                return true;
+            }
+    
+            @Override
+            public boolean verticalSynchronization() {
+                return true;
             }
         });
     }

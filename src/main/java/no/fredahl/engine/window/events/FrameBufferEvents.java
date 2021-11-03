@@ -33,11 +33,11 @@ public class FrameBufferEvents extends GLFWFramebufferSizeCallback {
         
     }
     
-    public int height() {
+    public int viewportHeight() {
         return h;
     }
     
-    public int width() {
+    public int viewportWidth() {
         return w;
     }
     

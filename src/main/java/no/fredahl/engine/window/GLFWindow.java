@@ -1,5 +1,6 @@
 package no.fredahl.engine.window;
 
+import no.fredahl.engine.Application;
 import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
 
@@ -41,13 +42,16 @@ public interface GLFWindow {
     void create(Options options) throws Exception;
     void terminate();
     void setWindowTitle(String title);
+    void disableCursor(boolean disable);
+    void centerCursor();
     void toggleVsync(boolean on);
     void lockAspectRatio(boolean lock);
-    void updateViewport();
+    void updateViewport(Application app);
     void centerWindow();
     void windowed(int width, int height);
     void fullscreen(int width, int height);
     boolean isWindowed();
+    boolean cursorDisabled();
     boolean vsyncEnabled();
     boolean isMinimized();
     long windowHandle();

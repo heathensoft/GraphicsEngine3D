@@ -1,8 +1,8 @@
 package no.fredahl.examples.cube;
 
-import no.fredahl.engine.math.Camera;
 import no.fredahl.engine.graphics.ShaderProgram;
 import no.fredahl.engine.graphics.ShaderSource;
+import no.fredahl.engine.math.Camera;
 import no.fredahl.engine.utility.IO;
 import org.joml.Matrix4f;
 
@@ -52,7 +52,7 @@ public class Renderer {
         program.setUniform("texture_sampler", 0);
         program.setUniform("projectionMatrix", camera.projection);
         for (Cube cube : entities) {
-            cube.transform.modelView(camera.view,modelView);
+            cube.transform.modelView(camera.worldToView,modelView);
             program.setUniform("modelViewMatrix", modelView);
             cube.mesh.render();
         }

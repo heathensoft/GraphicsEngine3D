@@ -14,7 +14,7 @@ public interface Options {
     default boolean compatibleProfile() {
         return false;
     }
-    default boolean verticalSynchronization() { return false; }
+    default boolean verticalSynchronization() { return true; }
     default boolean lockAspectRatio() { return true; }
     default boolean resizableWindow() { return true; }
     default boolean windowedMode() { return true; }

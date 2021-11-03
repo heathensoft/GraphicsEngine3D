@@ -36,6 +36,9 @@ public interface Application {
      */
     void update(float delta);
     
+    
+    void resize(int viewportX, int viewportY, int viewportW, int viewportH);
+    
     /**
      * The rendering is happening separately from than that of
      * the input and update methods. (Look up "fixed time intervals")

@@ -63,6 +63,7 @@ public class Mouse {
     private final Vector2d[] dragOrigin = new Vector2d[BUTTONS];
     private final float[] timer = new float[BUTTONS];
     public float dragSensitivity = 5.0f;
+    private boolean firstMove = true;
     
     public Mouse(Window window) {
         this.window = window;
@@ -85,17 +86,26 @@ public class Mouse {
     
     public void collect(float delta) {
         
-        prevScreen.set(currentScreen);
-        currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
-        currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
-        currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
-    
+        boolean fpsMode = window.cursorDisabled();
+        if (firstMove) {
+            prevScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
+            currentScreen.set(prevScreen);
+            firstMove = false;
+        }
+        else {
+            prevScreen.set(currentScreen);
+            currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
+        }
+        if (!fpsMode) {
+            currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
+            currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
+        }
         if (!prevScreen.equals(currentScreen,0.0001d)) {
             final double x = (currentScreen.x - window.viewportX()) * window.viewportInvW();
             final double y = (currentScreen.y - window.viewportY()) * window.viewportInvH();
             prevVP.set(currentVP);
-            currentVP.x = Math.min(1,Math.max(x,0));
-            currentVP.y = Math.min(1,Math.max(y,0));
+            currentVP.x = fpsMode ? x : Math.min(1,Math.max(x,0));
+            currentVP.y = fpsMode ? y : Math.min(1,Math.max(y,0));
             ndc.x = 2 * currentVP.x - 1;
             ndc.y = 2 * currentVP.y - 1;
             currentVP.y /= window.aspectRatio();

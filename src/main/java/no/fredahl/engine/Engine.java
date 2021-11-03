@@ -56,7 +56,7 @@ public class Engine {
                         if (running) {
                             alpha = accumulator / delta;
                             if (!window.isMinimized()) {
-                                window.updateViewport();
+                                window.updateViewport(application);
                                 application.render(alpha);
                                 window.swapBuffers();
                             }
