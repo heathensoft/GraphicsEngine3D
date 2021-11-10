@@ -11,16 +11,15 @@ import org.joml.Vector3f;
 
 public class Transform {
     
-    private final Matrix4f transform;
+    private final Matrix4f modelToWorld;
     private final Vector3f position;
     private final Vector3f rotation;
     private final Vector3f scale;
     private boolean dirty;
     
-    // Todo: single axis rotation / scale / translation
     
     public Transform(Vector3f position, Vector3f rotation, Vector3f scale) {
-        this.transform = new Matrix4f();
+        this.modelToWorld = new Matrix4f();
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
@@ -33,7 +32,7 @@ public class Transform {
     
     public Matrix4f get() {
         if (dirty) {
-            transform.identity().
+            modelToWorld.identity().
                     translate(position).
                     rotateX((float)Math.toRadians(-rotation.x)).
                     rotateY((float)Math.toRadians(-rotation.y)).
@@ -41,7 +40,7 @@ public class Transform {
                     scale(scale);
             dirty = false;
         }
-        return transform;
+        return modelToWorld;
     }
     
     public Matrix4f get(Matrix4f dest) {

@@ -1,17 +1,28 @@
 
 ## 3D Graphics Engine
 
-**The core of a OpenGL graphics application for the Java Environment.**
+**A core framework for an OpenGL graphics application in the Java Environment.**
+
+Providing everything you need to create a window, process input and
+run an OpenGL application.
 
 Modern [OpenGL](https://www.opengl.org/) through the [LWJGL 3](https://www.lwjgl.org/) library for fast GPU rendering.
 
 Dividing window events and graphics into separate threads for seamless rendering.
 
-
 (I'm running it on Windows x64, but it should also support macOS x64 and Linux x64)
 
+The example in the example package shows you how you could set it up.
+The entry point is RTS.java. Use the mouse to pan camera/ double click to select.
+WASD to move around.
 
-### Engine.java
+_Currently, working on a reliable way to create and load resources_ (10/11/21)
+
+
+### On the technical side:
+
+
+#### Engine.java
 
 is the core class. The point of entry for the Graphics Engine.
 It creates the Window, runs the Application and manages both.
@@ -35,12 +46,12 @@ The Engine manages two primary threads:
 
 The main thread manages the window, and the application thread runs the graphics.
 
-Having window events seperate from rendering avoids freezing and stuttering of
+Having window events separate from rendering avoids freezing and stuttering of
 the application on window changes. You could let's say, resize the window while
 having continuous updated graphics.
 
 Implementing this is not straight forward. 
-Since most glfw (Window) functionallity is exclusive to the main-thread. And OpenGL
+Since most glfw (Window) functionality is exclusive to the main-thread. And OpenGL
 context can only be current on a single thread at a time.
 
 The latter is not the worst. You call a line of code on the Application thread
@@ -49,7 +60,7 @@ OpenGL methods directly. And you can not have state-changes in the application
 trigger window functionality directly. You could for instance not close the Window
 from the application thread. So we have to manage this in some way...
 
-### Communication between threads
+#### Communication between threads
 
 Is divided into two concepts: Events and Requests.
 
@@ -109,25 +120,6 @@ All main-thread-only glfw methods are wrapped inside of the functional Interface
 
 
 
-
-1. Initializing the glfw-window.
-2. Starting the Application on a seperate thread.
-3. Making the OpenGL API current on the Application-thread.
-Giving GPU access to the Application.
-
-After initialization, the main thread will loop until signalled to exit:
-
-4. Waits for window input events. When an event has occured,
-it will trigger the appropriate callback i.e. window resizing, mouse hover etc.
-Events like a key-press will get queued. Window related events will be handled
-immediately by the main thread.
-
-5. On a regular interval determined by the engine, it polls for Requests made
-by other threads. Since (most) glfw functionallity is exclusive to the main-thread,
-GLFW calls are wrapped inside Requests. Requests made by the Main-thread are handled 
-immideately, requests by other threads are queud and executed when polled.
-For instance. The Application can request for a new GamePad listener. Or it
-could request for the window to get maximized etc.
 
 
 

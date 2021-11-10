@@ -521,7 +521,7 @@ public class Window implements GLFWindow {
                     viewport.width(),
                     viewport.height());
             frameBufferEvents.reset();
-            app.resize(viewport.x(), viewport.y(), viewport.width(),viewport.height());
+            app.resize(this);
         }
     }
     

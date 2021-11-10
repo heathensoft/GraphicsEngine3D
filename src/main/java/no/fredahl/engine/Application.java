@@ -36,8 +36,11 @@ public interface Application {
      */
     void update(float delta);
     
-    
-    void resize(int viewportX, int viewportY, int viewportW, int viewportH);
+    /**
+     * For updating projection matrices
+     * @param window the glfw window
+     */
+    void resize(Window window);
     
     /**
      * The rendering is happening separately from than that of

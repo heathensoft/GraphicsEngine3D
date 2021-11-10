@@ -1,10 +1,7 @@
-package no.fredahl.examples.cube;
+package no.fredahl.example;
 
 import no.fredahl.engine.graphics.Texture;
 import no.fredahl.engine.graphics.VertexAttribute;
-import no.fredahl.examples.shared.EBO;
-import no.fredahl.examples.shared.VAO;
-import no.fredahl.examples.shared.VBO;
 
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -26,7 +23,6 @@ public class Mesh {
     
     public Mesh(float[] position, float[] texCoord, short[] indices, Texture texture) {
         vboPos = new VBO(new VertexAttribute(0, VertexAttribute.Type.POSITION_3D));
-        //vboColor = new VBO(new VertexAttribute(1,VertexAttribute.Type.COLOR_PACKED));
         vboTex = new VBO(new VertexAttribute(1, VertexAttribute.Type.TEX_COORDINATE));
         ebo = new EBO(indices.length);
         vao = new VAO();
@@ -52,8 +48,6 @@ public class Mesh {
     }
     
     public void free() {
-        texture.unbind();
-        texture.free();
         vboTex.free();
         vboPos.free();
         ebo.free();

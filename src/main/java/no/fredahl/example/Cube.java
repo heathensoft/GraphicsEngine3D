@@ -1,23 +1,12 @@
-package no.fredahl.examples.cube;
-
-import no.fredahl.engine.math.Transform;
+package no.fredahl.example;
 
 /**
  * @author Frederik Dahl
- * 28/10/2021
+ * 05/11/2021
  */
 
 
 public class Cube {
- 
-    public final Transform transform;
-    public final Mesh mesh;
-    
-    
-    public Cube(Mesh mesh) {
-        this.transform = new Transform();
-        this.mesh = mesh;
-    }
     
     public static short[] indices() {
         return new short[]{
@@ -103,6 +92,4 @@ public class Cube {
                 // V19: V2 repeated
                 0.5f, -0.5f, 0.5f,};
     }
-    
-    
 }

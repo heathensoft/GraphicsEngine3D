@@ -1,6 +1,7 @@
 package no.fredahl.engine.math;
 
 import org.joml.Matrix4f;
+import org.joml.RayAabIntersection;
 import org.joml.Vector3f;
 
 /**
@@ -15,7 +16,6 @@ public class Ray {
     public final Vector3f direction = new Vector3f();
     public final Vector3f origin = new Vector3f();
     
-    public Ray() {}
     
     public Vector3f getPoint(final Vector3f dest, final float distance) {
         return dest.set(direction).mul(distance).add(origin);
@@ -42,5 +42,10 @@ public class Ray {
         origin.mulProject(mat);
         direction.set(tmpV3f.sub(origin)).normalize();
         return this;
+    }
+    
+    public RayAabIntersection aabIntersection(RayAabIntersection dest) {
+        dest.set(origin.x,origin.y,origin.z,direction.x,direction.y,direction.z);
+        return dest;
     }
 }

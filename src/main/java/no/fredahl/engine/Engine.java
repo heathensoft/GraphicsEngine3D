@@ -25,7 +25,7 @@ public class Engine {
     private final Time frames;
     private final Object lock;
     public final Window window;
-    public Application application;
+    private Application application;
     private boolean running;
     
     private Engine() {

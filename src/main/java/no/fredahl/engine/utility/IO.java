@@ -2,21 +2,22 @@ package no.fredahl.engine.utility;
 
 import org.lwjgl.BufferUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.lwjgl.BufferUtils.createByteBuffer;
 import static org.lwjgl.system.MemoryUtil.memSlice;
 
 /**
+ *
  * @author Frederik Dahl
  * 18/10/2021
  */
@@ -64,6 +65,17 @@ public final class IO {
         }
         buffer.flip();
         return memSlice(buffer);
+    }
+    
+    public static List<String> lineByLine(String fileName) throws Exception {
+        List<String> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                list.add(line);
+            }
+        }
+        return list;
     }
     
     public static String projectPath(String filename, String... folders) {
