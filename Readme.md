@@ -1,7 +1,7 @@
 
 ## 3D Graphics Engine
 
-**A core framework for an OpenGL graphics application in the Java Environment.**
+**A core framework for OpenGL graphics applications in the Java Environment.**
 
 Providing everything you need to create a window, process input and
 run an OpenGL application.
