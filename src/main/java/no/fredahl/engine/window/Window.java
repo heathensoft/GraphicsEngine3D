@@ -4,6 +4,7 @@ import no.fredahl.engine.Application;
 import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -256,26 +257,7 @@ public class Window implements GLFWindow {
             System.out.println("Window: destroying window");
             glfwDestroyWindow(window);
             System.out.println("Window: freeing callbacks");
-            if (windowPositionEvents != null)
-                windowPositionEvents.free();
-            if (windowResizeEvents != null)
-                windowResizeEvents.free();
-            if (windowIconifyEvents != null)
-                windowIconifyEvents.free();
-            if (frameBufferEvents != null)
-                frameBufferEvents.free();
-            if (charPressEvents != null)
-                charPressEvents.free();
-            if (keyPressEvents != null)
-                keyPressEvents.free();
-            if (mouseScrollEvents != null)
-                mouseScrollEvents.free();
-            if (mousePressEvents != null)
-                mousePressEvents.free();
-            if (mouseEnterEvents != null)
-                mouseEnterEvents.free();
-            if (mouseHoverEvents != null)
-                mouseHoverEvents.free();
+            Callbacks.glfwFreeCallbacks(window);
             System.out.println("Window: terminating glfw");
             glfwTerminate();
             if (errorCallback != null)
