@@ -1,8 +1,8 @@
 package no.fredahl.example;
 
 import no.fredahl.engine.graphics.ShaderProgram;
-import no.fredahl.engine.graphics.ShaderSource;
 import no.fredahl.engine.math.ICamera;
+import no.fredahl.engine.utility.FileUtility;
 import org.joml.Matrix4f;
 
 import java.util.List;
@@ -25,10 +25,11 @@ public class Renderer {
     
     public Renderer() throws Exception {
         Assets assets = Assets.get();
-        ShaderSource fragmentShader = new ShaderSource(GL_FRAGMENT_SHADER, assets.unitFragmentShader);
-        ShaderSource vertexShader = new ShaderSource(GL_VERTEX_SHADER, assets.unitVertexShader);
+        String fragmentShader = FileUtility.resource.toString(assets.unitFragmentShaderPath);
+        String vertexShader = FileUtility.resource.toString(assets.unitVertexShaderPath);
         program = new ShaderProgram();
-        program.attach(fragmentShader,vertexShader);
+        program.attach(fragmentShader,GL_FRAGMENT_SHADER);
+        program.attach(vertexShader,GL_VERTEX_SHADER);
         program.compile();
         program.link();
         program.bind();

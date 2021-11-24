@@ -7,8 +7,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 /**
  * @author Frederik Dahl
@@ -21,6 +23,12 @@ public class ShaderProgram {
     private final int program;
     private final Map<String,Integer> uniforms;
     
+    static public final Set<Integer> SUPPORTED = Set.of(
+            GL_VERTEX_SHADER,
+            GL_FRAGMENT_SHADER,
+            GL_GEOMETRY_SHADER
+    );
+    
     
     public ShaderProgram() throws Exception {
         program = glCreateProgram();
@@ -29,13 +37,12 @@ public class ShaderProgram {
         uniforms = new HashMap<>();
     }
     
-    
-    public void attach(ShaderSource... shaders) {
-        for (ShaderSource source : shaders) {
-            int shader = glCreateShader(source.type());
-            glShaderSource(shader,source.get());
-            glAttachShader(program, shader);
-        }
+    public void attach(String source, int type) throws Exception {
+        if (!SUPPORTED.contains(type))
+            throw new Exception("Unsupported GL Shader");
+        int handle = glCreateShader(type);
+        glShaderSource(handle,source);
+        glAttachShader(program, handle);
     }
     
     public void compile() throws Exception {

@@ -1,7 +1,6 @@
 package no.fredahl.example;
 
 import no.fredahl.engine.graphics.Texture;
-import no.fredahl.engine.utility.IO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +18,9 @@ public class Assets {
     
     private final HashMap<String, Texture> TEXTURES = new HashMap<>();
     
-    public final String unitVertexShader = IO.projectPath("vertex.glsl","res","rts","shaders");
-    public final String unitFragmentShader = IO.projectPath("fragment.glsl","res","rts","shaders");
-    public final String unitTexture = IO.projectPath("cubeTest.png","res","rts","png");
+    public final String unitVertexShaderPath = "shaders/vertex.glsl";
+    public final String unitFragmentShaderPath = "shaders/fragment.glsl";
+    public final String unitTexturePath = "png/cubeTest.png";
     
     private Assets() {}
     
@@ -51,6 +50,5 @@ public class Assets {
             entry.getValue().free();
         }
     }
-    
     
 }

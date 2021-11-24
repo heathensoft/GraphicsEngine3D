@@ -68,7 +68,7 @@ public class RTS implements Application {
         Engine.get().start(new RTS(), new Options() {
             final String title = "RTS Test";
             @Override
-            public String windowTitle() {
+            public String title() {
                 return title;
             }
         });
