@@ -1,4 +1,4 @@
-package no.fredahl.example;
+package no.fredahl.example1;
 
 import no.fredahl.engine.math.Transform;
 import org.joml.Matrix4f;

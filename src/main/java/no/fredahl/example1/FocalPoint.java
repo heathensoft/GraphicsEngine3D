@@ -1,4 +1,4 @@
-package no.fredahl.example;
+package no.fredahl.example1;
 
 import org.joml.Math;
 import org.joml.Vector3f;

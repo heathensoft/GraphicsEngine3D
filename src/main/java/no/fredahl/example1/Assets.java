@@ -1,7 +1,10 @@
-package no.fredahl.example;
+package no.fredahl.example1;
 
+import no.fredahl.engine.graphics.Image;
 import no.fredahl.engine.graphics.Texture;
+import no.fredahl.engine.utility.FileUtility;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,9 +21,9 @@ public class Assets {
     
     private final HashMap<String, Texture> TEXTURES = new HashMap<>();
     
-    public final String unitVertexShaderPath = "shaders/vertex.glsl";
-    public final String unitFragmentShaderPath = "shaders/fragment.glsl";
-    public final String unitTexturePath = "png/cubeTest.png";
+    public final String unitVertexShaderPath = "example1/shaders/vertex.glsl";
+    public final String unitFragmentShaderPath = "example1/shaders/fragment.glsl";
+    public final String unitTexturePath = "example1/png/cubeTest.png";
     
     private Assets() {}
     
@@ -28,10 +31,11 @@ public class Assets {
         return instance == null ? new Assets() : instance;
     }
     
-    public Texture texture(String key, Texture.Config config){
+    public Texture texture(String key, Texture.Config config) throws IOException {
         if (TEXTURES.containsKey(key))
             return TEXTURES.get(key);
-        Texture texture = new Texture(key,config);
+        Image image = FileUtility.resource.image(key);
+        Texture texture = new Texture(image,config);
         TEXTURES.put(key,texture);
         return texture;
     }

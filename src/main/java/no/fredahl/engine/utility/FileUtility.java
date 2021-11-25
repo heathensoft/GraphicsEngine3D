@@ -1,5 +1,6 @@
 package no.fredahl.engine.utility;
 
+import no.fredahl.engine.graphics.Image;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
@@ -35,9 +36,10 @@ public class FileUtility {
     public static final ResourceUtility resource = new ResourceUtility();
     
     public static final class ReaderUtility {
-    
+        
         private ReaderUtility() {}
         
+        @SuppressWarnings("all")
         public ByteBuffer readToBuffer(Path path) throws IOException {
             ByteBuffer buffer;
             try (SeekableByteChannel byteChannel = Files.newByteChannel(path,StandardOpenOption.READ)) {
@@ -46,6 +48,8 @@ public class FileUtility {
             }buffer.flip();
             return memSlice(buffer);
         }
+        
+        // todo: Image, Online resources
         
         public Stream<String> readLines(Path path, Charset charset) throws IOException {
             return Files.lines(path, charset);
@@ -184,6 +188,19 @@ public class FileUtility {
         }
         
          */
+    
+        public Image image(String file, int size, boolean flip) throws IOException {
+            return new Image(toBuffer(file,size),flip);
+        }
+        
+        public Image image(String file, boolean flip) throws IOException {
+            int size = 1024 * 16; // 16kb default. It doesn't matter.
+            return image(file,size,flip);
+        }
+        
+        public Image image(String file) throws IOException {
+            return image(file,false);
+        }
         
         public Stream<String> asLines(String file, Charset charset) throws IOException {
             Stream<String> result;

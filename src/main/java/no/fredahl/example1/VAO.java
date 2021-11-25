@@ -1,4 +1,4 @@
-package no.fredahl.example;
+package no.fredahl.example1;
 
 import static org.lwjgl.opengl.GL30.*;
 
