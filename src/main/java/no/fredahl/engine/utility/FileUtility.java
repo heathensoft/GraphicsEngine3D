@@ -201,16 +201,18 @@ public class FileUtility {
         public Image image(String file) throws IOException {
             return image(file,false);
         }
-        
-        public Stream<String> asLines(String file, Charset charset) throws IOException {
-            Stream<String> result;
+    
+        public List<String> asLines(String file, Charset charset) throws IOException {
+            List<String> result;
             try (InputStream is = stream(file)){
                 if (is == null) throw new IOException("Unable to read: " + file);
-                result = new BufferedReader(new InputStreamReader(is,charset)).lines();
-            }return result;
+                Stream<String> stream = new BufferedReader(new InputStreamReader(is,charset)).lines();
+                result = stream.collect(Collectors.toList());
+            }
+            return result;
         }
     
-        public Stream<String> asLines(String file) throws IOException {
+        public List<String> asLines(String file) throws IOException {
             return asLines(file,StandardCharsets.UTF_8);
         }
         

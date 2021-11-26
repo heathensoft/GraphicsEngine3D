@@ -1,8 +1,8 @@
 package no.fredahl.engine.window;
 
 import no.fredahl.engine.Application;
-import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
+import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -29,8 +29,8 @@ public interface GLFWindow {
     default void swapBuffers() {
         glfwSwapBuffers(windowHandle());
     }
-    default void setClearColor(Color color) {
-        glClearColor(color.r(),color.g(),color.b(),color.a());
+    default void setClearColor(Vector4f color) {
+        glClearColor(color.x,color.y,color.z,color.w);
     }
     void waitEvents(float seconds);
     void show();

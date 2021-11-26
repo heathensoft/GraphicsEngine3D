@@ -106,6 +106,41 @@ public class ShaderProgram {
         uniforms.put(name, uniformLocation);
     }
     
+    public void createPointLightUniform(String uniformName) {
+        createUniform(uniformName + ".color");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".att.constant");
+        createUniform(uniformName + ".att.linear");
+        createUniform(uniformName + ".att.exponent");
+    }
+    
+    public void createMaterialUniform(String uniformName) {
+        createUniform(uniformName + ".ambient");
+        createUniform(uniformName + ".diffuse");
+        createUniform(uniformName + ".specular");
+        createUniform(uniformName + ".hasTexture");
+        createUniform(uniformName + ".reflectance");
+    }
+    
+    public void setUniform(String uniformName, PointLight pointLight) {
+        setUniform(uniformName + ".color", pointLight.color());
+        setUniform(uniformName + ".position", pointLight.position());
+        setUniform(uniformName + ".intensity", pointLight.intensity());
+        PointLight.Attenuation att = pointLight.attenuation();
+        setUniform(uniformName + ".att.constant", att.constant());
+        setUniform(uniformName + ".att.linear", att.linear());
+        setUniform(uniformName + ".att.exponent", att.exponent());
+    }
+    
+    public void setUniform(String uniformName, Material material) {
+        setUniform(uniformName + ".ambient", material.ambientColor());
+        setUniform(uniformName + ".diffuse", material.diffuseColor());
+        setUniform(uniformName + ".specular", material.specularColor());
+        setUniform(uniformName + ".hasTexture", material.isTextured() ? 1 : 0);
+        setUniform(uniformName + ".reflectance", material.reflectance());
+    }
+    
     public void setUniform(String name, Vector2f value) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer buffer = stack.mallocFloat(2);
