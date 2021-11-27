@@ -7,8 +7,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 /**
  * @author Frederik Dahl
@@ -21,6 +23,12 @@ public class ShaderProgram {
     private final int program;
     private final Map<String,Integer> uniforms;
     
+    static public final Set<Integer> SUPPORTED = Set.of(
+            GL_VERTEX_SHADER,
+            GL_FRAGMENT_SHADER,
+            GL_GEOMETRY_SHADER
+    );
+    
     
     public ShaderProgram() throws Exception {
         program = glCreateProgram();
@@ -29,13 +37,12 @@ public class ShaderProgram {
         uniforms = new HashMap<>();
     }
     
-    
-    public void attach(ShaderSource... shaders) {
-        for (ShaderSource source : shaders) {
-            int shader = glCreateShader(source.type());
-            glShaderSource(shader,source.get());
-            glAttachShader(program, shader);
-        }
+    public void attach(String source, int type) throws Exception {
+        if (!SUPPORTED.contains(type))
+            throw new Exception("Unsupported GL Shader");
+        int handle = glCreateShader(type);
+        glShaderSource(handle,source);
+        glAttachShader(program, handle);
     }
     
     public void compile() throws Exception {
@@ -97,6 +104,41 @@ public class ShaderProgram {
         if (uniformLocation < 0)
             throw new RuntimeException("No such uniform:" + name);
         uniforms.put(name, uniformLocation);
+    }
+    
+    public void createPointLightUniform(String uniformName) {
+        createUniform(uniformName + ".color");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".att.constant");
+        createUniform(uniformName + ".att.linear");
+        createUniform(uniformName + ".att.exponent");
+    }
+    
+    public void createMaterialUniform(String uniformName) {
+        createUniform(uniformName + ".ambient");
+        createUniform(uniformName + ".diffuse");
+        createUniform(uniformName + ".specular");
+        createUniform(uniformName + ".hasTexture");
+        createUniform(uniformName + ".reflectance");
+    }
+    
+    public void setUniform(String uniformName, PointLight pointLight) {
+        setUniform(uniformName + ".color", pointLight.color());
+        setUniform(uniformName + ".position", pointLight.position());
+        setUniform(uniformName + ".intensity", pointLight.intensity());
+        PointLight.Attenuation att = pointLight.attenuation();
+        setUniform(uniformName + ".att.constant", att.constant());
+        setUniform(uniformName + ".att.linear", att.linear());
+        setUniform(uniformName + ".att.exponent", att.exponent());
+    }
+    
+    public void setUniform(String uniformName, Material material) {
+        setUniform(uniformName + ".ambient", material.ambientColor());
+        setUniform(uniformName + ".diffuse", material.diffuseColor());
+        setUniform(uniformName + ".specular", material.specularColor());
+        setUniform(uniformName + ".hasTexture", material.isTextured() ? 1 : 0);
+        setUniform(uniformName + ".reflectance", material.reflectance());
     }
     
     public void setUniform(String name, Vector2f value) {

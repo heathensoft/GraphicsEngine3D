@@ -41,12 +41,12 @@ public class Texture {
     private final int h;
     
     
-    public Texture(String path) {
-        this(path,LINEAR_REPEAT);
+    public Texture(Image image) {
+        this(image,LINEAR_REPEAT);
     }
     
-    public Texture(String path, Config config) {
-        this(path,config.get());
+    public Texture(Image image, Config config) {
+        this(image,config.get());
     }
     
     public Texture(int[] rgba, int width, int height) {
@@ -57,8 +57,7 @@ public class Texture {
         this(rgba,width,height,config.get());
     }
     
-    public Texture(String path, TextureConfig config) {
-        Image image = Image.fromResource(path);
+    public Texture(Image image, TextureConfig config) {
     
         w = image.width();
         h = image.height();

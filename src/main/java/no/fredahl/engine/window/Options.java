@@ -8,7 +8,7 @@ package no.fredahl.engine.window;
 
 public interface Options {
     
-    default String windowTitle() { return "Application";}
+    default String title() { return "Application";}
     default int desiredResolutionWidth() { return 1280; }
     default int desiredResolutionHeight() { return 720; }
     default boolean compatibleProfile() {

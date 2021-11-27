@@ -5,7 +5,6 @@ import no.fredahl.engine.graphics.Color;
 import no.fredahl.engine.window.events.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.Callbacks;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -139,7 +138,7 @@ public class Window implements GLFWindow {
             showTriangles = options.showTriangles();
             antialiasing = options.antialiasing();
             resizable = options.resizableWindow();
-            windowTitle = options.windowTitle();
+            windowTitle = options.title();
             windowed = options.windowedMode();
             cullFace = options.cullFace();
     
@@ -607,7 +606,7 @@ public class Window implements GLFWindow {
         return new Options() {
             
             @Override
-            public String windowTitle() {
+            public String title() {
                 return windowTitle;
             }
     
