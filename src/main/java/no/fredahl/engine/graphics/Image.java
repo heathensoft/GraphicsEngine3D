@@ -5,13 +5,14 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import static java.lang.Math.round;
 import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImageWrite.stbi_write_png;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
+ * Remember to free Images.
+ *
  * @author Frederik Dahl
  * 25/11/2021
  */
@@ -34,11 +35,12 @@ public class Image {
             if (!stbi_info_from_memory(rawData, w, h, c)) {
                 throw new RuntimeException("Failed to read image information: " + stbi_failure_reason());
             } else System.out.println("OK with reason: " + stbi_failure_reason());
+            /*
             System.out.println("Image width: " + w.get(0));
             System.out.println("Image height: " + h.get(0));
             System.out.println("Image components: " + c.get(0));
             System.out.println("Image HDR: " + stbi_is_hdr_from_memory(rawData));
-            
+             */
             stbi_set_flip_vertically_on_load(flip);
             
             // Decode the image

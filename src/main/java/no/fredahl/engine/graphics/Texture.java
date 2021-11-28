@@ -35,7 +35,7 @@ public class Texture {
         
         void upload(int fi,int w,int h,int f, ByteBuffer b);
     }
-
+    private final static GLBindings bindings = GLBindings.get();
     private final int id;
     private final int w;
     private final int h;
@@ -79,11 +79,10 @@ public class Texture {
             default: throw new RuntimeException("Unsupported format");
         }
         id = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, id);
+        bindings.bindTexture2D(id);
         glPixelStorei(GL_UNPACK_ALIGNMENT,stride);
-        System.out.println(fi + " " + f);
         config.upload(fi, w, h, f, image.get());
-        glBindTexture(GL_TEXTURE_2D,0);
+        bindings.bindTexture2D(0);
         image.free();
     }
     
@@ -105,18 +104,18 @@ public class Texture {
         }
         buffer.flip();
         id = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, id);
+        bindings.bindTexture2D(id);
         config.upload(GL_RGBA8,w,h,GL_RGBA,buffer);
-        glBindTexture(GL_TEXTURE_2D,0);
+        bindings.bindTexture2D(0);
         MemoryUtil.memFree(buffer);
     }
     
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, id);
+        bindings.bindTexture2D(id);
     }
     
     public void unbind() {
-        glBindTexture(GL_TEXTURE_2D,0);
+        bindings.bindTexture2D(0);
     }
     
     public void free() {

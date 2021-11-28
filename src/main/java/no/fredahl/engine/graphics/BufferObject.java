@@ -18,6 +18,7 @@ import static org.lwjgl.opengl.GL15.*;
 
 public class BufferObject {
     
+    protected final static GLBindings bindings = GLBindings.get();
     protected final int target;
     protected final int usage;
     protected final int id;
@@ -118,11 +119,11 @@ public class BufferObject {
     }
     
     public void bind() {
-        glBindBuffer(target,id);
+        bindings.bindBufferObject(id,target);
     }
     
     public void unbind() {
-        glBindBuffer(target, 0);
+        bindings.bindBufferObject(0,target);
     }
     
     public void free() {

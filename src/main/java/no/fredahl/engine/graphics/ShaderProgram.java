@@ -22,6 +22,7 @@ public class ShaderProgram {
     
     private final int program;
     private final Map<String,Integer> uniforms;
+    private final static GLBindings bindings = GLBindings.get();
     
     static public final Set<Integer> SUPPORTED = Set.of(
             GL_VERTEX_SHADER,
@@ -201,11 +202,15 @@ public class ShaderProgram {
     }
     
     public void bind() {
-        glUseProgram(program);
+        bindings.bindShaderProgram(program);
     }
     
     public void unBind() {
-        glUseProgram(0);
+        bindings.bindShaderProgram(0);
+    }
+    
+    public int id() {
+        return program;
     }
     
     public void delete() {
