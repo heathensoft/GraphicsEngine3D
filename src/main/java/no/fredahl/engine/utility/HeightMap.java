@@ -2,6 +2,7 @@ package no.fredahl.engine.utility;
 
 import no.fredahl.engine.graphics.Image;
 import no.fredahl.engine.utility.noise.INoise;
+import org.joml.Vector3f;
 
 import java.nio.ByteBuffer;
 
@@ -37,14 +38,69 @@ public class HeightMap {
         if (channels < 3)
             throw new RuntimeException("supports 3 or 4 channel images");
         final ByteBuffer data = image.get();
-        float[][] heightMap = new float[rows][cols];
+        float[][] heightmap = new float[rows][cols];
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                heightMap[r][c] = colorToHeight(c,r,cols,channels,data);
+                heightmap[r][c] = colorToHeight(c,r,cols,channels,data);
             }
         }
         image.free();
-        return heightMap;
+        return heightmap;
+    }
+    
+    public static float[] normals(float[][] heightmap) {
+        final int rows = heightmap.length;
+        final int cols = heightmap[0].length;
+        final int cBounds = cols - 1;
+        final int rBounds = rows - 1;
+        int pointer = 0;
+        float hu, hr, hd, hl;
+        float[] normals = new float[rows * cols * 3];
+        Vector3f normalVec = new Vector3f();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (r > 0 && r < rBounds && c > 0 && c < cBounds) {
+                    hu = heightmap[r-1][c];
+                    hr = heightmap[r][c+1];
+                    hd = heightmap[r+1][c];
+                    hl = heightmap[r][c-1];
+                    // The ordering here might be off
+                    normalVec.z = hl - hr;
+                    normalVec.x = hd - hu;
+                    normalVec.y = 2.0f;
+                    normalVec.normalize();
+                    normals[pointer++] = normalVec.x;
+                    normals[pointer++] = normalVec.y;
+                    normals[pointer++] = normalVec.z;
+                } else {
+                    normals[pointer++] = 0.0f;
+                    normals[pointer++] = 1.0f;
+                    normals[pointer++] = 0.0f;
+                }
+            }
+        }
+        return normals;
+    }
+    
+    public static short[] indices(float[][] heightmap) {
+        final int rows = heightmap.length;
+        final int cols = heightmap[0].length;
+        final int numStripsRequired = rows - 1;
+        final int numDegeneratesRequired = 2 * (numStripsRequired - 1);
+        final int verticesPerStrip = 2 * cols;
+        final short[] indices = new short[(verticesPerStrip * numStripsRequired) + numDegeneratesRequired];
+        int pointer = 0;
+        for (int r = 0; r < rows - 1; r++) {
+            if (r > 0)
+                indices[pointer++] = (short) (r * rows);
+            for (int c = 0; c < cols; c++) {
+                indices[pointer++] = (short) ((r * rows) + c);
+                indices[pointer++] = (short) (((r + 1) * rows) + c);
+            }
+            if (r < rows - 2)
+                indices[pointer++] = (short) (((r + 1) * rows) + (cols - 1));
+        }
+        return indices;
     }
     
     private static final int MAX_COLOUR = 256 * 256 * 256;
