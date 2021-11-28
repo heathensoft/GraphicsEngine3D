@@ -9,8 +9,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 /**
- * Heightmaps should have values in the interval [0 - 1]
- * This is the case for maps created with images and raw FastNoiseLite. The INoise interface should also abide by this.
  * If you think of a heightmap. Seen from above. The X-axis points to the right, The Y-axis points down.
  * This is reflected in the 2D array. With rows corresponding to the Y-axis and cols to the X-axis.
  *
@@ -80,27 +78,22 @@ public class Heightmap {
         buffer.clear();
         final int cBounds = cols - 1;
         final int rBounds = rows - 1;
+        final float mid = (minHeight + maxHeight) / 2;
         float hu, hr, hd, hl;
         Vector3f normalVec = new Vector3f();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                if (r > 0 && r < rBounds && c > 0 && c < cBounds) {
-                    hu = heightmap[r-1][c];
-                    hr = heightmap[r][c+1];
-                    hd = heightmap[r+1][c];
-                    hl = heightmap[r][c-1];
-                    normalVec.z = hl - hr;
-                    normalVec.x = hd - hu;
-                    normalVec.y = 2.0f;
-                    normalVec.normalize();
-                    buffer.put(normalVec.x);
-                    buffer.put(normalVec.y);
-                    buffer.put(normalVec.z);
-                } else {
-                    buffer.put(0.0f);
-                    buffer.put(1.0f);
-                    buffer.put(0.0f);
-                }
+                hr = c < cBounds ? heightmap[r][c+1] : mid;
+                hd = r < rBounds ? heightmap[r+1][c] : mid;
+                hu = r > 0 ? heightmap[r-1][c] : mid;
+                hl = c > 0 ? heightmap[r][c-1] : mid;
+                normalVec.z = hl - hr;
+                normalVec.x = hd - hu;
+                normalVec.y = 2.0f;
+                normalVec.normalize();
+                buffer.put(normalVec.x);
+                buffer.put(normalVec.y);
+                buffer.put(normalVec.z);
             }
         }
         buffer.flip();
@@ -109,29 +102,23 @@ public class Heightmap {
     public void normals(float[] normals) {
         final int cBounds = cols - 1;
         final int rBounds = rows - 1;
-        int pointer = 0;
+        final float mid = (minHeight + maxHeight) / 2;
+        int p = 0;
         float hu, hr, hd, hl;
         Vector3f normalVec = new Vector3f();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                if (r > 0 && r < rBounds && c > 0 && c < cBounds) {
-                    hu = heightmap[r-1][c];
-                    hr = heightmap[r][c+1];
-                    hd = heightmap[r+1][c];
-                    hl = heightmap[r][c-1];
-                    // The ordering here might be off
-                    normalVec.z = hl - hr;
-                    normalVec.x = hd - hu;
-                    normalVec.y = 2.0f;
-                    normalVec.normalize();
-                    normals[pointer++] = normalVec.x;
-                    normals[pointer++] = normalVec.y;
-                    normals[pointer++] = normalVec.z;
-                } else {
-                    normals[pointer++] = 0.0f;
-                    normals[pointer++] = 1.0f;
-                    normals[pointer++] = 0.0f;
-                }
+                hr = c < cBounds ? heightmap[r][c+1] : mid;
+                hd = r < rBounds ? heightmap[r+1][c] : mid;
+                hu = r > 0 ? heightmap[r-1][c] : mid;
+                hl = c > 0 ? heightmap[r][c-1] : mid;
+                normalVec.z = hl - hr;
+                normalVec.x = hd - hu;
+                normalVec.y = 2.0f;
+                normalVec.normalize();
+                normals[p++] = normalVec.x;
+                normals[p++] = normalVec.y;
+                normals[p++] = normalVec.z;
             }
         }
     }
@@ -139,14 +126,11 @@ public class Heightmap {
     public void indices(ShortBuffer buffer) {
         buffer.clear();
         for (int r = 0; r < rows - 1; r++) {
-            if (r > 0)
-                buffer.put((short) (r * rows));
+            if (r > 0) buffer.put((short) (r * rows));
             for (int c = 0; c < cols; c++) {
                 buffer.put((short) ((r * rows) + c));
                 buffer.put((short) (((r + 1) * rows) + c));
-            }
-            if (r < rows - 2)
-                buffer.put((short) (((r + 1) * rows) + (cols - 1)));
+            }if (r < rows - 2) buffer.put((short) (((r + 1) * rows) + (cols - 1)));
         }
         buffer.flip();
     }
@@ -154,14 +138,11 @@ public class Heightmap {
     public void indices(IntBuffer buffer) {
         buffer.clear();
         for (int r = 0; r < rows - 1; r++) {
-            if (r > 0)
-                buffer.put(r * rows);
+            if (r > 0) buffer.put(r * rows);
             for (int c = 0; c < cols; c++) {
                 buffer.put((r * rows) + c);
                 buffer.put(((r + 1) * rows) + c);
-            }
-            if (r < rows - 2)
-                buffer.put(((r + 1) * rows) + (cols - 1));
+            }if (r < rows - 2) buffer.put(((r + 1) * rows) + (cols - 1));
         }
         buffer.flip();
     }
@@ -169,30 +150,23 @@ public class Heightmap {
     public void indices(short[] indices) {
         int p = 0;
         for (int r = 0; r < rows - 1; r++) {
-            if (r > 0)
-                indices[p++] = (short) (r * rows);
+            if (r > 0) indices[p++] = (short) (r * rows);
             for (int c = 0; c < cols; c++) {
                 indices[p++] = (short) ((r * rows) + c);
                 indices[p++] = (short) (((r + 1) * rows) + c);
-            }
-            if (r < rows - 2)
-                indices[p++] = (short) (((r + 1) * rows) + (cols - 1));
+            }if (r < rows - 2) indices[p++] = (short) (((r + 1) * rows) + (cols - 1));
         }
     }
     
-    public int[] indices(int[] indices) {
+    public void indices(int[] indices) {
         int p = 0;
         for (int r = 0; r < rows - 1; r++) {
-            if (r > 0)
-                indices[p++] = r * rows;
+            if (r > 0) indices[p++] = r * rows;
             for (int c = 0; c < cols; c++) {
                 indices[p++] = (r * rows) + c;
                 indices[p++] = ((r + 1) * rows) + c;
-            }
-            if (r < rows - 2)
-                indices[p++] = ((r + 1) * rows) + (cols - 1);
+            }if (r < rows - 2) indices[p++] = ((r + 1) * rows) + (cols - 1);
         }
-        return indices;
     }
     
     private static final int MAX_COLOUR = 256 * 256 * 256;
