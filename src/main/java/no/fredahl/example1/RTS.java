@@ -2,7 +2,6 @@ package no.fredahl.example1;
 
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
-import no.fredahl.engine.utility.HeightMap;
 import no.fredahl.engine.utility.noise.FastNoiseLite;
 import no.fredahl.engine.utility.noise.INoise;
 import no.fredahl.engine.window.Options;
@@ -40,11 +39,11 @@ public class RTS implements Application {
         
         //Image image = new Image(FileUtility.resource.toBuffer("example2/png/heightmap.png",1000),false);
         //float[][] heightmap = HeightMap.create(image);
-        float[][] heightmap2 = HeightMap.create(noise,10,40,1f,4, 4);
+        //float[][] heightmap2 = HeightMap.create(noise,10,40,1f,10, 10);
         
         //float[] normals = HeightMap.calculateNormals(heightmap2);
         
-        short[] indices = HeightMap.indices(heightmap2);
+        //short[] indices = HeightMap.indices(heightmap2);
         
         renderer = new Renderer();
         world = new World();
