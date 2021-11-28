@@ -70,23 +70,20 @@ public class Heightmap {
             for (int c = 0; c < cols; c++) {
                 heightmap[r][c] = minH + (maxH-minH) * colorToHeight(c,r,cols,channels,data);
             }
-        }
-        image.free();
+        } image.free();
     }
     
     public void normals(FloatBuffer buffer) {
-        buffer.clear();
         final int cBounds = cols - 1;
         final int rBounds = rows - 1;
-        final float mid = (minHeight + maxHeight) / 2;
         float hu, hr, hd, hl;
         Vector3f normalVec = new Vector3f();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                hr = c < cBounds ? heightmap[r][c+1] : mid;
-                hd = r < rBounds ? heightmap[r+1][c] : mid;
-                hu = r > 0 ? heightmap[r-1][c] : mid;
-                hl = c > 0 ? heightmap[r][c-1] : mid;
+                hr = c < cBounds ? heightmap[r][c+1] : heightmap[r][c];
+                hd = r < rBounds ? heightmap[r+1][c] : heightmap[r][c];
+                hu = r > 0 ? heightmap[r-1][c] : heightmap[r][c];
+                hl = c > 0 ? heightmap[r][c-1] : heightmap[r][c];
                 normalVec.z = hl - hr;
                 normalVec.x = hd - hu;
                 normalVec.y = 2.0f;
@@ -96,24 +93,22 @@ public class Heightmap {
                 buffer.put(normalVec.z);
             }
         }
-        buffer.flip();
     }
     
     public void normals(float[] normals) {
         final int cBounds = cols - 1;
         final int rBounds = rows - 1;
-        final float mid = (minHeight + maxHeight) / 2;
         int p = 0;
         float hu, hr, hd, hl;
         Vector3f normalVec = new Vector3f();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                hr = c < cBounds ? heightmap[r][c+1] : mid;
-                hd = r < rBounds ? heightmap[r+1][c] : mid;
-                hu = r > 0 ? heightmap[r-1][c] : mid;
-                hl = c > 0 ? heightmap[r][c-1] : mid;
-                normalVec.z = hl - hr;
-                normalVec.x = hd - hu;
+                hr = c < cBounds ? heightmap[r][c+1] : heightmap[r][c];
+                hd = r < rBounds ? heightmap[r+1][c] : heightmap[r][c];
+                hu = r > 0 ? heightmap[r-1][c] : heightmap[r][c];
+                hl = c > 0 ? heightmap[r][c-1] : heightmap[r][c];
+                normalVec.x = hl - hr;
+                normalVec.z = hd - hu;
                 normalVec.y = 2.0f;
                 normalVec.normalize();
                 normals[p++] = normalVec.x;
@@ -124,7 +119,6 @@ public class Heightmap {
     }
     
     public void indices(ShortBuffer buffer) {
-        buffer.clear();
         for (int r = 0; r < rows - 1; r++) {
             if (r > 0) buffer.put((short) (r * rows));
             for (int c = 0; c < cols; c++) {
@@ -132,11 +126,9 @@ public class Heightmap {
                 buffer.put((short) (((r + 1) * rows) + c));
             }if (r < rows - 2) buffer.put((short) (((r + 1) * rows) + (cols - 1)));
         }
-        buffer.flip();
     }
     
     public void indices(IntBuffer buffer) {
-        buffer.clear();
         for (int r = 0; r < rows - 1; r++) {
             if (r > 0) buffer.put(r * rows);
             for (int c = 0; c < cols; c++) {
@@ -144,7 +136,6 @@ public class Heightmap {
                 buffer.put(((r + 1) * rows) + c);
             }if (r < rows - 2) buffer.put(((r + 1) * rows) + (cols - 1));
         }
-        buffer.flip();
     }
     
     public void indices(short[] indices) {

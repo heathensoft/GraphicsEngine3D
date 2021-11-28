@@ -17,7 +17,6 @@ public class Transform {
     private final Vector3f scale;
     private boolean dirty;
     
-    
     public Transform(Vector3f position, Vector3f rotation, Vector3f scale) {
         this.modelToWorld = new Matrix4f();
         this.position = position;
@@ -26,11 +25,15 @@ public class Transform {
         this.dirty = true;
     }
     
-    public Transform() {
-        this(new Vector3f(), new Vector3f(),new Vector3f(1,1,1));
+    public Transform(Vector3f position) {
+        this(position,new Vector3f(),new Vector3f(1,1,1));
     }
     
-    public Matrix4f get() {
+    public Transform() {
+        this(new Vector3f());
+    }
+    
+    public Matrix4f modelToWorldMatrix() {
         if (dirty) {
             modelToWorld.identity().
                     translate(position).
@@ -43,14 +46,13 @@ public class Transform {
         return modelToWorld;
     }
     
-    public Matrix4f get(Matrix4f dest) {
-        return dest.set(get());
+    public Matrix4f modelToWorldMatrix(Matrix4f dest) {
+        return dest.set(modelToWorldMatrix());
     }
     
     public Matrix4f modelView(Matrix4f view, Matrix4f dest) {
-        return dest.set(view).mul(get());
+        return dest.set(view).mul(modelToWorldMatrix());
     }
-    
     
     public void translate(Vector3f translation) {
         position.add(translation);
