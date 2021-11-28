@@ -1,5 +1,7 @@
 package no.fredahl.example1;
 
+import no.fredahl.engine.graphics.GLBindings;
+
 import static org.lwjgl.opengl.GL30.*;
 
 /**
@@ -9,6 +11,7 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class VAO {
 
+    private final static GLBindings bindings = GLBindings.get();
     private final int id;
 
     public VAO() {
@@ -16,11 +19,11 @@ public class VAO {
     }
 
     public void bind() {
-        glBindVertexArray(id);
+        bindings.bindAttributeArray(id);
     }
 
     public void unbind() {
-        glBindVertexArray(0);
+        bindings.bindAttributeArray(0);
     }
 
     public void delete() { glDeleteVertexArrays(id);}

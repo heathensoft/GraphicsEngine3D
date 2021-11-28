@@ -20,9 +20,26 @@ public class RTS implements Application {
     private Renderer renderer;
     private World world;
     
+    /*
+    private INoise noise = new INoise() {
+        FastNoiseLite noiseLite = new FastNoiseLite();
+        @Override
+        public float query(float x, float y) {
+            return noiseLite.GetNoise(x,y);
+        }
+    };
+    
+     */
+    
     
     @Override
     public void start(Window window) throws Exception {
+        
+        //Image image = new Image(FileUtility.resource.toBuffer("example2/png/heightmap_test.png",1000),false);
+        //float[][] heightmap = HeightMap.create(image);
+        //float[][] heightmap2 = HeightMap.create(noise,10,40,1f,400, 200);
+        
+        
         renderer = new Renderer();
         world = new World();
         control = new RTSControl(world);
