@@ -1,6 +1,6 @@
 package no.fredahl.engine.graphics;
 
-import no.fredahl.engine.utility.noise.INoise;
+import no.fredahl.engine.utility.noise.NoiseGenerator;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -10,6 +10,14 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 /**
+ * This is a weeks work, and it's well optimized. Memory usage (buffer size) and performance.
+ * Its mesh is one continuous triangle strip. So use GL_TRIANGLE_STRIP to render.
+ * You can generate a heightmap from an image or any noise function.
+ *
+ * Its shortest axis is normalized to unit size 1. so for a map with rows = 100, cols = 50, the y-axis length would be 1,
+ * and the x-axis length would be 2. The map position is its center.
+ * Epsilon is the normalized grid size. If you have 2 rows and 2 cols (4 vertices or one "tile") this would be 1.
+ *
  * @author Frederik Dahl
  * 29/11/2021
  */
@@ -29,7 +37,7 @@ public class Heightmap {
     private final float[][] heightmap;
     
     /**
-     * @param noise the noise implement
+     * @param ng the noise implement
      * @param nX0 the noise query start position for x
      * @param nY0 the noise query start position for y
      * @param freq the noise frequency
@@ -37,7 +45,7 @@ public class Heightmap {
      * @param rows vertices in the y dimension
      * @param cols vertices in the x dimension
      */
-    public Heightmap(INoise noise, float nX0, float nY0, float freq, float amp, int rows, int cols) {
+    public Heightmap(NoiseGenerator ng, float nX0, float nY0, float freq, float amp, int rows, int cols) {
         this.amplitude = amp;
         this.rows = rows;
         this.cols = cols;
@@ -61,7 +69,7 @@ public class Heightmap {
             float y = nY0 + freq * r;
             for (int c = 0; c < cols; c++) {
                 float x = nX0 + freq * c;
-                heightmap[r][c] = -amp + (2 * amp) * noise.query(x,y);
+                heightmap[r][c] = -amp + (2 * amp) * ng.query(x,y);
             }
         }
     }

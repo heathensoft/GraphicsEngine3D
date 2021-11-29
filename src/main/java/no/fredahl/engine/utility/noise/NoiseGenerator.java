@@ -6,7 +6,7 @@ package no.fredahl.engine.utility.noise;
  */
 
 
-public interface INoise {
+public interface NoiseGenerator {
     
     float query(float x, float y);
     

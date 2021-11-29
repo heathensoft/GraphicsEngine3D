@@ -3,7 +3,7 @@ package no.fredahl.example1;
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
 import no.fredahl.engine.utility.noise.FastNoiseLite;
-import no.fredahl.engine.utility.noise.INoise;
+import no.fredahl.engine.utility.noise.NoiseGenerator;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 
@@ -23,7 +23,7 @@ public class RTS implements Application {
     private World world;
     
     
-    private INoise noise = new INoise() {
+    private NoiseGenerator noise = new NoiseGenerator() {
         FastNoiseLite noiseLite = new FastNoiseLite();
         @Override
         public float query(float x, float y) {
