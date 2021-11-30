@@ -2,9 +2,8 @@ package no.fredahl.example1;
 
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
-import no.fredahl.engine.utility.HeightMap;
 import no.fredahl.engine.utility.noise.FastNoiseLite;
-import no.fredahl.engine.utility.noise.INoise;
+import no.fredahl.engine.utility.noise.NoiseGenerator;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 
@@ -24,7 +23,7 @@ public class RTS implements Application {
     private World world;
     
     
-    private INoise noise = new INoise() {
+    private NoiseGenerator noise = new NoiseGenerator() {
         FastNoiseLite noiseLite = new FastNoiseLite();
         @Override
         public float query(float x, float y) {
@@ -39,12 +38,6 @@ public class RTS implements Application {
     public void start(Window window) throws Exception {
         
         //Image image = new Image(FileUtility.resource.toBuffer("example2/png/heightmap.png",1000),false);
-        //float[][] heightmap = HeightMap.create(image);
-        float[][] heightmap2 = HeightMap.create(noise,10,40,1f,4, 4);
-        
-        //float[] normals = HeightMap.calculateNormals(heightmap2);
-        
-        short[] indices = HeightMap.indices(heightmap2);
         
         renderer = new Renderer();
         world = new World();

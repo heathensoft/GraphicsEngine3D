@@ -75,7 +75,7 @@ public class Unit implements Selectable{
     }
     
     public Matrix4f getModelToWorld() {
-        return transform.get();
+        return transform.modelToWorldMatrix();
     }
     
     
