@@ -263,6 +263,102 @@ public class Heightmap {
         }
     }
     
+    public void smoothen(){
+        float sum;
+        final int cBounds = cols - 1;
+        final int rBounds = rows - 1;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                sum = 0;
+                if (r == 0) {
+                    if (c == 0) {
+                        for (byte[] adj : nw) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/4;
+                    } else if (c == cBounds) {
+                        for (byte[] adj : ne) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/4;
+                    } else { for (byte[] adj : n) {
+                        sum += heightmap[r+adj[0]][c+adj[1]];
+                    } heightmap[r][c] = sum/6;
+                    } continue;
+                } if (r == rBounds) {
+                    if (c == 0) {
+                        for (byte[] adj : sw) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/4;
+                    } else if (c == cBounds) {
+                        for (byte[] adj : se) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/4;
+                    } else { for (byte[] adj : s) {
+                        sum += heightmap[r+adj[0]][c+adj[1]];
+                    } heightmap[r][c] = sum/6;
+                    } continue;
+                } if (c == 0) {
+                    for (byte[] adj : w) {
+                        sum += heightmap[r+adj[0]][c+adj[1]];
+                    } heightmap[r][c] = sum/6;
+                } else if (c == cBounds) {
+                    for (byte[] adj : e) {
+                        sum += heightmap[r+adj[0]][c+adj[1]];
+                    } heightmap[r][c] = sum/6;
+                } else { for (byte[] adj : m) {
+                    sum += heightmap[r+adj[0]][c+adj[1]];
+                } heightmap[r][c] = sum/9; }
+            }
+        }
+    }
+    
+    private static final byte[][] m = {
+            {-1,-1},{-1, 0},{-1, 1},
+            { 0,-1},{ 0, 0},{ 0, 1},
+            { 1,-1},{ 1, 0},{ 1, 1}
+    };
+    
+    private static final byte[][] n = {
+            { 0,-1},{ 0, 0},{ 0, 1},
+            { 1,-1},{ 1, 0},{ 1, 1}
+    };
+    
+    private static final byte[][] ne = {
+            { 0,-1},{ 0, 0},
+            { 1,-1},{ 1, 0}
+    };
+    
+    private static final byte[][] e = {
+            {-1,-1},{-1, 0},
+            { 0,-1},{ 0, 0},
+            { 1,-1},{ 1, 0}
+    };
+    
+    private static final byte[][] se = {
+            {-1,-1},{-1, 0},
+            { 0,-1},{ 0, 0}
+    };
+    
+    private static final byte[][] s = {
+            {-1,-1},{-1, 0},{-1, 1},
+            { 0,-1},{ 0, 0},{ 0, 1}
+    };
+    
+    private static final byte[][] sw = {
+            {-1, 0},{-1, 1},
+            { 0, 0},{ 0, 1},
+    };
+    
+    private static final byte[][] w = {
+            {-1, 0},{-1, 1},
+            { 0, 0},{ 0, 1},
+            { 1, 0},{ 1, 1}
+    };
+    
+    private static final byte[][] nw = {
+            { 0, 0},{ 0, 1},
+            { 1, 0},{ 1, 1}
+    };
+    
     public float get(int x, int y) {
         return heightmap[y][x];
     }
