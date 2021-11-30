@@ -16,7 +16,7 @@ The example in the example package shows you how you could set it up.
 The entry point is RTS.java. Use the mouse to pan camera/ double click to select.
 WASD to move around.
 
-_Currently, working on lights, materials, heightmaps_ (10/11/21)
+_Currently, working on lights, materials, heightmaps_ (30/11/21)
 
 ![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap00.png?raw=true)
 
