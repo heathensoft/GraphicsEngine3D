@@ -3,12 +3,20 @@ package no.fredahl.engine.graphics;
 import org.joml.Vector4f;
 
 /**
+ * todo: I should probably use vec3's instead. Then use a single float for alpha. Yep
+ *
  * @author Frederik Dahl
  * 26/11/2021
  */
 
 
 public class Material {
+    
+    
+    public static final Material BRONZE = new Material(
+            new Vector4f(0.2125f,0.1275f,0.054f,1),
+            new Vector4f(0.714f,0.4284f,0.18144f,1),
+            new Vector4f(0.393548f,0.271906f,0.166721f,1),0.2f);
     
     private static final Vector4f DEFAULT_COLOR = Color.WHITE;
     

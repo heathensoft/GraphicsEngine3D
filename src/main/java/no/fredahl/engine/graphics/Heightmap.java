@@ -10,7 +10,7 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 /**
- * This is a weeks work, and it's well optimized. Memory usage (buffer size) and performance.
+ * Well optimized. Memory usage (buffer size) and performance.
  * Its mesh is one continuous triangle strip. So use GL_TRIANGLE_STRIP to render.
  * You can generate a heightmap from an image or any noise function.
  *
@@ -203,8 +203,8 @@ public class Heightmap {
     }
     
     public short[] indicesShort() {
-        short[] indices = new short[this.indices];
         int p = 0;
+        short[] indices = new short[this.indices];
         for (int r = 0; r < rows - 1; r++) {
             if (r > 0) indices[p++] = (short) (r * rows);
             for (int c = 0; c < cols; c++) {
@@ -233,8 +233,8 @@ public class Heightmap {
     }
     
     public int[] indicesInt() {
-        int[] indices = new int[this.indices];
         int p = 0;
+        int[] indices = new int[this.indices];
         for (int r = 0; r < rows - 1; r++) {
             if (r > 0) indices[p++] = r * rows;
             for (int c = 0; c < cols; c++) {
