@@ -263,50 +263,62 @@ public class Heightmap {
         }
     }
     
-    public void smoothen(){
+    public void smoothen(boolean includeEdges){
         float sum;
         final int cBounds = cols - 1;
         final int rBounds = rows - 1;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                sum = 0;
-                if (r == 0) {
-                    if (c == 0) {
-                        for (byte[] adj : nw) {
+        if (includeEdges) {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    sum = 0;
+                    if (r == 0) {
+                        if (c == 0) {
+                            for (byte[] adj : nw) {
+                                sum += heightmap[r+adj[0]][c+adj[1]];
+                            } heightmap[r][c] = sum/4;
+                        } else if (c == cBounds) {
+                            for (byte[] adj : ne) {
+                                sum += heightmap[r+adj[0]][c+adj[1]];
+                            } heightmap[r][c] = sum/4;
+                        } else { for (byte[] adj : n) {
                             sum += heightmap[r+adj[0]][c+adj[1]];
-                        } heightmap[r][c] = sum/4;
+                        } heightmap[r][c] = sum/6;
+                        } continue;
+                    } if (r == rBounds) {
+                        if (c == 0) {
+                            for (byte[] adj : sw) {
+                                sum += heightmap[r+adj[0]][c+adj[1]];
+                            } heightmap[r][c] = sum/4;
+                        } else if (c == cBounds) {
+                            for (byte[] adj : se) {
+                                sum += heightmap[r+adj[0]][c+adj[1]];
+                            } heightmap[r][c] = sum/4;
+                        } else { for (byte[] adj : s) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/6;
+                        } continue;
+                    } if (c == 0) {
+                        for (byte[] adj : w) {
+                            sum += heightmap[r+adj[0]][c+adj[1]];
+                        } heightmap[r][c] = sum/6;
                     } else if (c == cBounds) {
-                        for (byte[] adj : ne) {
+                        for (byte[] adj : e) {
                             sum += heightmap[r+adj[0]][c+adj[1]];
-                        } heightmap[r][c] = sum/4;
-                    } else { for (byte[] adj : n) {
+                        } heightmap[r][c] = sum/6;
+                    } else { for (byte[] adj : m) {
                         sum += heightmap[r+adj[0]][c+adj[1]];
-                    } heightmap[r][c] = sum/6;
-                    } continue;
-                } if (r == rBounds) {
-                    if (c == 0) {
-                        for (byte[] adj : sw) {
+                    } heightmap[r][c] = sum/9; }
+                }
+            }
+        } else {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    if (r > 0 && r < rBounds && c > 0 && c < cBounds) {
+                        sum = 0; for (byte[] adj : m) {
                             sum += heightmap[r+adj[0]][c+adj[1]];
-                        } heightmap[r][c] = sum/4;
-                    } else if (c == cBounds) {
-                        for (byte[] adj : se) {
-                            sum += heightmap[r+adj[0]][c+adj[1]];
-                        } heightmap[r][c] = sum/4;
-                    } else { for (byte[] adj : s) {
-                        sum += heightmap[r+adj[0]][c+adj[1]];
-                    } heightmap[r][c] = sum/6;
-                    } continue;
-                } if (c == 0) {
-                    for (byte[] adj : w) {
-                        sum += heightmap[r+adj[0]][c+adj[1]];
-                    } heightmap[r][c] = sum/6;
-                } else if (c == cBounds) {
-                    for (byte[] adj : e) {
-                        sum += heightmap[r+adj[0]][c+adj[1]];
-                    } heightmap[r][c] = sum/6;
-                } else { for (byte[] adj : m) {
-                    sum += heightmap[r+adj[0]][c+adj[1]];
-                } heightmap[r][c] = sum/9; }
+                        } heightmap[r][c] = sum/9;
+                    }
+                }
             }
         }
     }
