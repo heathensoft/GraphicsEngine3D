@@ -10,27 +10,27 @@ import org.joml.Vector3f;
 
 public class DirectionalLight {
     
-    private Phong components;
+    private Components components;
     private Vector3f direction;
     
     public DirectionalLight(Vector3f color, Vector3f direction) {
-        this(new Phong(color),direction);
+        this(new Components(color),direction);
     }
     
     public DirectionalLight(Vector3f ambient, Vector3f diffuse, Vector3f specular, Vector3f direction) {
-        this(new Phong(ambient, diffuse, specular),direction);
+        this(new Components(ambient, diffuse, specular),direction);
     }
     
-    public DirectionalLight(Phong components, Vector3f direction) {
+    public DirectionalLight(Components components, Vector3f direction) {
         this.components = components;
         this.direction = direction;
     }
     
-    public Phong getComponents() {
+    public Components getComponents() {
         return components;
     }
     
-    public void setComponents(Phong components) {
+    public void setComponents(Components components) {
         this.components = components;
     }
     

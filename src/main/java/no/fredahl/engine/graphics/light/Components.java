@@ -8,17 +8,17 @@ import org.joml.Vector3f;
  */
 
 
-public class Phong {
+public class Components {
     
     private Vector3f ambient;
     private Vector3f diffuse;
     private Vector3f specular;
     
-    public Phong(Vector3f color) {
+    public Components(Vector3f color) {
         this(new Vector3f(color),new Vector3f(color),new Vector3f(color));
     }
     
-    public Phong(Vector3f ambient, Vector3f diffuse, Vector3f specular) {
+    public Components(Vector3f ambient, Vector3f diffuse, Vector3f specular) {
         this.ambient = ambient;
         this.diffuse = diffuse;
         this.specular = specular;
