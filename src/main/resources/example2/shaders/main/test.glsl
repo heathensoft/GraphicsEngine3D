@@ -24,6 +24,7 @@ const int DIFFUSE_ONLY      = 8;
 const int USE_MIXING        = 16;
 const int IS_TERRAIN        = 32;
 const int USE_NORMAL_MAP    = 64;
+const int TRANSPARENCY      = 128;
 
 // *****************************************************************************
 
@@ -177,7 +178,15 @@ void main() {
 
     Material material = Material(ambientData,diffuseData,specularData,emmisiveData,shine,alpha);
 
+    vec3 viewDir = normalize(-in_mvpos);
+    vec3 combined = calcDirLight(u_directionalLight,material,in_mvpos,viewDir,in_normal);
 
+    for(int i = 0; i < numPointLights; i++){
+        combined += calcPointLight(u_pointLights[i],material,in_mvpos,viewDir,in_normal);
+    }
+    for(int i = 0; i < numSpotLights; i++){
+        combined += calcSpotLight(u_spotLights[i],material,in_mvposs,viewDir,in_normal);
+    }
 
 
     combined += emmisiveData;
