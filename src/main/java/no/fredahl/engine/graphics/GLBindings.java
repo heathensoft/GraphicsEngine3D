@@ -1,7 +1,6 @@
 package no.fredahl.engine.graphics;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -46,6 +45,11 @@ public class GLBindings {
     public void bindTexture2D(int id) {
         if (id == boundTexture) return;
         glBindTexture(GL_TEXTURE_2D, boundTexture = id);
+    }
+    
+    public void bindTexture1D(int id) {
+        if (id == boundTexture) return;
+        glBindTexture(GL_TEXTURE_1D, boundTexture = id);
     }
     
 }

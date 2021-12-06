@@ -27,6 +27,16 @@ public class OBJFormatter {
         public float[] normals;
         public short[] indices;
         
+        public short[] toTexels(int w, int h) {
+            short[] result = new short[texCoords.length / 2];
+            for (int i = 0; i < result.length; i++) {
+                float u = texCoords[i];
+                float v = texCoords[i+1];
+                result[i] = (short) (Math.floor(w*u) + Math.floor(h*v));
+            }
+            return result;
+        }
+        
     }
     
     public static Geometry process(List<String> lines) {

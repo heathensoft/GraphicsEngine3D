@@ -21,7 +21,7 @@ public class World {
         Assets assets = Assets.get();
         Texture texture;
         try {
-            texture = assets.texture(assets.unitTexturePath, Texture.Config.LINEAR_REPEAT);
+            texture = assets.texture(assets.unitTexturePath, Texture.Config.LINEAR_REPEAT_2D);
         } catch (RuntimeException e) {
             throw new Exception(e);
         }

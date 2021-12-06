@@ -27,12 +27,14 @@ void main() {
     vec3 viewDir = normalize(-mvVertexPos);
     vec3 combined = calcDirLight(directionalLight, material, mvVertexPos,viewDir,mvVertexNormal);
 
-    for(int i = 0; i < numPointLights; i++) {
+    for(int i = 0; i < numPointLights; i++){
         combined += calcPointLight(pointLights[i], material, mvVertexPos, viewDir, mvVertexNormal);
     }
-    for(int i = 0; i < numSpotLights; i++) {
+    for(int i = 0; i < numSpotLights; i++){
         combined += calcSpotLight(spotLights[i], material, mvVertexPos, viewDir, mvVertexNormal);
     }
+    combined += material.emmisive;
+    // Gamma correction must be applied in the last shader only (last framebuffer)
     combined = pow(combined,GAMMA_CORRECTION);
     fragColor = vec4(combined,material.alpha);
 }

@@ -73,6 +73,7 @@ public class VertexAttribute implements Comparable<VertexAttribute>{
     private int primitiveSize() {
         switch (type) {
             case GL_FLOAT:
+            case GL_INT:
             case GL_FIXED:
                 return Float.BYTES;
             case GL_UNSIGNED_BYTE:

@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics.light;
+package no.fredahl.engine.graphics.lighting;
 
 /**
  * @author Frederik Dahl
