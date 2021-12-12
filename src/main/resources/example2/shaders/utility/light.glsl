@@ -17,8 +17,8 @@ struct PointLight {
 
 struct SpotLight {
     vec3 coneDir;
-    float cutoffInner;
-    float cutoffOuter;
+    float cutoffI;
+    float cutoffO;
     PointLight pl;
 };
 
@@ -105,8 +105,8 @@ vec3 calcSpotLight(SpotLight spotlight, vec3 pos, vec3 eye, vec3 norm) {
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
 
     float theta = dot(-lightDir, normalize(-spotlight.coneDir)); // might need to inverse this
-    float epsilon = (spotlight.cutoffInner - spotlight.cutoffOuter);
-    float intensity = clamp((theta - spotlight.cutoffOuter) / epsilon, 0.0, 1.0);
+    float epsilon = (spotlight.cutoffI - spotlight.cutoffO);
+    float intensity = clamp((theta - spotlight.cutoffO) / epsilon, 0.0, 1.0);
 
     float d = length(lightVec);
     float att = 1.0 / (light.att.c + light.att.l * d + light.att.q * d * d);

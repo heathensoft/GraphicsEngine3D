@@ -63,6 +63,8 @@ public class PointLight {
         this(new Vector3f(DEFAULT_DIFFUSION));
     }
     
+    
+    
     public Vector3f ambient() {
         return ambient;
     }
@@ -93,6 +95,10 @@ public class PointLight {
     
     public void setPosition(Vector3f position) {
         this.position.set(position);
+    }
+    
+    public void translate(Vector3f translation) {
+        this.position.add(translation);
     }
     
     public Attenuation attenuation() {
