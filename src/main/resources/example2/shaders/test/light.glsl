@@ -16,10 +16,10 @@ struct PointLight {
 };
 
 struct SpotLight {
-    PointLight light;
     vec3 conedir;
-    float cutoff;
+    float cutoffInner;
     float cutoffOuter;
+    PointLight light;
 };
 
 struct DirectionalLight {
@@ -108,7 +108,7 @@ vec3 calcSpotLight(SpotLight spotlight, Material material, vec3 fragPos, vec3 vi
     //float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shine) * energyConservation;
     // spotlight intensity
     float theta = dot(-lightDir, normalize(-spotlight.conedir)); // might need to inverse this
-    float epsilon = (spotlight.cutoff - spotlight.cutoffOuter);
+    float epsilon = (spotlight.cutoffInner - spotlight.cutoffOuter);
     float intensity = clamp((theta - spotlight.cutoffOuter) / epsilon, 0.0, 1.0);
     // attenuation
     float d = length(lightVec);

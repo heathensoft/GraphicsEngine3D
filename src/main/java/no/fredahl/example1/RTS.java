@@ -2,10 +2,20 @@ package no.fredahl.example1;
 
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
+import no.fredahl.engine.graphics.Image;
+import no.fredahl.engine.graphics.Texture;
+import no.fredahl.engine.graphics.TextureAtlas;
+import no.fredahl.engine.graphics.TextureRegion;
+import no.fredahl.engine.utility.FileUtility;
 import no.fredahl.engine.utility.noise.FastNoiseLite;
 import no.fredahl.engine.utility.noise.NoiseGenerator;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
+import org.joml.Vector4f;
+
+import java.util.List;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Testing out "RTS" -like camera control and unit-selection.
@@ -36,8 +46,6 @@ public class RTS implements Application {
     
     @Override
     public void start(Window window) throws Exception {
-        
-        //Image image = new Image(FileUtility.resource.toBuffer("example2/png/heightmap.png",1000),false);
         
         renderer = new Renderer();
         world = new World();
@@ -80,7 +88,12 @@ public class RTS implements Application {
         renderer.dispose();
     }
     
-    public static void main(String[] args) {
+    
+    public static void main(String[] args) throws Exception{
+    
+        
+        
+        
         Engine.get().start(new RTS(), new Options() {
             final String title = "RTS Test";
             @Override
@@ -88,5 +101,6 @@ public class RTS implements Application {
                 return title;
             }
         });
+        
     }
 }

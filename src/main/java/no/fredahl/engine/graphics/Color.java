@@ -1,6 +1,7 @@
 package no.fredahl.engine.graphics;
 
 import org.joml.Math;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 /**
@@ -11,8 +12,11 @@ import org.joml.Vector4f;
 
 public class Color {
     
-    public static final Vector4f WHITE = new Vector4f(1.0f,1.0f,1.0f,1.0f);
-    public static final Vector4f BLACK = new Vector4f(0.0f,0.0f,0.0f,0.0f);
+    public static final Vector4f WHITE_RGBA = new Vector4f(1.0f,1.0f,1.0f,1.0f);
+    public static final Vector4f BLACK_RGBA = new Vector4f(0.0f,0.0f,0.0f,0.0f);
+    
+    public static final Vector3f WHITE_RGB = new Vector3f(1.0f,1.0f,1.0f);
+    public static final Vector3f BLACK_RGB = new Vector3f(0.0f,0.0f,0.0f);
     
     // todo: Mixing with influence
     
@@ -25,12 +29,29 @@ public class Color {
         return Float.intBitsToFloat(i & 0xfeffffff);
     }
     
+    public static float packed(Vector3f color) {
+        final int r = rgba(clamp(color.x));
+        final int g = rgba(clamp(color.y));
+        final int b = rgba(clamp(color.z));
+        final int a = rgba(clamp(1.0f));
+        final int i = a << 24 | b << 16 | g << 8 | r;
+        return Float.intBitsToFloat(i & 0xfeffffff);
+    }
+    
     public Vector4f fromRGBA(int r, int g, int b, int a) {
         Vector4f color = new Vector4f();
         color.x = normalize(clamp(r));
         color.y = normalize(clamp(g));
         color.z = normalize(clamp(b));
         color.w = normalize(clamp(a));
+        return color;
+    }
+    
+    public Vector3f fromRGB(int r, int g, int b) {
+        Vector3f color = new Vector3f();
+        color.x = normalize(clamp(r));
+        color.y = normalize(clamp(g));
+        color.z = normalize(clamp(b));
         return color;
     }
     
@@ -49,6 +70,17 @@ public class Color {
         final int g = rgba(clamp(color.y));
         final int b = rgba(clamp(color.z));
         final int a = rgba(clamp(color.w));
+        int rgba8888 = r << 24 | g << 16 | b << 8 | a;
+        StringBuilder value = new StringBuilder(Integer.toHexString(rgba8888));
+        while (value.length() < 8) value.insert(0, "0");
+        return value.toString();
+    }
+    
+    public String toHex(Vector3f color) {
+        final int r = rgba(clamp(color.x));
+        final int g = rgba(clamp(color.y));
+        final int b = rgba(clamp(color.z));
+        final int a = rgba(clamp(1.0f));
         int rgba8888 = r << 24 | g << 16 | b << 8 | a;
         StringBuilder value = new StringBuilder(Integer.toHexString(rgba8888));
         while (value.length() < 8) value.insert(0, "0");

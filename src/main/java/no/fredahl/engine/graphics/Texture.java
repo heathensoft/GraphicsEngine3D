@@ -1,11 +1,9 @@
 package no.fredahl.engine.graphics;
 
-import org.joml.Math;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
-import static no.fredahl.engine.graphics.Texture.Config.LINEAR_REPEAT_2D;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
@@ -13,222 +11,200 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 /**
  * @author Frederik Dahl
- * 17/10/2021
+ * 04/12/2021
+ *
+ * Example initialization:
+ *
+ * Texture tex = new Texture(GL_TEXTURE_2D);
+ * tex.bind();
+ * tex.setTextureWrapST(GL_REPEAT);
+ * tex.setFilter(GL_LINEAR);
+ * tex.tex2D(image);
+ * tex.generateMipMap();
+ * tex.unbind();
+ *
  */
+ 
 
 
 public class Texture {
     
-    /**
-     * @see Config
-     */
-    public interface TextureConfig {
-        
-        /**
-         * @param fi internal format texture
-         * @param w texture width
-         * @param h texture height
-         * @param f buffer format
-         * @param b pixel buffer
-         */
-        
-        void upload(int fi,int w,int h,int f, ByteBuffer b);
-    }
     private final static GLBindings bindings = GLBindings.get();
+    
+    private static final float MIN_LOD = -1000.0f;
+    private static final float MAX_LOD =  1000.0f;
+    
     private final int id;
-    private final int w;
-    private final int h;
+    private final int target;
+    private int depth;
+    private int width;
+    private int height;
     
-    
-    public Texture(Image image) {
-        this(image, LINEAR_REPEAT_2D);
+    public Texture(int target) {
+        this.id = glGenTextures();
+        this.target = target;
+        this.width = 0;
+        this.height = 0;
+        this.depth = 0;
     }
     
-    public Texture(Image image, Config config) {
-        this(image,config.get());
-    }
     
-    public Texture(int[] rgba, int width, int height) {
-        this(rgba,width,height, LINEAR_REPEAT_2D);
-    }
-    
-    public Texture(int[] rgba, int width, int height, Config config) {
-        this(rgba,width,height,config.get());
-    }
-    
-    public Texture(Image image, TextureConfig config) {
-        w = image.width();
-        h = image.height();
-        int f;  // image format
-        int fi; // internal format
+    public void tex2D(Image image) {
+        
+        this.width = image.width();
+        this.height = image.height();
+        int internalFormat; // GPU side
+        int format; // client memory
         int stride = 4;
     
         switch (image.channels()) {
             case 3:
-                fi = f = GL_RGB;
-                if ((w & 3) != 0) {
-                    stride = 2 - (w & 1);
-                }
-                break;
+                internalFormat = format = GL_RGB;
+                if ((width & 3) != 0) {
+                    stride = 2 - (width & 1);
+                }break;
             case 4:
-                f = GL_RGBA;
-                fi = GL_RGBA8;
+                format = GL_RGBA;
+                internalFormat = GL_RGBA8;
                 break;
-            default: throw new RuntimeException("Unsupported format");
+            default:
+                throw new RuntimeException("Unsupported format");
         }
-        id = glGenTextures();
-        bindings.bindTexture2D(id);
+        
         glPixelStorei(GL_UNPACK_ALIGNMENT,stride);
-        config.upload(fi, w, h, f, image.get());
-        bindings.bindTexture2D(0);
-        image.free();
+        glTexImage2D(target,
+                0,
+                internalFormat,
+                width,
+                height,
+                0,
+                format,
+                GL_UNSIGNED_BYTE,
+                image.get());
     }
     
-    public Texture(int[] rgba, int width, int height, TextureConfig config) {
+    public void tex2D(int[] rgba, int width, int height) {
         
-        w = width;
-        h = height;
-    
         ByteBuffer buffer = MemoryUtil.memAlloc(rgba.length * 4);
     
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                int pixel = rgba[y * w + x];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel = rgba[y * width + x];
                 buffer.put((byte) ((pixel >> 16) & 0xFF)); // r
                 buffer.put((byte) ((pixel >> 8 ) & 0xFF)); // g
                 buffer.put((byte) ((pixel      ) & 0xFF)); // b
                 buffer.put((byte) ((pixel >> 24) & 0xFF)); // a
             }
         }
+        
         buffer.flip();
-        id = glGenTextures();
-        bindings.bindTexture2D(id);
-        config.upload(GL_RGBA8,w,h,GL_RGBA,buffer);
-        bindings.bindTexture2D(0);
+        glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+        glTexImage2D(target,
+                0,
+                GL_RGBA8,
+                width,
+                height,
+                0,
+                GL_BGRA,
+                GL_UNSIGNED_BYTE,
+                buffer);
+        
         MemoryUtil.memFree(buffer);
+    
+        this.width = width;
+        this.height = height;
+    }
+    
+    public void tex2D(int level, int internalFormat, int width, int height, int texelFormat, int type) {
+        glTexImage2D(target,level,internalFormat,width,height,0,texelFormat,type,(ByteBuffer) null);
+        this.width = width;
+        this.height = height;
+    }
+    
+    public void magFilter(int magFilter) {
+        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+    }
+    
+    public void minFilter(int minFilter) {
+        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+    }
+    
+    public void filter(int minFilter, int magFilter) {
+        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
+        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
+    }
+    
+    public void filter(int filter) {
+        filter(filter,filter);
+    }
+    
+    public void wrapS(int wrapS) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+    }
+    
+    public void wrapT(int wrapT) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+    }
+    
+    public void wrapR(int wrapR) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+    }
+    
+    public void wrapST(int wrapS, int wrapT) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+    }
+    
+    public void wrapSTR(int wrapS, int wrapT, int wrapR) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrapS);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrapT);
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, wrapR);
+    }
+    
+    public void wrapST(int wrap) {
+        wrapST(wrap,wrap);
+    }
+    
+    public void wrapSTR(int wrap) {
+        wrapSTR(wrap,wrap,wrap);
+    }
+    
+    public void generateMipMap(float lodBias, float min, float max) {
+        glGenerateMipmap(target);
+        glTexParameterf(target,GL_TEXTURE_MIN_LOD,min);
+        glTexParameterf(target,GL_TEXTURE_MAX_LOD,max);
+        glTexParameterf(target,GL_TEXTURE_LOD_BIAS,lodBias);
+    }
+    
+    public void generateMipMap(float lodBias) {
+        generateMipMap(lodBias, MIN_LOD, MAX_LOD);
+    }
+    
+    public void generateMipMap() {
+        generateMipMap(0.0f);
     }
     
     public void bind() {
-        bindings.bindTexture2D(id);
+        bindings.bindTexture2(target,id);
     }
     
     public void unbind() {
-        bindings.bindTexture2D(0);
+        bindings.bindTexture2(target,0);
     }
     
-    public void free() {
+    public void delete() {
         glDeleteTextures(id);
     }
     
     public int width() {
-        return w;
+        return width;
     }
     
     public int height() {
-        return h;
+        return height;
     }
     
-    
-    
-    
-    
-    public enum Config {
-        
-        // Todo Add more when needed. Also only supports 1d 2d 3d
-        LINEAR_REPEAT_2D(new DefaultConfig(GL_TEXTURE_2D)), // OpenGL Default
-        NEAREST_REPEAT_2D(new DefaultConfig(GL_TEXTURE_2D,GL_UNSIGNED_BYTE,GL_REPEAT,GL_NEAREST)),
-        ;
-        
-        TextureConfig config;
-        
-        Config(TextureConfig config) {
-            this.config = config;
-        }
-        
-        public TextureConfig get() {
-            return config;
-        }
-    
-        private static final class DefaultConfig implements TextureConfig {
-        
-            // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-        
-            private static final float MIN_LOD = -1000.0f;
-            private static final float MAX_LOD =  1000.0f;
-            private static final float MIPMAP_NONE = -3000.0f;
-        
-            final int target;
-            final int data_type;
-            final int wrap_s;
-            final int wrap_t;
-            final int min_filter;
-            final int mag_filter;
-        
-            final float lod_bias;
-        
-            public DefaultConfig(int t, int dt, int ws, int wt, int mif, int maf, float lod) {
-                lod_bias = lod == MIPMAP_NONE ? lod : Math.clamp(MIN_LOD,MAX_LOD,lod);
-                target = t;
-                data_type = dt;
-                wrap_s = ws;
-                wrap_t = wt;
-                min_filter = mif;
-                mag_filter = maf;
-            }
-        
-            public DefaultConfig(int t, int dt, int ws, int wt, int mif, int maf) {
-                this(t,dt,ws,wt,mif,maf,MIPMAP_NONE);
-            }
-        
-            public DefaultConfig(int t, int dt, int w, int f, float lod) {
-                this(t,dt,w,w,f,f,lod);
-            }
-        
-            public DefaultConfig(int t, int dt, int w, int f) {
-                this(t,dt,w,w,f,f,MIPMAP_NONE);
-            }
-        
-            public DefaultConfig(int t, int dt, float lod) {
-                this(t,dt,GL_REPEAT,GL_LINEAR,lod);
-            }
-        
-            public DefaultConfig(int t, int dt) {
-                this(t,dt,MIPMAP_NONE);
-            }
-        
-            public DefaultConfig(int t, float lod) {
-                this(t,GL_UNSIGNED_BYTE,lod);
-            }
-        
-            public DefaultConfig(int t) {
-                this(t,GL_UNSIGNED_BYTE,MIPMAP_NONE);
-            }
-            
-            
-            @Override
-            public void upload(int fi, int w, int h, int f, ByteBuffer b) {
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, mag_filter);
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, min_filter);
-                glTexParameteri(target, GL_TEXTURE_WRAP_S, wrap_s);
-                glTexParameteri(target, GL_TEXTURE_WRAP_T, wrap_t);
-                switch (target) {
-                    case GL_TEXTURE_1D: // height = border and must be 0
-                        glTexImage1D(target,0,fi,w,h,f,data_type,b);
-                        break;
-                    case GL_TEXTURE_2D:
-                        glTexImage2D(target,0,fi,w,h,0,f,data_type,b);
-                        break;
-                    case GL_TEXTURE_3D:
-                        glTexImage3D(target,0,fi,w,h,0,0,f,data_type,b);
-                        break;
-                }
-                if (lod_bias != MIPMAP_NONE) {
-                    glGenerateMipmap(target);
-                    glTexParameterf(target,GL_TEXTURE_MIN_LOD,MIN_LOD);
-                    glTexParameterf(target,GL_TEXTURE_MAX_LOD,MAX_LOD);
-                    glTexParameterf(target,GL_TEXTURE_LOD_BIAS,lod_bias);
-                }
-            }
-        }
+    public int depth() {
+        return depth;
     }
 }

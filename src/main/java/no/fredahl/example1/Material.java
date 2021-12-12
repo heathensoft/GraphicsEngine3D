@@ -1,6 +1,6 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.example1;
 
-import no.fredahl.example1.Texture;
+import no.fredahl.engine.graphics.Color;
 import org.joml.Vector4f;
 
 /**
@@ -22,16 +22,17 @@ public class Material {
     private static final Vector4f DEFAULT_COLOR = Color.WHITE_RGBA;
     
     private Texture texture;
-    private Vector4f ambientColor;
-    private Vector4f diffuseColor;
-    private Vector4f specularColor;
+    private Vector4f ambient;
+    private Vector4f diffuse;
+    private Vector4f specular
+            ;
     private float reflectance;
     
     
-    public Material(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, float reflectance) {
-        this.ambientColor = ambientColor;
-        this.diffuseColor = diffuseColor;
-        this.specularColor = specularColor;
+    public Material(Vector4f ambient, Vector4f diffuse, Vector4f specular, float reflectance) {
+        this.ambient = ambient;
+        this.diffuse = diffuse;
+        this.specular = specular;
         this.reflectance = reflectance;
         this.texture = null;
     }
@@ -51,15 +52,15 @@ public class Material {
     }
     
     public Vector4f ambientColor() {
-        return ambientColor;
+        return ambient;
     }
     
     public Vector4f diffuseColor() {
-        return diffuseColor;
+        return diffuse;
     }
     
     public Vector4f specularColor() {
-        return specularColor;
+        return specular;
     }
     
     public float reflectance() {
@@ -75,16 +76,16 @@ public class Material {
     }
     
     
-    public void setAmbientColor(Vector4f ambientColor) {
-        this.ambientColor = ambientColor;
+    public void setAmbient(Vector4f ambient) {
+        this.ambient = ambient;
     }
     
-    public void setDiffuseColor(Vector4f diffuseColor) {
-        this.diffuseColor = diffuseColor;
+    public void setDiffuse(Vector4f diffuse) {
+        this.diffuse = diffuse;
     }
     
-    public void setSpecularColor(Vector4f specularColor) {
-        this.specularColor = specularColor;
+    public void setSpecular(Vector4f specular) {
+        this.specular = specular;
     }
     
     public void setReflectance(float reflectance) {

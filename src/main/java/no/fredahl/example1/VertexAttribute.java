@@ -1,4 +1,4 @@
-package no.fredahl.engine.graphics;
+package no.fredahl.example1;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;

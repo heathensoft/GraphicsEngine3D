@@ -12,11 +12,15 @@ Dividing window events and graphics into separate threads for seamless rendering
 
 (I'm running it on Windows x64, but it should also support macOS x64 and Linux x64)
 
-The example in the example package shows you how you could set it up.
+The example in the example1 package shows you how you could set it up.
 The entry point is RTS.java. Use the mouse to pan camera/ double click to select.
 WASD to move around.
+(example1 is from an older version and contains a lot of retracted classes.
+The example1 package will be removed when the new example is up)
 
-_Currently, working on lights, materials, heightmaps_ (30/11/21)
+_Currently, working on lights, materials, heightmaps_ (12/12/21)
+
+From example2:
 
 ![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap00.png?raw=true)
 

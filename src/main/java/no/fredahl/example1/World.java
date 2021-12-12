@@ -1,7 +1,5 @@
 package no.fredahl.example1;
 
-import no.fredahl.engine.graphics.Texture;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,9 @@
 package no.fredahl.engine.graphics;
 
+import no.fredahl.engine.graphics.lighting.Attenuation;
+import no.fredahl.engine.graphics.lighting.DirectionalLight;
+import no.fredahl.engine.graphics.lighting.Material;
+import no.fredahl.engine.graphics.lighting.PointLight;
 import org.joml.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -108,50 +112,54 @@ public class ShaderProgram {
     }
     
     public void createPointLightUniform(String uniformName) {
-        createUniform(uniformName + ".color");
-        createUniform(uniformName + ".position");
-        createUniform(uniformName + ".intensity");
-        createUniform(uniformName + ".att.constant");
-        createUniform(uniformName + ".att.linear");
-        createUniform(uniformName + ".att.exponent");
-    }
-    
-    public void createDirectionalLightUniform(String uniformName) {
-        createUniform(uniformName + ".color");
-        createUniform(uniformName + ".direction");
-        createUniform(uniformName + ".intensity");
-    }
-    
-    public void createMaterialUniform(String uniformName) {
-        createUniform(uniformName + ".ambient");
-        createUniform(uniformName + ".diffuse");
-        createUniform(uniformName + ".specular");
-        createUniform(uniformName + ".hasTexture");
-        createUniform(uniformName + ".reflectance");
+        createUniform(uniformName + ".a");
+        createUniform(uniformName + ".d");
+        createUniform(uniformName + ".s");
+        createUniform(uniformName + ".pos");
+        createUniform(uniformName + ".att.c");
+        createUniform(uniformName + ".att.l");
+        createUniform(uniformName + ".att.q");
     }
     
     public void setUniform(String uniformName, PointLight pointLight) {
-        PointLight.Attenuation att = pointLight.attenuation();
-        setUniform(uniformName + ".color", pointLight.color());
-        setUniform(uniformName + ".position", pointLight.position());
-        setUniform(uniformName + ".intensity", pointLight.intensity());
-        setUniform(uniformName + ".att.constant", att.constant());
-        setUniform(uniformName + ".att.linear", att.linear());
-        setUniform(uniformName + ".att.exponent", att.exponent());
+        Attenuation att = pointLight.attenuation();
+        setUniform(uniformName + ".a", pointLight.ambient());
+        setUniform(uniformName + ".d", pointLight.diffuse());
+        setUniform(uniformName + ".s", pointLight.specular());
+        setUniform(uniformName + ".pos", pointLight.position());
+        setUniform(uniformName + ".att.c", att.constant());
+        setUniform(uniformName + ".att.l", att.linear());
+        setUniform(uniformName + ".att.q", att.quadratic());
+    }
+    
+    public void createDirectionalLightUniform(String uniformName) {
+        createUniform(uniformName + ".a");
+        createUniform(uniformName + ".d");
+        createUniform(uniformName + ".s");
+        createUniform(uniformName + ".dir");
     }
     
     public void setUniform(String uniformName, DirectionalLight dirLight) {
-        setUniform(uniformName + ".color", dirLight.color());
-        setUniform(uniformName + ".direction", dirLight.direction());
-        setUniform(uniformName + ".intensity", dirLight.intensity());
+        setUniform(uniformName + ".a", dirLight.ambient());
+        setUniform(uniformName + ".d", dirLight.diffuse());
+        setUniform(uniformName + ".s", dirLight.specular());
+        setUniform(uniformName + ".dir", dirLight.direction());
+    }
+    
+    public void createMaterialUniform(String uniformName) {
+        createUniform(uniformName + ".a");
+        createUniform(uniformName + ".d");
+        createUniform(uniformName + ".s");
+        createUniform(uniformName + ".e");
+        createUniform(uniformName + ".shine");
     }
     
     public void setUniform(String uniformName, Material material) {
-        setUniform(uniformName + ".ambient", material.ambientColor());
-        setUniform(uniformName + ".diffuse", material.diffuseColor());
-        setUniform(uniformName + ".specular", material.specularColor());
-        setUniform(uniformName + ".hasTexture", material.isTextured() ? 1 : 0);
-        setUniform(uniformName + ".reflectance", material.reflectance());
+        setUniform(uniformName + ".a", material.ambient());
+        setUniform(uniformName + ".d", material.diffuse());
+        setUniform(uniformName + ".s", material.specular());
+        setUniform(uniformName + ".e", material.emissivity());
+        setUniform(uniformName + ".shine", material.shine());
     }
     
     public void setUniform(String name, Vector2f value) {
@@ -214,11 +222,11 @@ public class ShaderProgram {
     }
     
     public void bind() {
-        bindings.bindShaderProgram(program);
+        bindings.useShaderProgram(program);
     }
     
     public void unBind() {
-        bindings.bindShaderProgram(0);
+        bindings.useShaderProgram(0);
     }
     
     public int id() {

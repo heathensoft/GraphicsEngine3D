@@ -119,11 +119,11 @@ public class BufferObject {
     }
     
     public void bind() {
-        bindings.bindBufferObject(id,target);
+        bindings.bindBufferObject(target,id);
     }
     
     public void unbind() {
-        bindings.bindBufferObject(0,target);
+        bindings.bindBufferObject(target,0);
     }
     
     public void free() {

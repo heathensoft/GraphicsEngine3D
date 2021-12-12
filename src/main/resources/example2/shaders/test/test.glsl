@@ -120,8 +120,6 @@ void main() {
         shine = u_material.shine;
         alpha = u_material.alpha;
 
-        // this requires texcoords and uniform secondaryWeight
-
         if(useMixing) {
 
             vec3 mixColor = texture(u_secondary[secondarySlot],in_uv).rgb;
@@ -149,10 +147,18 @@ void main() {
 
             // Treat the texture as a single texture region
             // Use the texture coordinates as they are
+
             if(diffuseOnly) {
 
                 diffuseData = texture(u_textures[primarySlot],in_uv).rgb;
-                ambientData = diffuseData;
+
+                if(useMixing) {
+
+                    vec3 mixColor = texture(u_secondary[secondarySlot],in_uv).rgb;
+                    diffuseData = mix(diffuseData,mixColor,u_secondaryWeight);
+                }
+
+                ambientData = vec3(diffuseData); // you don't have to use a constructor i think. But i keep it for now.
 
             }
 
@@ -163,13 +169,26 @@ void main() {
             // Specular region
             // Emissive region
             // Later we can add a normal map region;
+
             else {
 
                 vec2 uv_diff = in_uv * 0.5;
-                diffuseData = texture(u_textures[primarySlot],uv_diff).rgb;
-                //vec2 uv_spec = uv_diff + vec2()
+                float u = in_uv.x * 0.5;
+                float v = in_uv.y * 0.5;
 
+                diffuseData = texture(u_textures[primarySlot],vec2(u,v)).rgb;
+
+                if(useMixing) {
+
+                    diffuseData = mix(diffuseData,mixColor,u_secondaryWeight);
+                }
+
+                ambientData = vec3(diffuseData);
+                specularData = texture(u_textures[primarySlot],vec2((u + 0.5),v)).rgb;
+                emmisiveData = texture(u_textures[primarySlot],vec2(u,(v + 0.5))).rgb;
             }
+
+
 
         }
 

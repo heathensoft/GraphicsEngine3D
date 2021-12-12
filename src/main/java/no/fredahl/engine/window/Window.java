@@ -238,7 +238,7 @@ public class Window implements GLFWindow {
         glfwSwapInterval(vsync ? 1 : 0);
         GL.createCapabilities();
         glEnable(GL_BLEND);
-        setClearColor(Color.BLACK);
+        setClearColor(Color.BLACK_RGBA);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if (showTriangles) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         if (cullFace) {

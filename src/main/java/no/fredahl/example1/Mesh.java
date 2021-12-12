@@ -1,17 +1,11 @@
 package no.fredahl.example1;
 
 import no.fredahl.engine.graphics.BufferObject;
-import no.fredahl.engine.graphics.Texture;
-import no.fredahl.engine.graphics.VertexAttribute;
-import org.lwjgl.opengl.GL30;
 
-import static org.lwjgl.opengl.GL11.GL_INT;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 
 /**

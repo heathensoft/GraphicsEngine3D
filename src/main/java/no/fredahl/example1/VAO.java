@@ -2,7 +2,8 @@ package no.fredahl.example1;
 
 import no.fredahl.engine.graphics.GLBindings;
 
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 /**
  * @author Frederik Dahl

@@ -5,8 +5,8 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import static java.lang.Math.round;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImageWrite.stbi_write_png;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
@@ -25,6 +25,10 @@ public class Image {
     private final int channels;
     
     private ByteBuffer data;
+    
+    public Image(ByteBuffer rawData) {
+        this(rawData,true);
+    }
     
     public Image(ByteBuffer rawData, boolean flip) {
         try (MemoryStack stack = stackPush()) {

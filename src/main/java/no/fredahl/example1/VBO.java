@@ -1,7 +1,6 @@
 package no.fredahl.example1;
 
 import no.fredahl.engine.graphics.BufferObject;
-import no.fredahl.engine.graphics.VertexAttribute;
 
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;

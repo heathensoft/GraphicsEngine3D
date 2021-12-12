@@ -8,6 +8,7 @@ const vec3 GAMMA_CORRECTION = vec3(1.0/GAMMA);
 in vec3 mvVertexPos;
 in vec3 mvVertexNormal;
 
+
 out vec4 fragColor;
 
 // insert light.glsl

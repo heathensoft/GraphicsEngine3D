@@ -39,13 +39,13 @@ public class OBJFormatter {
         
     }
     
-    public static Geometry process(List<String> lines) {
+    public static Geometry process(List<String> layout) {
         List<Vector3f> vertices = new ArrayList<>();
         List<Vector2f> textures = new ArrayList<>();
         List<Vector3f> normals = new ArrayList<>();
         List<Face> faces = new ArrayList<>();
     
-        for (String line : lines) {
+        for (String line : layout) {
             String[] tokens = line.split("\\s+");
             switch (tokens[0]) {
                 case "v": // Geometric vertex

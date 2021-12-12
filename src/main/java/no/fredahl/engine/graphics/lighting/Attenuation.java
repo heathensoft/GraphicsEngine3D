@@ -1,5 +1,7 @@
 package no.fredahl.engine.graphics.lighting;
 
+import no.fredahl.engine.graphics.ShaderProgram;
+
 /**
  * @author Frederik Dahl
  * 02/12/2021
@@ -33,27 +35,52 @@ public class Attenuation {
         this.quadratic = q;
     }
     
-    public float getConstant() {
+    public Attenuation(Attenuation attenuation) {
+        if (attenuation == null) {
+            this.constant = ATT_65.constant;
+            this.linear = ATT_65.linear;
+            this.quadratic = ATT_65.quadratic;
+        }
+        else {
+            this.constant = attenuation.constant;
+            this.linear = attenuation.linear;
+            this.quadratic = attenuation.quadratic;
+        }
+    }
+    
+    public void set(Attenuation attenuation) {
+        if (attenuation != null) {
+            this.constant = attenuation.constant;
+            this.linear = attenuation.linear;
+            this.quadratic = attenuation.quadratic;
+        }
+    }
+    
+    public float constant() {
         return constant;
+    }
+    
+    public float linear() {
+        return linear;
+    }
+    
+    public float quadratic() {
+        return quadratic;
     }
     
     public void setConstant(float constant) {
         this.constant = constant;
     }
     
-    public float getLinear() {
-        return linear;
-    }
-    
     public void setLinear(float linear) {
         this.linear = linear;
     }
     
-    public float getQuadratic() {
-        return quadratic;
-    }
-    
     public void setQuadratic(float quadratic) {
         this.quadratic = quadratic;
+    }
+    
+    public void upload(ShaderProgram program) {
+    
     }
 }

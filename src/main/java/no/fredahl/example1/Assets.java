@@ -1,7 +1,6 @@
 package no.fredahl.example1;
 
 import no.fredahl.engine.graphics.Image;
-import no.fredahl.engine.graphics.Texture;
 import no.fredahl.engine.utility.FileUtility;
 
 import java.io.IOException;

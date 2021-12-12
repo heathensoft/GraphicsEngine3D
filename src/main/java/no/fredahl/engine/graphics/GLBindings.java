@@ -1,9 +1,10 @@
 package no.fredahl.engine.graphics;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.*;
 
 /**
  * @author Frederik Dahl
@@ -14,6 +15,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 public class GLBindings {
     
     private int boundAttributeArray = 0;
+    private int boundRenderBuffer = 0;
+    private int boundFrameBuffer = 0;
     private int boundBufferObject = 0;
     private int boundProgram = 0;
     private int boundTexture = 0;
@@ -27,29 +30,40 @@ public class GLBindings {
         return instance == null ? new GLBindings() : instance;
     }
     
+    
     public void bindAttributeArray(int id) {
         if (id == boundAttributeArray) return;
         glBindVertexArray(boundAttributeArray = id);
     }
     
-    public void bindBufferObject(int id, int target) {
+    public void bindBufferObject(int target, int id) {
         if (id == boundBufferObject) return;
         glBindBuffer(target, boundBufferObject = id);
     }
     
-    public void bindShaderProgram(int id) {
+    public void useShaderProgram(int id) {
         if (id == boundProgram) return;
         glUseProgram(boundProgram = id);
     }
     
-    public void bindTexture2D(int id) {
+    public void bindTexture(int id) {
         if (id == boundTexture) return;
         glBindTexture(GL_TEXTURE_2D, boundTexture = id);
     }
     
-    public void bindTexture1D(int id) {
+    public void bindTexture2(int target, int id) {
         if (id == boundTexture) return;
-        glBindTexture(GL_TEXTURE_1D, boundTexture = id);
+        glBindTexture(target, boundTexture = id);
+    }
+    
+    public void bindFrameBuffer(int target, int id) {
+        if (id == boundFrameBuffer) return;
+        glBindFramebuffer(target, boundFrameBuffer = id);
+    }
+    
+    public void bindRenderBuffer(int target, int id) {
+        if (id == boundRenderBuffer) return;
+        glBindRenderbuffer(target, boundRenderBuffer = id);
     }
     
 }
