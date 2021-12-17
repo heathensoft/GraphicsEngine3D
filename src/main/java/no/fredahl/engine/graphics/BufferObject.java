@@ -9,6 +9,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL30.glBindBufferBase;
+import static org.lwjgl.opengl.GL30.glBindBufferRange;
 
 /**
  * @author Frederik Dahl
@@ -82,7 +84,7 @@ public class BufferObject {
         }
     }
     
-    public void bufferData(int bytes) {
+    public void bufferData(long bytes) {
         glBufferData(target,bytes,usage);
     }
     
@@ -116,6 +118,14 @@ public class BufferObject {
     
     public void bufferSubData(ByteBuffer data, int offset) {
         glBufferSubData(target,offset,data);
+    }
+    
+    public void bindBufferBase(int bindingPoint) {
+        glBindBufferBase(target, bindingPoint,id);
+    }
+    
+    public void bindBufferRange(int bindingPoint, long offset, long size) {
+        glBindBufferRange(target, bindingPoint,id,offset,size);
     }
     
     public void bind() {

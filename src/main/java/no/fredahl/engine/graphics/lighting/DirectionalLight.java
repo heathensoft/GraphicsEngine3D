@@ -1,65 +1,74 @@
 package no.fredahl.engine.graphics.lighting;
 
+import no.fredahl.engine.graphics.Color;
 import org.joml.Vector3f;
+
+import java.nio.FloatBuffer;
+
+/**
+ * @author Frederik Dahl
+ * 17/12/2021
+ */
+
 
 public class DirectionalLight {
     
-    private final static Vector3f DEFAULT_AMBIENCE = new Vector3f(0.4f,0.4f,0.4f);
-    private final static Vector3f DEFAULT_DIFFUSION = new Vector3f(1.0f,1.0f,1.0f);
-    private final static Vector3f DEFAULT_SPECULAR = new Vector3f(0.5f,0.5f,0.5f);
-    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0.0f,1.0f,0.0f).normalize();
+    private final static float DEFAULT_AMBIENCE = 0.5f;
+    private final static float DEFAULT_DIFFUSE = 0.5f;
+    private final static Vector3f DEFAULT_COLOR = new Vector3f(Color.WHITE_RGB);
+    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0.2f,1.0f,0.2f).normalize();
     
-    private final Vector3f ambient;
-    private final Vector3f diffuse;
-    private final Vector3f specular;
+    private final Vector3f color;
     private final Vector3f direction;
     
+    private float ambient;
+    private float diffuse;
     
-    public DirectionalLight(Vector3f ambient, Vector3f diffuse, Vector3f specular, Vector3f direction) {
+    public DirectionalLight(Vector3f color, Vector3f direction, float ambient, float diffuse) {
+        this.color = color;
+        this.direction = direction;
         this.ambient = ambient;
         this.diffuse = diffuse;
-        this.specular = specular;
-        this.direction = direction;
-    }
-    
-    public DirectionalLight(Vector3f ambient, Vector3f diffuse, Vector3f specular) {
-        this(ambient,diffuse,specular,new Vector3f(DEFAULT_DIRECTION));
     }
     
     public DirectionalLight(Vector3f color, Vector3f direction) {
-        this(new Vector3f(DEFAULT_AMBIENCE),color,new Vector3f(DEFAULT_SPECULAR),direction);
+        this(color,direction,DEFAULT_AMBIENCE,DEFAULT_DIFFUSE);
     }
     
     public DirectionalLight(Vector3f color) {
-        this(new Vector3f(DEFAULT_AMBIENCE),color,new Vector3f(DEFAULT_SPECULAR));
+        this(color,new Vector3f(DEFAULT_DIRECTION));
     }
     
     public DirectionalLight() {
-        this(new Vector3f(DEFAULT_DIFFUSION));
+        this(new Vector3f(DEFAULT_COLOR));
     }
     
-    public Vector3f ambient() {
+    public float ambient() {
         return ambient;
     }
     
-    public void setAmbient(Vector3f ambient) {
-        this.ambient.set(ambient);
+    public void setAmbient(float ambient) {
+        this.ambient = ambient;
     }
     
-    public Vector3f diffuse() {
+    public float diffuse() {
         return diffuse;
     }
     
-    public void setDiffuse(Vector3f diffuse) {
-        this.diffuse.set(diffuse);
+    public void setDiffuse(float diffuse) {
+        this.diffuse = diffuse;
     }
     
-    public Vector3f specular() {
-        return specular;
+    public Vector3f color() {
+        return color;
     }
     
-    public void setSpecular(Vector3f specular) {
-        this.specular.set(specular);
+    public void setColor(Vector3f color) {
+        this.color.set(color);
+    }
+    
+    public void setColor(float r, float g, float b) {
+        this.color.set(r, g, b);
     }
     
     public Vector3f direction() {
@@ -70,11 +79,25 @@ public class DirectionalLight {
         this.direction.set(direction);
     }
     
-    public void setComponents(DirectionalLight directionalLight) {
-        if (directionalLight != null) {
-            this.setAmbient(directionalLight.ambient);
-            this.setDiffuse(directionalLight.diffuse);
-            this.setSpecular(directionalLight.specular);
+    public void setDirection(float x, float y, float z) {
+        this.direction.set(x,y,z);
+    }
+    
+    public void setComponents(DirectionalLight light) {
+        if (light != null) {
+            this.color.set(light.color);
+            this.ambient = light.ambient;
+            this.diffuse = light.diffuse;
         }
     }
+    
+    public void getSTD140(FloatBuffer buffer) {
+        buffer.put(color.x).put(color.y).put(color.z).put(ambient);
+        buffer.put(direction.x).put(direction.y).put(direction.z).put(diffuse);
+    }
+    
+    public static int sizeSTD140(int count) {
+        return count * 32;
+    }
+    
 }

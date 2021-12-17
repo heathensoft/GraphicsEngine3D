@@ -1,7 +1,5 @@
 package no.fredahl.engine.graphics.lighting;
 
-import no.fredahl.engine.graphics.ShaderProgram;
-
 /**
  * @author Frederik Dahl
  * 02/12/2021
@@ -56,6 +54,12 @@ public class Attenuation {
         }
     }
     
+    public void set(float c, float l, float q) {
+        this.constant = c;
+        this.linear = l;
+        this.quadratic = q;
+    }
+    
     public float constant() {
         return constant;
     }
@@ -80,7 +84,4 @@ public class Attenuation {
         this.quadratic = quadratic;
     }
     
-    public void upload(ShaderProgram program) {
-    
-    }
 }

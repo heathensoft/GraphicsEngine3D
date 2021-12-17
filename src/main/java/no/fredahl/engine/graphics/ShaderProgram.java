@@ -13,6 +13,8 @@ import java.util.Set;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30C.glUniform1uiv;
+import static org.lwjgl.opengl.GL31.glGetUniformBlockIndex;
+import static org.lwjgl.opengl.GL31.glUniformBlockBinding;
 import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 /**
@@ -25,6 +27,7 @@ public class ShaderProgram {
     
     private final int program;
     private final Map<String,Integer> uniforms;
+    private final Map<String,Integer> blockIndices;
     private final static GLBindings bindings = GLBindings.get();
     
     static public final Set<Integer> SUPPORTED = Set.of(
@@ -39,6 +42,7 @@ public class ShaderProgram {
         if (program == GL_FALSE)
             throw new Exception("Could not create program");
         uniforms = new HashMap<>();
+        blockIndices = new HashMap<>();
     }
     
     public void attach(String source, int type) throws Exception {
@@ -103,12 +107,28 @@ public class ShaderProgram {
         }
     }
     
+    public void createUniformBlockIndex(String name) {
+        int index = glGetUniformBlockIndex(program,name);
+        if (index < 0)
+            throw new RuntimeException("No such block:" + name);
+        blockIndices.put(name,index);
+    }
+    
+    public void bindBlock(String name, int bindingPoint) {
+        Integer index = blockIndices.get(name);
+        if (index == null)
+            throw new RuntimeException("No such block:" + name);
+        glUniformBlockBinding(program,index,bindingPoint);
+    }
+    
     public void createUniform(String name) {
         int uniformLocation = glGetUniformLocation(program, name);
         if (uniformLocation < 0)
             throw new RuntimeException("No such uniform:" + name);
         uniforms.put(name, uniformLocation);
     }
+    
+    /*
     
     public void createPointLightUniformArray(String name, int size) {
         for (int i = 0; i < size; i++) {
@@ -208,6 +228,8 @@ public class ShaderProgram {
         setUniform(name + ".e", material.emissivity());
         setUniform1f(name + ".shine", material.shine());
     }
+    
+     */
     
     public void setUniform(String name, Vector2f value) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
