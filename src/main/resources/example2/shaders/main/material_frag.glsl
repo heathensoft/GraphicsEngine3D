@@ -1,5 +1,8 @@
 #version 420
 
+const float GAMMA = 2.2;
+const vec3 GAMMA_CORRECTION = vec3(1.0/GAMMA);
+
 in VS_OUT {
     vec3 pos;
     vec3 nor;
@@ -73,7 +76,7 @@ void main() {
     }
     combined += e_color;
     // Gamma correction must be applied in the last shader only (last framebuffer)
-    //combined = pow(combined,GAMMA_CORRECTION);
+    combined = pow(combined,GAMMA_CORRECTION);
     color = vec4(combined,alpha);
     //color = vec4(1,1,1,1);
 

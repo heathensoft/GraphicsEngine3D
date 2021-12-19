@@ -28,17 +28,17 @@ public class World {
         Transform heightmapTransform = new Transform();
         heightmapTransform.setScale(20f);
         heightmapTransform.setPosition(0,0,0);
-        GameObject heightmap = new GameObject(heightmapMesh,heightmapTransform,16);
+        GameObject heightmap = new GameObject(heightmapMesh,heightmapTransform,11);
         gameObjects.add(heightmap);
         
         
         lights = new Lights(1,5,1,0);
         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1,1,1),new Vector3f(1f,1f,0).normalize());
-        directionalLight.setAmbient(0.5f);
-        directionalLight.setDiffuse(0.6f);
+        directionalLight.setAmbient(0.1f);
+        directionalLight.setDiffuse(0.1f);
         PointLight pointLight = new PointLight(new Vector3f(1,0,0),new Vector3f(0,6,0));
         pointLight.setDiffuse(0.4f);
-        pointLight.setAmbient(0.0f);
+        pointLight.setAmbient(0.1f);
         lights.addPointLight(pointLight);
         lights.addDirectionalLight(directionalLight);
         
@@ -48,7 +48,7 @@ public class World {
                 if (j % 2 == 0) continue;
                 if (i % 2 == 0) continue;
                 int m = (20 + i + j) % 26;
-                createCube(i,2,j,m);
+                createCube(i,3,j,m);
             }
         }
     }
