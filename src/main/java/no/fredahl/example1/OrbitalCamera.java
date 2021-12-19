@@ -17,7 +17,7 @@ public class OrbitalCamera implements ICamera {
     
     public final static float PI2 = (float) (Math.PI * 2);
     public final static float MAX_PITCH = Math.toRadians(89);
-    public final static float MIN_PITCH = Math.toRadians(0);
+    public final static float MIN_PITCH = Math.toRadians(15);
     public final static float MIN_PIVOT_DISTANCE = 5.0f;
     public final static float MAX_PIVOT_DISTANCE = 40.0f;
     
@@ -35,8 +35,6 @@ public class OrbitalCamera implements ICamera {
     public final Vector3f right= new Vector3f();
     public final Vector3f up = new Vector3f();
     
-    public float focusRadius = 0.5f;
-    public float springStrength = 4f;
     public float horizontalSensitivity = 2;
     public float verticalSensitivity = 2;
     public float distanceFromPivot = 10;
@@ -59,8 +57,7 @@ public class OrbitalCamera implements ICamera {
     }
     
     public void follow(Vector3f targetFocus) {
-        updateFocusPoint(targetFocus);
-        //spring(currentFocus);
+        currentFocus.set(targetFocus);
         float horizontalDist = distanceFromPivot * Math.cos(verticalRotation);
         float verticalDist = distanceFromPivot * Math.sin(verticalRotation);
         float offsetX = horizontalDist * Math.sin(horizontalRotation);
@@ -73,28 +70,6 @@ public class OrbitalCamera implements ICamera {
         right.set(up).cross(direction).normalize();
         up.set(direction).cross(right).normalize();
         worldToView.identity().lookAt(position,currentFocus,up);
-    }
-    
-    private void updateFocusPoint(Vector3f targetFocus) {
-        /*
-        if (focusRadius > 0) {
-            float distance = currentFocus.distance(targetFocus);
-            System.out.println(distance);
-            if (distance > focusRadius) {
-                currentFocus.x = Math.lerp(currentFocus.x, targetFocus.x, focusRadius / distance * 1/2);
-                currentFocus.y = Math.lerp(currentFocus.y, targetFocus.y, focusRadius / distance * 1/2);
-                currentFocus.z = Math.lerp(currentFocus.z, targetFocus.z, focusRadius / distance * 1/2);
-            }
-        }
-        
-         */
-        currentFocus.set(targetFocus);
-    }
-    
-    private Vector3f spring(Vector3f target) {
-        float distance = position.distance(target);
-        tmpV3f.set(target).sub(position).normalize();
-        return tmpV3f.mul(distance * distance * springStrength);
     }
     
     public Rayf getPickingRay(float ndcX, float ndcY) {

@@ -27,6 +27,7 @@ public class Attenuation {
     private float linear;
     private float quadratic;
     
+    
     public Attenuation(float c, float l, float q) {
         this.constant = c;
         this.linear = l;

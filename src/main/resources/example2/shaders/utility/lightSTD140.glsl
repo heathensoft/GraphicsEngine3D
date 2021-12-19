@@ -11,17 +11,25 @@
 // light has no specular specific component. It's treated to always be 1.0 (or 1.0, 1.0, 1.0)
 //
 
+struct Material {
+    vec3 ambient;
+    float emission;
+    vec3 diffuse;
+    float alpha;
+    vec3 specular;
+    float shine;
+};
 
-struct DirectionalLight { // 32 byte
+struct DirectionalLight {
     vec3 color;
     float ambient;
     vec3 direction;
     float diffuse;
 };
 
-struct PointLight {  // 48 byte
+struct PointLight {
     vec3 color;
-    float intensity; // padding really
+    float intensity;
     vec3 position;
     float ambient;
     float diffuse;
@@ -30,7 +38,7 @@ struct PointLight {  // 48 byte
     float quadratic;
 };
 
-struct SpotLight { // 64 byte
+struct SpotLight {
     vec3 color;
     float ambient;
     vec3 position;
@@ -43,22 +51,6 @@ struct SpotLight { // 64 byte
     float outerCutoff;
 };
 
-struct Material { // 48 bytes
-    vec3 ambient;
-    float emissive;
-    vec3 diffuse;
-    float alpha;
-    vec3 specular;
-    float shine;
-};
-
-vec3 a_color;
-vec3 d_color;
-vec3 s_color;
-vec3 e_color;
-float shine;
-float alpha;
-
 const float PI = 3.14159265;
 
 vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {
@@ -67,7 +59,7 @@ vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
     // specular
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 8.0 + shine ) / ( 8.0 * PI );
+    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
     // apply
     vec3 a = l.ambient * a_color;
@@ -84,11 +76,11 @@ vec3 calc_point_light(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
     // specular
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 8.0 + shine ) / ( 8.0 * PI );
+    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
     // attenuation
-    float d = length(lightVec);
-    float att = 1.0 / (l.constant + l.linear * d + l.quadratic * d * d);
+    float dist = length(lightVec);
+    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);
     // apply
     vec3 a = l.ambient * a_color;
     vec3 d = l.diffuse * d_color * diff;
@@ -96,7 +88,7 @@ vec3 calc_point_light(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
 
     a *= att;
     d *= att;
-    d *= att;
+    s *= att;
 
     return (a + d + s);
 }
@@ -108,15 +100,15 @@ vec3 calc_spot_light(SpotLight l, vec3 pos, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
     // specular
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 8.0 + shine ) / ( 8.0 * PI );
+    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
     // light intensity based on cone parameters
     float theta = dot(-lightDir, normalize(-l.coneDir)); // might need to inverse this
     float epsilon = (l.innerCutoff - l.outerCutoff);
     float intensity = clamp((theta - l.outerCutoff) / epsilon, 0.0, 1.0);
     // attenuation
-    float d = length(lightVec);
-    float att = 1.0 / (l.constant + l.linear * d + l.quadratic * d * d);
+    float dist = length(lightVec);
+    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);
     // apply
     vec3 a = l.ambient * a_color;
     vec3 d = l.diffuse * d_color * diff;

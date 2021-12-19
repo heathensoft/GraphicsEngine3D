@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 layout (location=0) in vec3 v_in_position;
 layout (location=3) in vec4 v_in_color;

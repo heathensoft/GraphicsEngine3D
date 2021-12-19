@@ -431,4 +431,8 @@ public class ShaderProgram {
         if (glGetProgrami(program,GL_DELETE_STATUS) == GL_FALSE)
             glDeleteProgram(program);
     }
+    
+    public static String insert(String insert, String replace, String glslString) {
+        return glslString.replace(replace,insert);
+    }
 }

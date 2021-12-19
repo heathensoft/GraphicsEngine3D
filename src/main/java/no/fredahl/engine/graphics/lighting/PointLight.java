@@ -24,6 +24,7 @@ public class PointLight {
     protected final Vector3f position;
     protected final Attenuation attenuation;
     
+    
     public PointLight(Vector3f color, Vector3f position, float ambient, float diffuse, Attenuation attenuation) {
         this.color = color;
         this.position = position;
@@ -117,6 +118,16 @@ public class PointLight {
         }
     }
     
+    public void set(PointLight light) {
+        if (light != null) {
+            setColor(light.color);
+            setAmbient(light.ambient);
+            setDiffuse(light.diffuse);
+            setPosition(light.position);
+            setAttenuation(light.attenuation);
+        }
+    }
+    
     public void getSTD140(FloatBuffer buffer) {
         buffer.put(color.x).put(color.y).put(color.z).put(0.0f);
         buffer.put(position.x).put(position.y).put(position.z).put(ambient);
@@ -125,5 +136,9 @@ public class PointLight {
     
     public static int sizeSTD140(int count) {
         return count * 48;
+    }
+    
+    public static int sizeInFloats(int count) {
+        return count * 12;
     }
 }

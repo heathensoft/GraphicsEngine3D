@@ -46,8 +46,7 @@ public class Renderer {
         program.setUniform("projectionMatrix", transform.getProjectionMatrix());
         for (Unit unit : units) {
             Matrix4f modelToWorld = unit.getModelToWorld();
-            tmpM4f.set(transform.getWorldToViewMatrix());
-            tmpM4f.mul(modelToWorld);
+            tmpM4f.set(transform.getWorldToViewMatrix()).mul(modelToWorld);
             program.setUniform("modelViewMatrix", tmpM4f);
             unit.draw();
         }

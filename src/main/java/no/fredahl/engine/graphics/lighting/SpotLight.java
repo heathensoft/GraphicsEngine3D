@@ -17,6 +17,7 @@ public class SpotLight {
     private float cutoffInner;
     private float cutoffOuter;
     
+    
     public SpotLight(PointLight light, Vector3f direction, float cutoffInner, float cutoffOuter) {
         this.light = light;
         this.direction = direction;
@@ -26,6 +27,27 @@ public class SpotLight {
     
     public SpotLight(PointLight light, Vector3f direction, float cutoff) {
         this(light,direction,cutoff,cutoff);
+    }
+    
+    public SpotLight(PointLight light, Vector3f direction) {
+        this(light,direction,1f);
+    }
+    
+    public SpotLight(PointLight light) {
+        this(light,new Vector3f(0,-1,0),1f);
+    }
+    
+    public SpotLight() {
+        this(new PointLight(),new Vector3f(0,-1,0),1f);
+    }
+    
+    public void set(SpotLight light) {
+        if (light != null) {
+            setDirection(light.direction);
+            this.light.set(light.light);
+            this.cutoffInner = light.cutoffInner;
+            this.cutoffOuter = light.cutoffOuter;
+        }
     }
     
     public PointLight light() {
@@ -70,5 +92,9 @@ public class SpotLight {
     
     public static int sizeSTD140(int count) {
         return count * 64;
+    }
+    
+    public static int sizeInFloats(int count) {
+        return count * 16;
     }
 }

@@ -45,6 +45,7 @@ public class World {
     
     public void dispose() {
         units.clear();
+        unitMesh.free();
         Assets.get().dispose();
     }
 }

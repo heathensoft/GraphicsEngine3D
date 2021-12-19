@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 //in vec4 v_out_color;
 //in vec2 v_out_texCoords;

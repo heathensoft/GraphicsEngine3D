@@ -255,4 +255,8 @@ public class Material {
     public static int sizeSTD140(int count) {
         return count * 48;
     }
+    
+    public static int sizeInFloats(int count) {
+        return count * 12;
+    }
 }

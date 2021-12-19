@@ -22,8 +22,8 @@ public class Engine {
     
     private static Engine instance;
     private final Thread GLContext;
-    private final Time frames;
     private final Object lock;
+    public final Time time;
     public final Window window;
     private Application application;
     private boolean running;
@@ -31,11 +31,11 @@ public class Engine {
     private Engine() {
         window = new Window();
         lock = new Object();
-        frames = new Time();
+        time = new Time();
         GLContext = new Thread(() -> {
             try {
                 window.initialize();
-                frames.init();
+                time.init();
                 application.start(window);
                 running = true;
                 float alpha;
@@ -43,13 +43,13 @@ public class Engine {
                 float accumulator = 0f;
                 float delta = 1f / TARGET_UPS;
                 while (running) {
-                    frameTime = frames.frameTime();
+                    frameTime = time.frameTime();
                     accumulator += frameTime;
                     while (accumulator >= delta) {
                         if (!window.isMinimized())
                             application.input(delta);
                         application.update(delta);
-                        frames.incUpsCount();
+                        time.incUpsCount();
                         accumulator -= delta;
                     }
                     synchronized (lock) {
@@ -62,8 +62,8 @@ public class Engine {
                             }
                         }
                     }
-                    frames.incFpsCount();
-                    frames.update();
+                    time.incFpsCount();
+                    time.update();
                     if (!window.vsyncEnabled()) {
                         if (CAP_FPS) sync();
                     }
@@ -132,8 +132,8 @@ public class Engine {
     
     private void sync() {
         
-        double lastFrame = frames.lastFrame();
-        double now = frames.timeSeconds();
+        double lastFrame = time.lastFrame();
+        double now = time.timeSeconds();
         float targetTime = 0.96f / TARGET_FPS;
         
         while (now - lastFrame < targetTime) {
@@ -145,7 +145,7 @@ public class Engine {
                     e.printStackTrace();
                 }
             }
-            now = frames.timeSeconds();
+            now = time.timeSeconds();
         }
     }
     
@@ -180,12 +180,12 @@ public class Engine {
         
         public Time(float frameTimeLimit) { this.frameTimeLimit = frameTimeLimit; }
         
-        public void init() {
+        protected void init() {
             initTime = nanoTime();
             lastFrame = timeSeconds();
         }
         
-        public float frameTime() {
+        protected float frameTime() {
             double timeSeconds = timeSeconds();
             float frameTime = (float) (timeSeconds - lastFrame);
             frameTime = Math.min(frameTime, frameTimeLimit);
@@ -194,7 +194,7 @@ public class Engine {
             return frameTime;
         }
         
-        public void update() {
+        protected void update() {
             
             if (timeAccumulator > 1) {
                 fps = fpsCount;
@@ -208,9 +208,9 @@ public class Engine {
         
         public double runTime() { return nanoTime() - initTime; }
         
-        public void incFpsCount() { fpsCount++; }
+        protected void incFpsCount() { fpsCount++; }
         
-        public void incUpsCount() { upsCount++; }
+        protected void incUpsCount() { upsCount++; }
         
         public int fps() {
             return fps > 0 ? fps : fpsCount;
@@ -218,7 +218,7 @@ public class Engine {
         
         public int ups() { return ups > 0 ? ups : upsCount; }
         
-        public double lastFrame() { return lastFrame; }
+        protected double lastFrame() { return lastFrame; }
         
         public float frameTimeLimit() { return frameTimeLimit; }
         

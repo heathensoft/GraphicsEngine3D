@@ -16,13 +16,14 @@ public class DirectionalLight {
     private final static float DEFAULT_AMBIENCE = 0.5f;
     private final static float DEFAULT_DIFFUSE = 0.5f;
     private final static Vector3f DEFAULT_COLOR = new Vector3f(Color.WHITE_RGB);
-    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0.2f,1.0f,0.2f).normalize();
+    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0f,1.0f,1.0f).normalize();
     
     private final Vector3f color;
     private final Vector3f direction;
     
     private float ambient;
     private float diffuse;
+    
     
     public DirectionalLight(Vector3f color, Vector3f direction, float ambient, float diffuse) {
         this.color = color;
@@ -91,6 +92,15 @@ public class DirectionalLight {
         }
     }
     
+    public void set(DirectionalLight light) {
+        if (light != null) {
+            this.direction.set(light.direction);
+            this.color.set(light.color);
+            this.ambient = light.ambient;
+            this.diffuse = light.diffuse;
+        }
+    }
+    
     public void getSTD140(FloatBuffer buffer) {
         buffer.put(color.x).put(color.y).put(color.z).put(ambient);
         buffer.put(direction.x).put(direction.y).put(direction.z).put(diffuse);
@@ -98,6 +108,10 @@ public class DirectionalLight {
     
     public static int sizeSTD140(int count) {
         return count * 32;
+    }
+    
+    public static int sizeInFloats(int count) {
+        return count * 8;
     }
     
 }
