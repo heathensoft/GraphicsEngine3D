@@ -36,13 +36,14 @@ public class Assets {
         return instance == null ? new Assets() : instance;
     }
     
-    public Mesh heightmapMesh(String path, float amplitude) throws IOException {
+    public Mesh heightmapMesh(String path, float amplitude, int smoothen) throws IOException {
         Mesh mesh = GEOMETRY.get(path);
         if (mesh != null) return mesh;
         Image img = new Image(resource.toBuffer(path,1024),false);
         Heightmap heightmap = new Heightmap(img,amplitude);
-        heightmap.smoothen(true);
-        heightmap.smoothen(true);
+        for (int i = 0; i < smoothen; i++) {
+            heightmap.smoothen(true);
+        }
         mesh = new Mesh(heightmap);
         GEOMETRY.put(path,mesh);
         return mesh;

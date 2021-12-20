@@ -25,7 +25,7 @@ public class World {
     public World() throws Exception {
         
         gameObjects = new ArrayList<>();
-        Mesh heightmapMesh = Assets.get().heightmapMesh(Assets.HEIGHTMAP_PNG,0.08f);
+        Mesh heightmapMesh = Assets.get().heightmapMesh(Assets.HEIGHTMAP_PNG,0.08f,0);
         
         float scale = 20f;
         
