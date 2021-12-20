@@ -135,36 +135,36 @@ public class Lights {
                        "const float PI = 3.14159265;\n" +
                        "\n" +
                        "vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {\n" +
+                       "    \n" +
                        "    vec3 lightDir = normalize(l.direction);\n" +
-                       "    // diffuse\n" +
-                       "    float diff = max(dot(norm,lightDir), 0.0);\n" +
-                       "    // specular\n" +
+                       "    float diff = max(dot(norm, lightDir), 0.0);\n" +
+                       "    \n" +
                        "    vec3 halfwayDir = normalize(lightDir + eye);\n" +
                        "    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );\n" +
                        "    float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;\n" +
-                       "    // apply\n" +
-                       "    vec3 a = l.color * l.ambient * a_color;\n" +
-                       "    vec3 d = l.color * l.diffuse * d_color * diff;\n" +
+                       "    \n" +
+                       "    vec3 a = l.color * a_color * l.ambient;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
                        "    vec3 s = l.color * s_color * spec;\n" +
                        "\n" +
                        "    return (a + d + s);\n" +
                        "}\n" +
                        "\n" +
                        "vec3 calc_point_light(PointLight l, vec3 pos, vec3 eye, vec3 norm) {\n" +
+                       "    \n" +
                        "    vec3 lightVec = l.position - pos;\n" +
                        "    vec3 lightDir = normalize(lightVec);\n" +
-                       "    // diffuse\n" +
                        "    float diff = max(dot(norm, lightDir), 0.0);\n" +
-                       "    // specular\n" +
+                       "    \n" +
                        "    vec3 halfwayDir = normalize(lightDir + eye);\n" +
                        "    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );\n" +
                        "    float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;\n" +
-                       "    // attenuation\n" +
+                       "    \n" +
                        "    float dist = length(lightVec);\n" +
                        "    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);\n" +
-                       "    // apply\n" +
-                       "    vec3 a = l.color * l.ambient * a_color;\n" +
-                       "    vec3 d = l.color * l.diffuse * d_color * diff;\n" +
+                       "    \n" +
+                       "    vec3 a = l.color * a_color * l.ambient;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
                        "    vec3 s = l.color * s_color * spec;\n" +
                        "\n" +
                        "    a *= att;\n" +
@@ -175,24 +175,24 @@ public class Lights {
                        "}\n" +
                        "\n" +
                        "vec3 calc_spot_light(SpotLight l, vec3 pos, vec3 eye, vec3 norm) {\n" +
+                       "    \n" +
                        "    vec3 lightVec = l.position - pos;\n" +
                        "    vec3 lightDir = normalize(lightVec);\n" +
-                       "    // diffuse\n" +
                        "    float diff = max(dot(norm, lightDir), 0.0);\n" +
-                       "    // specular\n" +
+                       "    \n" +
                        "    vec3 halfwayDir = normalize(lightDir + eye);\n" +
                        "    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );\n" +
                        "    float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;\n" +
-                       "    // light intensity based on cone parameters\n" +
-                       "    float theta = dot(-lightDir, normalize(-l.coneDir)); // might need to inverse this\n" +
+                       "    \n" +
+                       "    float theta = dot(-lightDir, normalize(-l.coneDir));\n" +
                        "    float epsilon = (l.innerCutoff - l.outerCutoff);\n" +
                        "    float intensity = clamp((theta - l.outerCutoff) / epsilon, 0.0, 1.0);\n" +
-                       "    // attenuation\n" +
+                       "    \n" +
                        "    float dist = length(lightVec);\n" +
                        "    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);\n" +
-                       "    // apply\n" +
-                       "    vec3 a = l.color * l.ambient * a_color;\n" +
-                       "    vec3 d = l.color * l.diffuse * d_color * diff;\n" +
+                       "    \n" +
+                       "    vec3 a = l.color * a_color * l.ambient;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
                        "    vec3 s = l.color * s_color * spec;\n" +
                        "\n" +
                        "    a *= att * intensity;\n" +

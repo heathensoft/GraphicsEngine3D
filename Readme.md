@@ -25,6 +25,9 @@ From example2:
 
 ![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap00.png?raw=true)
 
+Lighting and Materials;
+
+![2](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap01.png?raw=true)
 
 ### On the technical side:
 

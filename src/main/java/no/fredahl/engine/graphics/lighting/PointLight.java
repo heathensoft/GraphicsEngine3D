@@ -53,79 +53,89 @@ public class PointLight {
         return ambient;
     }
     
-    public void setAmbient(float ambient) {
+    public PointLight setAmbient(float ambient) {
         this.ambient = ambient;
+        return this;
     }
     
     public float diffuse() {
         return diffuse;
     }
     
-    public void setDiffuse(float diffuse) {
+    public PointLight setDiffuse(float diffuse) {
         this.diffuse = diffuse;
+        return this;
     }
     
     public Vector3f color() {
         return color;
     }
     
-    public void setColor(Vector3f color) {
+    public PointLight setColor(Vector3f color) {
         this.color.set(color);
+        return this;
     }
     
-    public void setColor(float r, float g, float b) {
+    public PointLight setColor(float r, float g, float b) {
         this.color.set(r, g, b);
+        return this;
     }
     
     public Vector3f position() {
         return position;
     }
     
-    public void setPosition(Vector3f position) {
+    public PointLight setPosition(Vector3f position) {
         this.position.set(position);
+        return this;
     }
     
-    public void setPosition(float x, float y, float z) {
+    public PointLight setPosition(float x, float y, float z) {
         this.position.set(x,y,z);
+        return this;
     }
     
-    public void translate(Vector3f translation) {
+    public PointLight translate(Vector3f translation) {
         this.position.add(translation);
+        return this;
     }
     
-    public void translate(float x, float y, float z) {
+    public PointLight translate(float x, float y, float z) {
         this.position.add(x,y,z);
+        return this;
     }
     
     public Attenuation attenuation() {
         return attenuation;
     }
     
-    public void setAttenuation(Attenuation attenuation) {
+    public PointLight setAttenuation(Attenuation attenuation) {
         this.attenuation.set(attenuation);
+        return this;
     }
     
-    public void setAttenuation(float c, float l, float q) {
+    public PointLight setAttenuation(float c, float l, float q) {
         this.attenuation.set(c, l, q);
+        return this;
     }
     
-    public void setComponents(PointLight light) {
+    public PointLight setComponents(PointLight light) {
         if (light != null) {
             setColor(light.color);
             setAmbient(light.ambient);
             setDiffuse(light.diffuse);
             setAttenuation(light.attenuation);
-        }
+        } return this;
     }
     
-    public void set(PointLight light) {
+    public PointLight set(PointLight light) {
         if (light != null) {
             setColor(light.color);
             setAmbient(light.ambient);
             setDiffuse(light.diffuse);
             setPosition(light.position);
             setAttenuation(light.attenuation);
-        }
+        } return this;
     }
     
     public void getSTD140(FloatBuffer buffer) {

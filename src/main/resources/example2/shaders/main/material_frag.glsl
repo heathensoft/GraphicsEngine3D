@@ -31,8 +31,6 @@ uniform int u_material_index;
 
 void setupColors() {
 
-
-
     Material m = ubo_materials.list[u_material_index];
     a_color = m.ambient;
     d_color = m.diffuse;
@@ -40,18 +38,6 @@ void setupColors() {
     e_color = m.diffuse * m.emission;
     shine = m.shine;
     alpha = m.alpha;
-
-
-
-
-    /*
-    a_color = vec3(1.0,0.8,1.0);
-    d_color = a_color * 0.6;
-    s_color = a_color * 0.1;
-    e_color = a_color * 0;
-    shine = 50.0;
-    alpha = 1.0;
-    */
 
 }
 
@@ -76,7 +62,7 @@ void main() {
     }
     combined += e_color;
     // Gamma correction must be applied in the last shader only (last framebuffer)
-    combined = pow(combined,GAMMA_CORRECTION);
+    //combined = pow(combined,GAMMA_CORRECTION);
     color = vec4(combined,alpha);
     //color = vec4(1,1,1,1);
 

@@ -48,57 +48,63 @@ public class DirectionalLight {
         return ambient;
     }
     
-    public void setAmbient(float ambient) {
+    public DirectionalLight setAmbient(float ambient) {
         this.ambient = ambient;
+        return this;
     }
     
     public float diffuse() {
         return diffuse;
     }
     
-    public void setDiffuse(float diffuse) {
+    public DirectionalLight setDiffuse(float diffuse) {
         this.diffuse = diffuse;
+        return this;
     }
     
     public Vector3f color() {
         return color;
     }
     
-    public void setColor(Vector3f color) {
+    public DirectionalLight setColor(Vector3f color) {
         this.color.set(color);
+        return this;
     }
     
-    public void setColor(float r, float g, float b) {
+    public DirectionalLight setColor(float r, float g, float b) {
         this.color.set(r, g, b);
+        return this;
     }
     
     public Vector3f direction() {
         return direction;
     }
     
-    public void setDirection(Vector3f direction) {
+    public DirectionalLight setDirection(Vector3f direction) {
         this.direction.set(direction);
+        return this;
     }
     
-    public void setDirection(float x, float y, float z) {
+    public DirectionalLight setDirection(float x, float y, float z) {
         this.direction.set(x,y,z);
+        return this;
     }
     
-    public void setComponents(DirectionalLight light) {
+    public DirectionalLight setComponents(DirectionalLight light) {
         if (light != null) {
             this.color.set(light.color);
             this.ambient = light.ambient;
             this.diffuse = light.diffuse;
-        }
+        } return this;
     }
     
-    public void set(DirectionalLight light) {
+    public DirectionalLight set(DirectionalLight light) {
         if (light != null) {
             this.direction.set(light.direction);
             this.color.set(light.color);
             this.ambient = light.ambient;
             this.diffuse = light.diffuse;
-        }
+        } return this;
     }
     
     public void getSTD140(FloatBuffer buffer) {

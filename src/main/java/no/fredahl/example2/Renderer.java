@@ -1,6 +1,5 @@
 package no.fredahl.example2;
 
-import no.fredahl.engine.Engine;
 import no.fredahl.engine.graphics.ShaderProgram;
 import no.fredahl.engine.graphics.lighting.Lights;
 import no.fredahl.engine.graphics.lighting.Material;
