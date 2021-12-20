@@ -59,7 +59,7 @@ vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
+    float energyConservation = ( 16.0 + shine ) / ( 16.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
 
     vec3 a = l.color * a_color * l.ambient;
@@ -76,7 +76,7 @@ vec3 calc_point_light(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
+    float energyConservation = ( 16.0 + shine ) / ( 16.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
 
     float dist = length(lightVec);
@@ -100,7 +100,7 @@ vec3 calc_spot_light(SpotLight l, vec3 pos, vec3 eye, vec3 norm) {
     float diff = max(dot(norm, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + eye);
-    float energyConservation = ( 32.0 + shine ) / ( 32.0 * PI );
+    float energyConservation = ( 16.0 + shine ) / ( 16.0 * PI );
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
 
     float theta = dot(-lightDir, normalize(-l.coneDir));

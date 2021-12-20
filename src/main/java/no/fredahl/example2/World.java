@@ -74,7 +74,7 @@ public class World {
     private static float timer = 0f;
     
     public void update(float dt) {
-        /*
+        
         timer += dt;
         if (timer >= 2f) {
             timer = 0f;
@@ -82,7 +82,7 @@ public class World {
                 object.material = (object.material + 1) % 26;
             }
         }
-         */
+        
     }
     
     public void createCube(float x, float y, float z, int material) throws IOException {
