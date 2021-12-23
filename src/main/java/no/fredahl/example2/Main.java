@@ -69,6 +69,11 @@ public class Main implements Application {
             public boolean cullFace() {
                 return true;
             }
+    
+            @Override
+            public boolean showTriangles() {
+                return false;
+            }
         });
     }
 }

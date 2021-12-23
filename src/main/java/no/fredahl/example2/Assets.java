@@ -22,10 +22,12 @@ public class Assets {
     private static final FileUtility.ResourceUtility resource = FileUtility.resource;
     
     public static final String CUBE_OBJ = "example2/obj/cube.obj";
+    public static final String TEST_VS = "example2/shaders/main/shadowMap_vert.glsl";
+    public static final String TEST_FS = "example2/shaders/main/shadowMap_frag.glsl";
+    public static final String LIGHTING_SHADER = "example2/shaders/utility/lighting.glsl";
     public static final String MATERIAL_VS = "example2/shaders/main/material_vert.glsl";
     public static final String MATERIAL_FS = "example2/shaders/main/material_frag.glsl";
-    //public static final String MATERIAL_VS = "example2/shaders/main/mat_vert.glsl";
-    //public static final String MATERIAL_FS = "example2/shaders/main/mat_frag.glsl";
+    public static final String DEPTH_MAP_VS = "example2/shaders/main/depthMap_vert.glsl";
     public static final String HEIGHTMAP_PNG = "example2/png/heightmap.png";
     
     private final Map<String,Mesh> GEOMETRY = new HashMap<>();

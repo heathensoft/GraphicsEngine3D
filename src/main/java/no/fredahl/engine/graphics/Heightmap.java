@@ -176,7 +176,6 @@ public class Heightmap {
         try { normals = MemoryUtil.memAllocFloat(vertices * 3);
             final int cBounds = cols - 1;
             final int rBounds = rows - 1;
-            int p = 0;
             float hu, hr, hd, hl;
             Vector3f normalVec = new Vector3f();
             for (int r = 0; r < rows; r++) {

@@ -185,11 +185,11 @@ public class Texture {
     }
     
     public void bind() {
-        bindings.bindTexture2(target,id);
+        bindings.bindTexture(target,id);
     }
     
     public void unbind() {
-        bindings.bindTexture2(target,0);
+        bindings.bindTexture(target,0);
     }
     
     public void delete() {
@@ -206,5 +206,9 @@ public class Texture {
     
     public int depth() {
         return depth;
+    }
+    
+    public int id() {
+        return id;
     }
 }

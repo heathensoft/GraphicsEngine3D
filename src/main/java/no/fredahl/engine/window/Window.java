@@ -700,7 +700,7 @@ public class Window implements GLFWindow {
         glfwGetWindowSize(window,w,h);
     }
     
-   private void getWindowPosition(IntBuffer x, IntBuffer y) {
+    private void getWindowPosition(IntBuffer x, IntBuffer y) {
         glfwGetWindowPos(window, x, y);
     }
     

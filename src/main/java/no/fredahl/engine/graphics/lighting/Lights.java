@@ -71,6 +71,18 @@ public class Lights {
             spotLights.add(light);
     }
     
+    public List<SpotLight> spotLights() {
+        return spotLights;
+    }
+    
+    public List<PointLight> pointLights() {
+        return pointLights;
+    }
+    
+    public List<DirectionalLight> directionalLights() {
+        return directionalLights;
+    }
+    
     public void removeDirectionalLight(DirectionalLight light) {
         directionalLights.remove(light);
     }
@@ -144,8 +156,8 @@ public class Lights {
                        "    float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;\n" +
                        "\n" +
                        "    vec3 a = l.color * a_color * l.ambient;\n" +
-                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
-                       "    vec3 s = l.color * s_color * spec;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff * shadow;\n" +
+                       "    vec3 s = l.color * s_color * spec * shadow;\n" +
                        "\n" +
                        "    return (a + d + s);\n" +
                        "}\n" +
@@ -164,8 +176,8 @@ public class Lights {
                        "    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);\n" +
                        "\n" +
                        "    vec3 a = l.color * a_color * l.ambient;\n" +
-                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
-                       "    vec3 s = l.color * s_color * spec;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff * shadow;\n" +
+                       "    vec3 s = l.color * s_color * spec * shadow;\n" +
                        "\n" +
                        "    a *= att;\n" +
                        "    d *= att;\n" +
@@ -192,8 +204,8 @@ public class Lights {
                        "    float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);\n" +
                        "\n" +
                        "    vec3 a = l.color * a_color * l.ambient;\n" +
-                       "    vec3 d = l.color * d_color * l.diffuse * diff;\n" +
-                       "    vec3 s = l.color * s_color * spec;\n" +
+                       "    vec3 d = l.color * d_color * l.diffuse * diff * shadow;\n" +
+                       "    vec3 s = l.color * s_color * spec * shadow;\n" +
                        "\n" +
                        "    a *= att * intensity;\n" +
                        "    d *= att * intensity;\n" +

@@ -43,10 +43,10 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.bind();
         program.setUniform1i("texture_sampler", 0);
-        program.setUniform("projectionMatrix", transform.getProjectionMatrix());
+        program.setUniform("projectionMatrix", transform.projection());
         for (Unit unit : units) {
             Matrix4f modelToWorld = unit.getModelToWorld();
-            tmpM4f.set(transform.getWorldToViewMatrix()).mul(modelToWorld);
+            tmpM4f.set(transform.view()).mul(modelToWorld);
             program.setUniform("modelViewMatrix", tmpM4f);
             unit.draw();
         }

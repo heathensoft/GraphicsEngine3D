@@ -107,12 +107,32 @@ public class OrbitalCamera implements ICamera {
     }
     
     @Override
-    public final Matrix4f getProjectionMatrix() {
+    public final Matrix4f projection() {
         return projection;
     }
     
     @Override
-    public final Matrix4f getWorldToViewMatrix() {
+    public final Matrix4f view() {
         return worldToView;
+    }
+    
+    @Override
+    public Matrix4f combined() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseProjection() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseView() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseCombined() {
+        return null;
     }
 }

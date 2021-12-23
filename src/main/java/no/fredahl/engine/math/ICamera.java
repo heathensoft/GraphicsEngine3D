@@ -9,7 +9,12 @@ import org.joml.Matrix4f;
 
 
 public interface ICamera {
- 
-    Matrix4f getProjectionMatrix();
-    Matrix4f getWorldToViewMatrix();
+    
+    Matrix4f projection();
+    Matrix4f view();
+    Matrix4f combined();
+    Matrix4f inverseProjection();
+    Matrix4f inverseView();
+    Matrix4f inverseCombined();
+    
 }

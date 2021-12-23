@@ -8,6 +8,9 @@ import org.joml.Vector4f;
 import org.joml.primitives.Rayf;
 
 /**
+ *
+ * No roll, orbital camera
+ *
  * @author Frederik Dahl
  * 04/11/2021
  */
@@ -15,11 +18,12 @@ import org.joml.primitives.Rayf;
 
 public class OrbitalCamera implements ICamera {
     
-    public final static float PI2 = (float) (Math.PI * 2);
-    public final static float MAX_PITCH = Math.toRadians(89);
-    public final static float MIN_PITCH = Math.toRadians(15);
-    public final static float MIN_PIVOT_DISTANCE = 5.0f;
-    public final static float MAX_PIVOT_DISTANCE = 40.0f;
+    private final static Vector3f UP = new Vector3f(0,1,0);
+    private final static float PI2 = (float) (Math.PI * 2);
+    private final static float MAX_PITCH = Math.toRadians(89);
+    private final static float MIN_PITCH = Math.toRadians(15);
+    private final static float MIN_PIVOT_DISTANCE = 5.0f;
+    private final static float MAX_PIVOT_DISTANCE = 50.0f;
     
     private final Matrix4f tmpM4f = new Matrix4f();
     private final Vector3f tmpV3f = new Vector3f();
@@ -33,7 +37,6 @@ public class OrbitalCamera implements ICamera {
     public final Vector3f position = new Vector3f();
     public final Vector3f direction= new Vector3f();
     public final Vector3f right= new Vector3f();
-    public final Vector3f up = new Vector3f();
     
     public float horizontalSensitivity = 2;
     public float verticalSensitivity = 2;
@@ -66,10 +69,8 @@ public class OrbitalCamera implements ICamera {
         position.x = currentFocus.x - offsetX;
         position.z = currentFocus.z - offsetZ;
         direction.set(position).sub(currentFocus).normalize();
-        up.set(0,1,0);
-        right.set(up).cross(direction).normalize();
-        up.set(direction).cross(right).normalize();
-        worldToView.identity().lookAt(position,currentFocus,up);
+        right.set(UP).cross(direction).normalize();
+        worldToView.identity().lookAt(position,currentFocus,UP);
     }
     
     public Rayf getPickingRay(float ndcX, float ndcY) {
@@ -107,12 +108,32 @@ public class OrbitalCamera implements ICamera {
     }
     
     @Override
-    public final Matrix4f getProjectionMatrix() {
+    public final Matrix4f projection() {
         return projection;
     }
     
     @Override
-    public final Matrix4f getWorldToViewMatrix() {
+    public final Matrix4f view() {
         return worldToView;
+    }
+    
+    @Override
+    public Matrix4f combined() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseProjection() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseView() {
+        return null;
+    }
+    
+    @Override
+    public Matrix4f inverseCombined() {
+        return null;
     }
 }

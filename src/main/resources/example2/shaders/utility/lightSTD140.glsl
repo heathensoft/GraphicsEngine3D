@@ -63,8 +63,8 @@ vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * energyConservation;
 
     vec3 a = l.color * a_color * l.ambient;
-    vec3 d = l.color * d_color * l.diffuse * diff;
-    vec3 s = l.color * s_color * spec;
+    vec3 d = l.color * d_color * l.diffuse * diff * shadow;
+    vec3 s = l.color * s_color * spec * shadow;
 
     return (a + d + s);
 }
@@ -83,8 +83,8 @@ vec3 calc_point_light(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
     float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);
 
     vec3 a = l.color * a_color * l.ambient;
-    vec3 d = l.color * d_color * l.diffuse * diff;
-    vec3 s = l.color * s_color * spec;
+    vec3 d = l.color * d_color * l.diffuse * diff * shadow;
+    vec3 s = l.color * s_color * spec * shadow;
 
     a *= att;
     d *= att;
@@ -111,8 +111,8 @@ vec3 calc_spot_light(SpotLight l, vec3 pos, vec3 eye, vec3 norm) {
     float att = 1.0 / (l.constant + l.linear * dist + l.quadratic * dist * dist);
 
     vec3 a = l.color * a_color * l.ambient;
-    vec3 d = l.color * d_color * l.diffuse * diff;
-    vec3 s = l.color * s_color * spec;
+    vec3 d = l.color * d_color * l.diffuse * diff * shadow;
+    vec3 s = l.color * s_color * spec * shadow;
 
     a *= att * intensity;
     d *= att * intensity;

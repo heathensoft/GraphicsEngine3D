@@ -12,6 +12,7 @@ import org.joml.primitives.Rayf;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  *
@@ -66,6 +67,13 @@ public class RTSControl implements MouseListener {
         }
         float strafe = 0;
         float straight = 0;
+        
+        if (keyboard.pressed(CONTROL))
+            glViewport(
+                    0,
+                    0,
+                    500,
+                    500);
         
         if (keyboard.pressed(FORWARD)) straight += 1;
         if (keyboard.pressed(BACKWARD)) straight -= 1;

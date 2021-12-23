@@ -1,4 +1,4 @@
-#version 420
+#version 430
 
 const float GAMMA = 2.2;
 const vec3 GAMMA_CORRECTION = vec3(1.0/GAMMA);
@@ -6,20 +6,12 @@ const vec3 GAMMA_CORRECTION = vec3(1.0/GAMMA);
 in VS_OUT {
     vec3 pos;
     vec3 nor;
+    vec4 lpos;
 } _in;
 
 out vec4 color;
 
-vec3 a_color;
-vec3 d_color;
-vec3 s_color;
-vec3 e_color;
-float shine;
-float alpha;
-
-#LIGHTS
-
-#MATERIALS
+#LIGHTING
 
 #LIGHT_BLOCK
 
@@ -27,43 +19,48 @@ float alpha;
 
 // INSTANCE
 uniform int u_material_index;
+uniform sampler2D u_shadowMap;
 
 
 void setupColors() {
 
     Material m = ubo_materials.list[u_material_index];
-    a_color = m.ambient;
-    d_color = m.diffuse;
-    s_color = m.specular;
-    e_color = m.diffuse * m.emission;
+    a_source = m.ambient;
+    d_source = m.diffuse;
+    s_source = m.specular;
+    e_source = m.diffuse * m.emission;
     shine = m.shine;
     alpha = m.alpha;
+    shadow = calc_shadow(_in.lpos, u_shadowMap);
+    ec = energyConservation(shine);
 
 }
+
 
 void main() {
 
     setupColors();
 
     vec3 eye = normalize(-_in.pos);
-    vec3 combined = vec3(0.0,0.0,0.0);
 
     for(int i = 0; i < ubo_lights.num_dir_lights; i++){
         DirectionalLight dirLight = ubo_lights.dirLights[i];
-        combined += calc_dir_light(dirLight, eye, _in.nor);
+        calc_dirlight(dirLight, eye, _in.nor);
     }
     for(int i = 0; i < ubo_lights.num_point_lights; i++){
         PointLight pointLight = ubo_lights.pointLights[i];
-        combined += calc_point_light(pointLight, _in.pos, eye, _in.nor);
+        calc_pointlight(pointLight, _in.pos, eye, _in.nor);
     }
     for(int i = 0; i < ubo_lights.num_spot_lights; i++){
         SpotLight spotLight = ubo_lights.spotLights[i];
-        combined += calc_spot_light(spotLight, _in.pos, eye, _in.nor);
+        calc_spotlight(spotLight, _in.pos, eye, _in.nor);
     }
-    combined += e_color;
-    // Gamma correction must be applied in the last shader only (last framebuffer)
-    //combined = pow(combined,GAMMA_CORRECTION);
+
+    e_sum += e_source;
+
+    //vec3 combined = clamp(e_sum + a_sum + (d_sum + s_sum) * shadow, 0, 1);
+
+    vec3 combined = e_sum + a_sum + d_sum + s_sum;
     color = vec4(combined,alpha);
-    //color = vec4(1,1,1,1);
 
 }

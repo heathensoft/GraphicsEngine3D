@@ -46,12 +46,7 @@ public class GLBindings {
         glUseProgram(boundProgram = id);
     }
     
-    public void bindTexture(int id) {
-        if (id == boundTexture) return;
-        glBindTexture(GL_TEXTURE_2D, boundTexture = id);
-    }
-    
-    public void bindTexture2(int target, int id) {
+    public void bindTexture(int target, int id) {
         if (id == boundTexture) return;
         glBindTexture(target, boundTexture = id);
     }

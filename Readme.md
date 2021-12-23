@@ -11,21 +11,21 @@ Modern [OpenGL](https://www.opengl.org/) through the [LWJGL 3](https://www.lwjgl
 Dividing window events and graphics into separate threads for seamless rendering.
 
 I'm running it on Windows, but it should also support macOS and Linux.
-_Requires OpenGL version: 4.2_
+_Requires OpenGL version: 4.3_
 
 The example in the example2 package shows you how you could set it up.
 The entry point is Main.java. Use the mouse to pan camera/ double click to select.
-WASD to move around.
+WASD to move around. (Work in progress)
 (example1 is from an older version and contains a lot of retracted classes.
 The example1 package will be removed soon)
 
-_Currently, working on lights and Uniform Buffer Objects_ (18/12/21)
+_Currently, working on shadows_ (23/12/21)
 
-From example2:
+From example2 (Lighting, Shadow and Materials) :
 
-![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap00.png?raw=true)
+![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap02.png?raw=true)
 
-Lighting and Materials;
+
 
 ![2](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap01.png?raw=true)
 
