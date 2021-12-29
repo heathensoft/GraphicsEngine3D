@@ -2,10 +2,9 @@
 
 layout (location=0) in vec4 a_pos;
 
-uniform mat4 u_shadowMV;
-uniform mat4 u_shadowP;
+uniform mat4 u_light_mvp;
 
 void main() {
 
-    gl_Position = u_shadowP * u_shadowMV * a_pos;
+    gl_Position = u_light_mvp * a_pos;
 }

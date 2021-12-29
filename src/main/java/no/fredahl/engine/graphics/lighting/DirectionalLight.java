@@ -16,7 +16,7 @@ public class DirectionalLight {
     private final static float DEFAULT_AMBIENCE = 0.5f;
     private final static float DEFAULT_DIFFUSE = 0.5f;
     private final static Vector3f DEFAULT_COLOR = new Vector3f(Color.WHITE_RGB);
-    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0f,1.0f,1.0f).normalize();
+    private final static Vector3f DEFAULT_DIRECTION = new Vector3f(0f,-1.0f,0.000001f).normalize();
     
     private final Vector3f color;
     private final Vector3f direction;

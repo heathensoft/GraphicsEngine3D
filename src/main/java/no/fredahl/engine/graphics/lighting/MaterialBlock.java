@@ -1,6 +1,8 @@
 package no.fredahl.engine.graphics.lighting;
 
 import no.fredahl.engine.graphics.BufferObject;
+import no.fredahl.engine.graphics.Color;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -19,6 +21,37 @@ public class MaterialBlock {
     private final BufferObject uniformBuffer;
     private final int bindingPoint;
     private final int count;
+    
+    public MaterialBlock(int bindingPoint) {
+        this(bindingPoint,
+                Material.DEBUG,
+                Material.BLACK_PLASTIC,
+                Material.BLACK_RUBBER,
+                Material.BRASS,
+                Material.BRONZE,
+                Material.CHROME,
+                Material.COPPER,
+                Material.EMERALD,
+                Material.GOLD,
+                Material.GREEN_PLASTIC,
+                Material.GREEN_RUBBER,
+                Material.JADE,
+                Material.OBSIDIAN,
+                Material.PERL,
+                Material.POLISHED_BRONZE,
+                Material.POLISHED_COPPER,
+                Material.POLISHED_GOLD,
+                Material.POLISHED_SILVER,
+                Material.RED_PLASTIC,
+                Material.RED_RUBBER,
+                Material.RUBY,
+                Material.SILVER,
+                Material.TIN,
+                Material.WHITE_PLASTIC,
+                Material.WHITE_RUBBER,
+                Material.YELLOW_PLASTIC,
+                Material.TURQUOISE);
+    }
     
     public MaterialBlock(int bindingPoint, Material ...materials) {
         
@@ -63,8 +96,11 @@ public class MaterialBlock {
         return bindingPoint;
     }
     
+    public int count() {
+        return count;
+    }
+    
     public void free() {
-        
         uniformBuffer.unbind();
         uniformBuffer.free();
     }

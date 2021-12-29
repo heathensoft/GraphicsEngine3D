@@ -142,6 +142,11 @@ public class Material {
             new Vector3f(0.5f,0.5f,0.5f),
             new Vector3f(0.7f,0.7f,0.7f),10.0f / 128);
     
+    public static final Material DEBUG = new Material(
+            new Vector3f(1.0f,1.0f,1.0f),
+            new Vector3f(1.0f,1.0f,1.0f),
+            new Vector3f(1.0f,1.0f,1.0f),1.0f,1.0f);
+    
     
     private final static Vector3f DEFAULT_AMBIENCE = new Vector3f(0.2f,0.2f,0.2f);
     private final static Vector3f DEFAULT_DIFFUSION = new Vector3f(1.0f,1.0f,1.0f);

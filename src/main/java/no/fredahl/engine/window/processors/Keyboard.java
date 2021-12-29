@@ -1,5 +1,6 @@
 package no.fredahl.engine.window.processors;
 
+import no.fredahl.engine.utility.storage.Interator;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.events.CharPressEvents;
 import no.fredahl.engine.window.events.KeyPressEvents;
@@ -34,7 +35,7 @@ public class Keyboard {
         this.charPressEvents.clear();
     }
     
-    private final Collector keyCollector = new Collector() {
+    private final Interator keyCollector = new Interator() {
         @Override
         public void next(int key) {
             if (key > 0) {
@@ -57,7 +58,7 @@ public class Keyboard {
         }
     };
     
-    private final Collector charCollector = new Collector() {
+    private final Interator charCollector = new Interator() {
         @Override
         public void next(int key) {
             if (textProcessor != null) {

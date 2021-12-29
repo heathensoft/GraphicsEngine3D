@@ -1,7 +1,7 @@
 package no.fredahl.engine.window.events;
 
-import no.fredahl.engine.window.processors.IntQueue;
-import no.fredahl.engine.window.processors.Collector;
+import no.fredahl.engine.utility.storage.IntQueue;
+import no.fredahl.engine.utility.storage.Interator;
 import org.lwjgl.glfw.GLFWCharCallback;
 
 /**
@@ -27,7 +27,7 @@ public class CharPressEvents extends GLFWCharCallback {
         }
     }
     
-    public synchronized void collect(Collector collector) {
+    public synchronized void collect(Interator collector) {
         while (!queue.isEmpty()) collector.next(queue.dequeue());
     }
     

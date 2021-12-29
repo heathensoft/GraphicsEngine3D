@@ -89,7 +89,9 @@ public class Mesh {
     }
     
     public void free() {
+        bindings.bindAttributeArray(vao);
         glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
         bindings.bindBufferObject(GL_ARRAY_BUFFER, 0);
         positionBufferObject.free();
         normalBufferObject.free();

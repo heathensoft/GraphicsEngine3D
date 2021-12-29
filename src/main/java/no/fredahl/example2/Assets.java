@@ -22,8 +22,8 @@ public class Assets {
     private static final FileUtility.ResourceUtility resource = FileUtility.resource;
     
     public static final String CUBE_OBJ = "example2/obj/cube.obj";
-    public static final String TEST_VS = "example2/shaders/main/shadowMap_vert.glsl";
-    public static final String TEST_FS = "example2/shaders/main/shadowMap_frag.glsl";
+    public static final String DEPTH_TEXTURE_VS = "example2/shaders/main/fboTest_vert.glsl";
+    public static final String DEPTH_TEXTURE_FS = "example2/shaders/main/fboTest_frag.glsl";
     public static final String LIGHTING_SHADER = "example2/shaders/utility/lighting.glsl";
     public static final String MATERIAL_VS = "example2/shaders/main/material_vert.glsl";
     public static final String MATERIAL_FS = "example2/shaders/main/material_frag.glsl";

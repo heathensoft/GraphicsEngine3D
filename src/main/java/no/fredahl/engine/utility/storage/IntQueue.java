@@ -1,4 +1,4 @@
-package no.fredahl.engine.window.processors;
+package no.fredahl.engine.utility.storage;
 
 
 import java.util.EmptyStackException;

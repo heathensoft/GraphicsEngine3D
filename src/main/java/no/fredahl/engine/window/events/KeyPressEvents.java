@@ -1,7 +1,7 @@
 package no.fredahl.engine.window.events;
 
-import no.fredahl.engine.window.processors.Collector;
-import no.fredahl.engine.window.processors.IntQueue;
+import no.fredahl.engine.utility.storage.Interator;
+import no.fredahl.engine.utility.storage.IntQueue;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
 
@@ -37,7 +37,7 @@ public class KeyPressEvents extends GLFWKeyCallback {
         }
     }
     
-    public synchronized boolean collect(Collector collector) {
+    public synchronized boolean collect(Interator collector) {
         if (queue.isEmpty()) return false;
         while (!queue.isEmpty())
             collector.next(queue.dequeue());

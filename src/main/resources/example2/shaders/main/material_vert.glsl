@@ -11,8 +11,7 @@ out VS_OUT {
 
 uniform mat4 u_modelView;
 uniform mat4 u_projection;
-uniform mat4 u_light_modelView;
-uniform mat4 u_light_projection;
+uniform mat4 u_light_mvp;
 
 void main() {
 
@@ -20,9 +19,5 @@ void main() {
     gl_Position = u_projection * mvPos;
     _out.nor = normalize(u_modelView * vec4(a_nor, 0.0)).xyz;
     _out.pos = mvPos.xyz;
-    _out.lpos = u_light_projection * u_light_modelView * a_pos;
-
-    //_out.u_modelView = u_modelView;
-    // mlightviewVertexPos = orthoProjectionMatrix * modelLightViewMatrix * vec4(position, 1.0);
-    //    outModelViewMatrix = modelViewMatrix;
+    _out.lpos = u_light_mvp * a_pos;
 }

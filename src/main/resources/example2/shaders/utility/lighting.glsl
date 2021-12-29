@@ -60,39 +60,39 @@ float energyConservation(float shine) {
 }
 
 float calc_shadow(vec4 pos, sampler2D shadowMap) {
-    vec3 coords = pos.xyz;
+    vec3 coords = pos.xyz / pos.w;
     float shadowFactor = 0.0;
-    float bias = 0.05;
+    float bias = 0.0001;
     vec2 inc = 1.0 / textureSize(shadowMap,0);
     coords = coords * 0.5 + 0.5;
-    for(int r = -1; r <= 1; ++r){
-        for(int c = -1; c <= 1; ++c){
+    for(int r = -2; r <= 2; ++r){
+        for(int c = -2; c <= 2; ++c){
             float textDepth = texture(shadowMap, coords.xy + vec2(r,c) * inc).r;
             shadowFactor += coords.z - bias > textDepth ? 1.0 : 0.0;
         }
     }
-    shadowFactor /= 9.0;
+    shadowFactor /= (25.0 * 1);
     if(coords.z > 1.0) {
-        shadowFactor = 1.0;
+        shadowFactor = 0.0;
     }
     return (1 - shadowFactor);
 }
 
 void calc_dirlight(DirectionalLight l, vec3 eye, vec3 norm) {
-    vec3 lightDir = normalize(l.direction);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 halfwayDir = normalize(lightDir + eye);
+    vec3 toLightDir = -normalize(l.direction);
+    float diff = max(dot(norm, toLightDir), 0.0);
+    vec3 halfwayDir = normalize(toLightDir + eye);
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * ec;
     a_sum += (l.color * a_source * l.ambient);
-    d_sum += (l.color * d_source * l.diffuse * diff) * shadow;
-    s_sum += (l.color * s_source * spec) * shadow;
+    d_sum += (l.color * d_source * l.diffuse * diff);
+    s_sum += (l.color * s_source * spec);
 }
 
 void calc_pointlight(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
     vec3 lightVec = l.position - pos;
-    vec3 lightDir = normalize(lightVec);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 halfwayDir = normalize(lightDir + eye);
+    vec3 toLightDir = normalize(lightVec);
+    float diff = max(dot(norm, toLightDir), 0.0);
+    vec3 halfwayDir = normalize(toLightDir + eye);
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * ec;
     float d = length(lightVec);
     float att = 1.0 / (l.constant + l.linear * d + l.quadratic * d * d);
@@ -103,18 +103,18 @@ void calc_pointlight(PointLight l, vec3 pos, vec3 eye, vec3 norm) {
 
 void calc_spotlight(SpotLight l, vec3 pos, vec3 eye, vec3 norm) {
     vec3 lightVec = l.position - pos;
-    vec3 lightDir = normalize(lightVec);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 halfwayDir = normalize(lightDir + eye);
+    vec3 toLightDir = normalize(lightVec);
+    float diff = max(dot(norm, toLightDir), 0.0);
+    vec3 halfwayDir = normalize(toLightDir + eye);
     float spec = pow(max(dot(norm,halfwayDir),0.0),shine) * ec;
-    float theta = dot(-lightDir, normalize(-l.coneDir));
+    float theta = dot(toLightDir, normalize(-l.coneDir));
     float epsilon = (l.innerCutoff - l.outerCutoff);
     float intensity = clamp((theta - l.outerCutoff) / epsilon, 0.0, 1.0);
     float d = length(lightVec);
     float att = 1.0 / (l.constant + l.linear * d + l.quadratic * d * d);
-    a_sum += (l.color * a_source * l.ambient) * att * intensity;
-    d_sum += (l.color * d_source * l.diffuse * diff) * att * intensity;
-    s_sum += (l.color * s_source * spec) * att * intensity;
+    a_sum += (l.color * a_source * l.ambient) * att * intensity ;
+    d_sum += (l.color * d_source * l.diffuse * diff) * att * intensity * shadow;
+    s_sum += (l.color * s_source * spec) * att * intensity * shadow;
 }
 
 

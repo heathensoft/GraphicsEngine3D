@@ -2,6 +2,7 @@ package no.fredahl.example2;
 
 import no.fredahl.engine.Application;
 import no.fredahl.engine.Engine;
+import no.fredahl.engine.math.ICamera;
 import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import no.fredahl.engine.window.processors.Keyboard;

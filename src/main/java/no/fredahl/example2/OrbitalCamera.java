@@ -35,7 +35,7 @@ public class OrbitalCamera implements ICamera {
     public final Vector3f currentFocus = new Vector3f();
     public final Matrix4f projection = new Matrix4f();
     public final Vector3f position = new Vector3f();
-    public final Vector3f direction= new Vector3f();
+    public final Vector3f direction = new Vector3f();
     public final Vector3f right= new Vector3f();
     
     public float horizontalSensitivity = 2;
@@ -46,7 +46,7 @@ public class OrbitalCamera implements ICamera {
     
     public float aspectRatio = 16/9f;
     public float fieldOfView = Math.toRadians(60);
-    public float far = 1000;
+    public float far = 100;
     public float near = 0.01f;
     
     public void updateProjection() {
@@ -68,8 +68,8 @@ public class OrbitalCamera implements ICamera {
         position.y = currentFocus.y + verticalDist;
         position.x = currentFocus.x - offsetX;
         position.z = currentFocus.z - offsetZ;
-        direction.set(position).sub(currentFocus).normalize();
-        right.set(UP).cross(direction).normalize();
+        direction.set(currentFocus).sub(position).normalize();
+        right.set(direction).cross(UP).normalize();
         worldToView.identity().lookAt(position,currentFocus,UP);
     }
     
@@ -119,7 +119,7 @@ public class OrbitalCamera implements ICamera {
     
     @Override
     public Matrix4f combined() {
-        return null;
+        return tmpM4f.set(projection).mul(worldToView);
     }
     
     @Override

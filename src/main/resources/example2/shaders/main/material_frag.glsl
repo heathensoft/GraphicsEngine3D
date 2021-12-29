@@ -60,7 +60,7 @@ void main() {
 
     //vec3 combined = clamp(e_sum + a_sum + (d_sum + s_sum) * shadow, 0, 1);
 
-    vec3 combined = e_sum + a_sum + d_sum + s_sum;
+    vec3 combined = (e_sum + a_sum + d_sum + s_sum);
     color = vec4(combined,alpha);
 
 }
