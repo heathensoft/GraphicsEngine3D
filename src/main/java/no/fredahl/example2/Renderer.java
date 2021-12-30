@@ -29,19 +29,16 @@ public class Renderer {
     
     private final ShaderProgram materialProgram;
     private final ShaderProgram depthMapProgram;
-    //private final ShaderProgram depthTextureProgram;
     private final MaterialBlock materialBlock;
     private final ShadowMap shadowMap;
     private final Matrix4f lightMVP;
     private final Matrix4f proj;
-    //private final ShadowBox shadowBox;
     
     public Renderer(World world) throws Exception {
         
         Lights lights = world.lights();
         
         shadowMap = new ShadowMap(2048,2048);
-        //shadowBox = new ShadowBox(Math.toRadians(60f),16/9f,0.01f,40f);
         lightMVP = new Matrix4f();
         //proj = new Matrix4f().setPerspective(Math.toRadians(60f),16/9f,0.01f,30f);
         proj = new Matrix4f().setPerspective(Math.toRadians(90f),1f,0.01f,20f);
@@ -76,19 +73,6 @@ public class Renderer {
         depthMapProgram.bind();
         depthMapProgram.createUniform("u_light_mvp");
         
-        
-        String depthTex_vs_source = FileUtility.resource.toString(Assets.DEPTH_TEXTURE_VS);
-        String depthTex_fs_source = FileUtility.resource.toString(Assets.DEPTH_TEXTURE_FS);
-        //depthTextureProgram = new ShaderProgram();
-        //depthTextureProgram.attach(depthTex_vs_source,GL_VERTEX_SHADER);
-        //depthTextureProgram.attach(depthTex_fs_source,GL_FRAGMENT_SHADER);
-        //depthTextureProgram.compile();
-        //depthTextureProgram.link();
-        //depthTextureProgram.bind();
-        //depthTextureProgram.createUniform("u_depthTexture");
-        
-        
-        
         glEnable(GL_DEPTH_TEST);
     }
     
@@ -104,8 +88,7 @@ public class Renderer {
         materialProgram.setUniform("u_projection",camera.projection());
         materialProgram.setUniform1i("u_shadowMap",0);
         
-        glActiveTexture(GL_TEXTURE0);
-        shadowMap.texture().bind();
+        shadowMap.texture().bind(GL_TEXTURE0);
         
         List<GameObject> objects = world.gameObjects();
         for (GameObject object : objects) {
@@ -113,22 +96,11 @@ public class Renderer {
             tmpM4f.set(camera.view()).mul(modelToWorld);
             materialProgram.setUniform("u_modelView", tmpM4f);
             materialProgram.setUniform1i("u_material_index", object.material);
-            //tmpM4f.set(shadowBox.lightCombined()).mul(modelToWorld);
             tmpM4f.set(lightMVP).mul(modelToWorld);
             materialProgram.setUniform("u_light_mvp", tmpM4f);
             object.mesh.render();
         }
         materialProgram.unBind();
-    
-        // renders the depth texture to screen
-        
-        //depthTextureProgram.bind();
-        //depthTextureProgram.setUniform1i("u_depthTexture",0);
-        glActiveTexture(GL_TEXTURE0);
-        //shadowMap.renderDepthTexture();
-        
-        
-        
         
         shadowMap.texture().unbind();
     }
@@ -136,22 +108,18 @@ public class Renderer {
     private void renderDepthMap(ICamera camera, World world) {
         
         //DirectionalLight light = world.lights().directionalLights().get(0);
-        //if (light == null) return;
-        
-        //shadowBox.calculateOrthographic(camera.view(),light.direction());
         //ShadowCast.calcLightProjViewOrtho(proj,camera.view(),light.direction(),lightMVP.identity(),false);
-        ShadowCast.calcLightProjViewPerspective(proj,new Vector3f(0,7,0),new Vector3f(0,-1,-0.0001f).normalize(),lightMVP.identity());
+        
+        ShadowCast.lightCombinedPerspective(proj,new Vector3f(0,7,0),new Vector3f(0,-1,-0.0001f).normalize(),lightMVP.identity());
         shadowMap.bind(); // binds the framebuffer
         glViewport(0, 0, shadowMap.width(), shadowMap.height());
         glClear(GL_DEPTH_BUFFER_BIT);
         depthMapProgram.bind();
         
-        //depthMapProgram.setUniform("u_shadowP", shadowBox.lightProjection());
         
         List<GameObject> objects = world.gameObjects();
         for (GameObject object : objects) {
             Matrix4f modelToWorld = object.transform.modelToWorldMatrix();
-            //tmpM4f.set(shadowBox.lightCombined()).mul(modelToWorld);
             tmpM4f.set(lightMVP).mul(modelToWorld);
             depthMapProgram.setUniform("u_light_mvp", tmpM4f);
             object.mesh.render();

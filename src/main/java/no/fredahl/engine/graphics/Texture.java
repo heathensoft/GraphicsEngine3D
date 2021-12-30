@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
@@ -186,6 +188,11 @@ public class Texture {
     
     public void bind() {
         bindings.bindTexture(target,id);
+    }
+    
+    public void bind(int textureUnit) {
+        glActiveTexture(textureUnit);
+        bind();
     }
     
     public void unbind() {

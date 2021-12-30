@@ -61,7 +61,7 @@ public class World {
         PointLight pointLight1 = new PointLight(new Vector3f(0.6f,0.3f,0.5f),new Vector3f(0,7,0));
         pointLight1.setAttenuation(Attenuation.ATT_3250).setDiffuse(0.8f).setAmbient(0.5f);
         PointLight pointLight2 = new PointLight(new Vector3f(0.2f,0.6f,0.5f),new Vector3f(20f,2f,20f));
-        pointLight2.setAttenuation(new Attenuation(0.6f,0.0014f,0.0007f)).setDiffuse(0.8f).setAmbient(0.2f);
+        pointLight1.setAttenuation(new Attenuation(0.3f,0.0014f,0.0007f)).setDiffuse(0.8f).setAmbient(0.2f);
         PointLight pointLight3 = new PointLight().set(pointLight2).setPosition(20,2,-20);
         PointLight pointLight4 = new PointLight().set(pointLight2).setPosition(-20,2,-20);
         PointLight pointLight5 = new PointLight().set(pointLight2).setPosition(-20,2,20);
