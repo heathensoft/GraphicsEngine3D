@@ -1,30 +1,57 @@
 package no.fredahl.engine.graphics.lighting;
 
-import no.fredahl.engine.graphics.BufferObject;
-import no.fredahl.engine.graphics.GLBindings;
-import no.fredahl.engine.graphics.ShaderProgram;
 import no.fredahl.engine.graphics.Texture;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NONE;
+import static org.lwjgl.opengl.GL13.GL_CLAMP_TO_BORDER;
 import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT16;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
  * @author Frederik Dahl
- * 22/12/2021
+ * 07/01/2022
  */
 
 
-public class ShadowMap {
+public class ShadowMap extends DepthMap{
     
-    private final static GLBindings bindings = GLBindings.get();
     
-    private final int fbo;
-    private final int width;
-    private final int height;
-    private final Texture depthMap;
+    public ShadowMap(int width, int height) throws Exception {
+        super(width, height);
+    }
     
-    // Debug purposes
+    @Override
+    protected void create(int width, int height) throws Exception {
+        this.width = width;
+        this.height = height;
+        depthTexture = new Texture(GL_TEXTURE_2D);
+        depthTexture.bind();
+        depthTexture.filter(GL_NEAREST);
+        depthTexture.wrapST(GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR,new float[] {1,1,1,1});
+        depthTexture.tex2D(0,GL_DEPTH_COMPONENT16,width,height,GL_DEPTH_COMPONENT,GL_FLOAT);
+        fbo = glGenFramebuffers();
+        bindFramebuffer();
+        glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,depthTexture.id(),0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            throw new Exception("Unable to create FrameBuffer");
+        unbindFramebuffer();
+    }
+    
+    @Override
+    public void dispose() {
+        glDeleteFramebuffers(fbo);
+        depthTexture.dispose();
+    }
+    
+    // Debugging purposes
+    // To draw the depthTexture to screen
+    // remember to also dispose the program and buffers
+    
+    /*
     private boolean debug;
     private boolean perspective;
     private ShaderProgram fboProgram;
@@ -36,7 +63,7 @@ public class ShadowMap {
         if (debug && !perspective) {
             fboProgram.bind();
             fboProgram.setUniform1i("u_depthTexture",textureUnit);
-            depthMap.bind(textureUnit);
+            depthTexture.bind(textureUnit);
             bindings.bindAttributeArray(vao);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,0);
             bindings.bindAttributeArray(0);
@@ -50,7 +77,7 @@ public class ShadowMap {
             fboProgram.setUniform1i("u_depthTexture",textureUnit);
             fboProgram.setUniform1f("u_nearPlane",near);
             fboProgram.setUniform1f("u_farPlane",far);
-            depthMap.bind(textureUnit);
+            depthTexture.bind(textureUnit);
             bindings.bindAttributeArray(vao);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,0);
             bindings.bindAttributeArray(0);
@@ -68,73 +95,6 @@ public class ShadowMap {
             perspective = perspectiveProjection;
         }
         
-    }
-    
-    public ShadowMap(int width, int height) throws Exception {
-    
-        this.width = width;
-        this.height = height;
-        
-        depthMap = new Texture(GL_TEXTURE_2D);
-        depthMap.bind();
-        depthMap.filter(GL_NEAREST);
-        depthMap.wrapST(GL_CLAMP_TO_BORDER);
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR,new float[] {1,1,1,1});
-        depthMap.tex2D(0,GL_DEPTH_COMPONENT16,width,height,GL_DEPTH_COMPONENT,GL_FLOAT);
-        
-        fbo = glGenFramebuffers();
-        bindings.bindFrameBuffer(GL_FRAMEBUFFER,fbo);
-        glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,depthMap.id(),0);
-        
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-    
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            throw new Exception("Unable to create FrameBuffer");
-        }
-    
-        bindings.bindFrameBuffer(GL_FRAMEBUFFER,0);
-        
-    }
-    
-    
-    public Texture texture() {
-        return depthMap;
-    }
-    
-    public int fbo() {
-        return fbo;
-    }
-    
-    public int width() {
-        return width;
-    }
-    
-    public int height() {
-        return height;
-    }
-    
-    public void bind() {
-        bindings.bindFrameBuffer(GL_FRAMEBUFFER,fbo);
-    }
-    
-    public void unbind() {
-        bindings.bindFrameBuffer(GL_FRAMEBUFFER,0);
-    }
-    
-    public void dispose() {
-        unbind();
-        glDeleteFramebuffers(fbo);
-        depthMap.unbind();
-        depthMap.delete();
-        if (debug) {
-            if (fboProgram != null) fboProgram.delete();
-            bindings.bindBufferObject(GL_ARRAY_BUFFER, 0);
-            vertices.free();
-            elements.free();
-            bindings.bindAttributeArray(0);
-            glDeleteVertexArrays(vao);
-        }
     }
     
     private void generateProgramOrtho() throws Exception {
@@ -251,4 +211,7 @@ public class ShadowMap {
                        "    color = vec4(vec3(linearizeDepth(depth) / u_farPlane),1.0);\n" +
                        "}";
     }
+    
+     */
+    
 }

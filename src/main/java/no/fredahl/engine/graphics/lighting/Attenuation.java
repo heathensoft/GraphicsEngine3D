@@ -1,5 +1,7 @@
 package no.fredahl.engine.graphics.lighting;
 
+import java.nio.FloatBuffer;
+
 /**
  * @author Frederik Dahl
  * 02/12/2021
@@ -10,23 +12,26 @@ public class Attenuation {
     
     // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
     
-    public static final Attenuation ATT_7 = new Attenuation(1.0f,0.7f,1.8f);
-    public static final Attenuation ATT_13 = new Attenuation(1.0f,0.35f,0.44f);
-    public static final Attenuation ATT_20 = new Attenuation(1.0f,0.22f,0.20f);
-    public static final Attenuation ATT_32 = new Attenuation(1.0f,0.14f,0.07f);
-    public static final Attenuation ATT_50 = new Attenuation(1.0f,0.09f,0.032f);
-    public static final Attenuation ATT_65 = new Attenuation(1.0f,0.07f,0.017f);
-    public static final Attenuation ATT_100 = new Attenuation(1.0f,0.045f,0.0075f);
-    public static final Attenuation ATT_160 = new Attenuation(1.0f,0.027f,0.0028f);
-    public static final Attenuation ATT_200 = new Attenuation(1.0f,0.022f,0.0019f);
-    public static final Attenuation ATT_325 = new Attenuation(1.0f,0.014f,0.0007f);
-    public static final Attenuation ATT_600 = new Attenuation(1.0f,0.007f,0.0002f);
-    public static final Attenuation ATT_3250 = new Attenuation(1.0f,0.0014f,0.000007f);
+    public static final Attenuation ATT_7 = new Attenuation(0.5f,0.7f,1.8f);
+    public static final Attenuation ATT_13 = new Attenuation(0.5f,0.35f,0.44f);
+    public static final Attenuation ATT_20 = new Attenuation(0.5f,0.22f,0.20f);
+    public static final Attenuation ATT_32 = new Attenuation(0.5f,0.14f,0.07f);
+    public static final Attenuation ATT_50 = new Attenuation(0.5f,0.09f,0.032f);
+    public static final Attenuation ATT_65 = new Attenuation(0.5f,0.07f,0.017f);
+    public static final Attenuation ATT_100 = new Attenuation(0.5f,0.045f,0.0075f);
+    public static final Attenuation ATT_160 = new Attenuation(0.5f,0.027f,0.0028f);
+    public static final Attenuation ATT_200 = new Attenuation(0.5f,0.022f,0.0019f);
+    public static final Attenuation ATT_325 = new Attenuation(0.5f,0.014f,0.0007f);
+    public static final Attenuation ATT_600 = new Attenuation(0.5f,0.007f,0.0002f);
+    public static final Attenuation ATT_3250 = new Attenuation(0.5f,0.0014f,0.000007f);
     
     private float constant;
     private float linear;
     private float quadratic;
     
+    public Attenuation() {
+        this(Attenuation.ATT_65);
+    }
     
     public Attenuation(float c, float l, float q) {
         this.constant = c;
@@ -59,6 +64,10 @@ public class Attenuation {
         this.constant = c;
         this.linear = l;
         this.quadratic = q;
+    }
+    
+    protected void get(FloatBuffer buffer) {
+        buffer.put(constant).put(linear).put(quadratic);
     }
     
     public float constant() {

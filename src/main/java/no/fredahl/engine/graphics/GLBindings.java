@@ -31,9 +31,15 @@ public class GLBindings {
     }
     
     
+    
+    
     public void bindAttributeArray(int id) {
         if (id == boundAttributeArray) return;
         glBindVertexArray(boundAttributeArray = id);
+    }
+    
+    public void unbindAttributeArray() {
+        bindAttributeArray(0);
     }
     
     public void bindBufferObject(int target, int id) {
@@ -41,7 +47,11 @@ public class GLBindings {
         glBindBuffer(target, boundBufferObject = id);
     }
     
-    public void useShaderProgram(int id) {
+    public void unbindBufferObject(int target) {
+        bindBufferObject(target,0);
+    }
+    
+    public void useShader(int id) {
         if (id == boundProgram) return;
         glUseProgram(boundProgram = id);
     }
@@ -51,14 +61,26 @@ public class GLBindings {
         glBindTexture(target, boundTexture = id);
     }
     
+    public void unbindTexture(int target) {
+        bindTexture(target,0);
+    }
+    
     public void bindFrameBuffer(int target, int id) {
         if (id == boundFrameBuffer) return;
         glBindFramebuffer(target, boundFrameBuffer = id);
     }
     
+    public void unbindFramebuffer(int target) {
+        bindFrameBuffer(target,0);
+    }
+    
     public void bindRenderBuffer(int target, int id) {
         if (id == boundRenderBuffer) return;
         glBindRenderbuffer(target, boundRenderBuffer = id);
+    }
+    
+    public void unbindRenderBuffer(int target) {
+        bindRenderBuffer(target,0);
     }
     
 }

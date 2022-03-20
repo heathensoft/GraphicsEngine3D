@@ -1,6 +1,8 @@
 package no.fredahl.engine.math;
 
 import org.joml.FrustumIntersection;
+import org.joml.Vector3f;
+import org.joml.primitives.AABBf;
 
 /**
  * @author Frederik Dahl
@@ -12,8 +14,9 @@ public interface Cullable {
     
     boolean insideFrustum(FrustumIntersection frustum);
     
-    boolean cullingEnabled();
+    boolean insideAABB(AABBf aabb);
     
-    void enableCulling(boolean on);
+    boolean insideSphere(Vector3f center, float radius);
+    
     
 }

@@ -1,6 +1,5 @@
 package no.fredahl.example2;
 
-import no.fredahl.engine.math.ICamera;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -36,7 +35,8 @@ public class OrbitalCamera implements ICamera {
     public final Matrix4f projection = new Matrix4f();
     public final Vector3f position = new Vector3f();
     public final Vector3f direction = new Vector3f();
-    public final Vector3f right= new Vector3f();
+    public final Vector3f right = new Vector3f();
+    public final Vector3f up = new Vector3f();
     
     public float horizontalSensitivity = 2;
     public float verticalSensitivity = 2;
@@ -50,13 +50,33 @@ public class OrbitalCamera implements ICamera {
     public float near = 0.01f;
     
     public void updateProjection() {
-        projection.identity().setPerspective(
+        projection.setPerspective(
                 fieldOfView, aspectRatio,
                 Math.abs(near),
                 Math.abs(far),
                 false);
         inverseProjection.set(projection);
         inverseProjection.invert();
+    }
+    
+    public void switchToOrtho() {
+        
+        /*
+        float focus_plane = 10;
+        float top = Math.tan(fieldOfView/2) * focus_plane;
+        float right = top * aspectRatio;
+        projection.identity().ortho(
+                -right,
+                right,
+                -top,
+                top,
+                near,
+                far
+        );
+        inverseProjection.set(projection);
+        inverseProjection.invert();
+        
+         */
     }
     
     public void follow(Vector3f targetFocus) {
@@ -70,7 +90,8 @@ public class OrbitalCamera implements ICamera {
         position.z = currentFocus.z - offsetZ;
         direction.set(currentFocus).sub(position).normalize();
         right.set(direction).cross(UP).normalize();
-        worldToView.identity().lookAt(position,currentFocus,UP);
+        up.set(right).cross(direction);
+        worldToView.identity().lookAt(position,currentFocus,up);
     }
     
     public Rayf getPickingRay(float ndcX, float ndcY) {

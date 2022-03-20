@@ -53,6 +53,7 @@ public class Controls implements MouseListener {
         float strafe = 0;
         float straight = 0;
     
+        if (keyboard.justPressed(CONTROL)) camera.switchToOrtho();
         if (keyboard.pressed(FORWARD)) straight += 1;
         if (keyboard.pressed(BACKWARD)) straight -= 1;
         if (keyboard.pressed(STRAFE_LEFT)) strafe -= 1;

@@ -13,13 +13,14 @@ Dividing window events and graphics into separate threads for seamless rendering
 I'm running it on Windows, but it should also support macOS and Linux.
 _Requires OpenGL version: 4.3_
 
-The example in the example2 package shows you how you could set it up.
-The entry point is Main.java. Use the mouse to pan camera/ double click to select.
-WASD to move around. (Work in progress)
-(example1 is from an older version and contains a lot of retracted classes.
-The example1 package will be removed soon)
+Currently, there are two examples to run. Example1 and Example2.
+They show how you could set up simple applications and show some graphics.
+Keep in mind the examples are also where I am doing my testing.
+So the packages contain some old and redundant classes while figuring
+things out :)
 
-_Currently, working on shadows_ (23/12/21)
+Use the mouse to pan camera, WASD to move around.
+
 
 From example2 (Lighting, Shadow and Materials) :
 

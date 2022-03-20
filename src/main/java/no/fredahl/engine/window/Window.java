@@ -34,7 +34,7 @@ public class Window implements GLFWindow {
     private long window;
     private long monitor;
     private String windowTitle;
-    private Viewport viewport;
+    private Viewport windowViewport;
     private final RequestQueue requestQueue;
     private GLFWErrorCallback errorCallback;
     private GLFWVidMode monitorDefaultVidMode;
@@ -61,6 +61,13 @@ public class Window implements GLFWindow {
     private boolean cursorDisabled;
     private boolean lockAspectRatio;
     private boolean compatibleProfile;
+    
+    private final Object viewPortLock = new Object();
+    private boolean borrowViewport;
+    private int glViewportX;
+    private int glViewportY;
+    private int glViewportW;
+    private int glViewportH;
     
     private int wwbfs; // window width before full-screen
     private int whbfs;
@@ -144,8 +151,8 @@ public class Window implements GLFWindow {
     
             final int desiredWidth = options.desiredResolutionWidth();
             final int desiredHeight = options.desiredResolutionHeight();
-            viewport = new Viewport(desiredWidth,desiredHeight);
-            if (lockAspectRatio) viewport.lockAspectRatio(true);
+            windowViewport = new Viewport(desiredWidth,desiredHeight);
+            if (lockAspectRatio) windowViewport.lockAspectRatio(true);
     
             glfwDefaultWindowHints();
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -215,11 +222,11 @@ public class Window implements GLFWindow {
             int frameBufferW = tmpBuffer1.get(0);
             int frameBufferH = tmpBuffer2.get(0);
             System.out.println("Window: framebuffer size: " + frameBufferW + ":" + frameBufferH);
-            viewport.update(frameBufferW,frameBufferH); // double check
+            windowViewport.update(frameBufferW,frameBufferH); // double check
             windowResizeEvents = new WindowResizeEvents();
             windowPositionEvents = new WindowPositionEvents();
             windowIconifyEvents = new WindowIconifyEvents();
-            frameBufferEvents = new FrameBufferEvents(viewport);
+            frameBufferEvents = new FrameBufferEvents(windowViewport);
             glfwSetWindowSizeCallback(window, windowResizeEvents);
             glfwSetWindowPosCallback(window, windowPositionEvents);
             glfwSetWindowIconifyCallback(window, windowIconifyEvents);
@@ -489,20 +496,67 @@ public class Window implements GLFWindow {
     
     @Override
     public void lockAspectRatio(boolean lock) {
-        viewport.lockAspectRatio(lock);
+        windowViewport.lockAspectRatio(lock);
     }
     
+    @Override
+    public void returnViewport() {
+        synchronized (viewPortLock) {
+            if (borrowViewport) {
+                final int x = windowViewport.x();
+                final int y = windowViewport.y();
+                final int w = windowViewport.width();
+                final int h = windowViewport.height();
+                glViewport(x,y,w,h);
+                glViewportX = x;
+                glViewportY = y;
+                glViewportW = w;
+                glViewportH = h;
+                borrowViewport = false;
+            }
+        }
+    }
+    
+    /**
+     * equivalent of glViewport(). Remember to call returnViewport() when done with it.
+     * When the viewport is "borrowed", the window will stop dynamically auto-fit the viewport to the window
+     * @param x viewport x0
+     * @param y viewport y0
+     * @param w viewport width
+     * @param h viewport height
+     */
+    @Override
+    public void borrowViewport(int x, int y, int w, int h) {
+        synchronized (viewPortLock) {
+            if (!(x == glViewportX && y == glViewportY && w == glViewportW && h == glViewportH)) {
+                glViewport(x, y, w, h);
+                glViewportX = x;
+                glViewportY = y;
+                glViewportW = w;
+                glViewportH = h;
+            }
+            borrowViewport = true;
+        }
+    }
     
     @Override
     public void updateViewport(Application app) {
-        if (frameBufferEvents.viewportEvent()) {
-            glViewport(
-                    viewport.x(),
-                    viewport.y(),
-                    viewport.width(),
-                    viewport.height());
-            frameBufferEvents.reset();
-            app.resize(this);
+        synchronized (viewPortLock) {
+            if (!borrowViewport) {
+                if (frameBufferEvents.viewportEvent()) {
+                    final int x = windowViewport.x();
+                    final int y = windowViewport.y();
+                    final int w = windowViewport.width();
+                    final int h = windowViewport.height();
+                    glViewport(x,y,w,h);
+                    frameBufferEvents.reset();
+                    glViewportX = x;
+                    glViewportY = y;
+                    glViewportW = w;
+                    glViewportH = h;
+                    app.resize(this);
+                }
+            }
         }
     }
     
@@ -568,37 +622,37 @@ public class Window implements GLFWindow {
     
     @Override
     public int viewportW() {
-        return viewport.width();
+        return glViewportW;
     }
     
     @Override
     public int viewportH() {
-        return viewport.height();
+        return glViewportH;
     }
     
     @Override
     public int viewportX() {
-        return viewport.x();
+        return glViewportX;
     }
     
     @Override
     public int viewportY() {
-        return viewport.y();
+        return glViewportY;
     }
     
     @Override
     public float aspectRatio() {
-        return viewport.aspectRatio();
+        return windowViewport.aspectRatio();
     }
     
     @Override
     public float viewportInvW() {
-        return viewport.inverseWidth();
+        return windowViewport.inverseWidth();
     }
     
     @Override
     public float viewportInvH() {
-        return viewport.inverseHeight();
+        return windowViewport.inverseHeight();
     }
     
     @Override

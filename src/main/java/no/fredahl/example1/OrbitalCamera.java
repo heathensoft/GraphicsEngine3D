@@ -1,6 +1,6 @@
 package no.fredahl.example1;
 
-import no.fredahl.engine.math.ICamera;
+import no.fredahl.example2.ICamera;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

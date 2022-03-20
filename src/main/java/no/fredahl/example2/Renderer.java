@@ -2,10 +2,9 @@ package no.fredahl.example2;
 
 import no.fredahl.engine.Engine;
 import no.fredahl.engine.graphics.ShaderProgram;
-import no.fredahl.engine.graphics.lighting.*;
-import no.fredahl.engine.math.ICamera;
+import no.fredahl.engine.graphics.lighting.MaterialBlock;
+import no.fredahl.example2.lighting.*;
 import no.fredahl.engine.utility.FileUtility;
-import no.fredahl.engine.window.Window;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -88,7 +87,7 @@ public class Renderer {
         materialProgram.setUniform("u_projection",camera.projection());
         materialProgram.setUniform1i("u_shadowMap",0);
         
-        shadowMap.texture().bind(GL_TEXTURE0);
+        shadowMap.texture().bindAndSetActive(GL_TEXTURE0);
         
         List<GameObject> objects = world.gameObjects();
         for (GameObject object : objects) {
@@ -112,7 +111,14 @@ public class Renderer {
         
         ShadowCast.lightCombinedPerspective(proj,new Vector3f(0,7,0),new Vector3f(0,-1,-0.0001f).normalize(),lightMVP.identity());
         shadowMap.bind(); // binds the framebuffer
-        glViewport(0, 0, shadowMap.width(), shadowMap.height());
+    
+        
+        Engine.get().window.borrowViewport(0, 0, shadowMap.width(), shadowMap.height());
+        //glViewport(0, 0, shadowMap.width(), shadowMap.height());
+        
+        
+        
+        
         glClear(GL_DEPTH_BUFFER_BIT);
         depthMapProgram.bind();
         
@@ -125,12 +131,7 @@ public class Renderer {
             object.mesh.render();
         }
         
-        Window window = Engine.get().window;
-        glViewport(
-                window.viewportX(),
-                window.viewportY(),
-                window.viewportW(),
-                window.viewportH());
+        Engine.get().window.returnViewport();
         shadowMap.unbind();
         depthMapProgram.unBind();
     }
@@ -138,7 +139,7 @@ public class Renderer {
     public void dispose() {
         if (shadowMap != null) shadowMap.dispose();
         if (materialBlock != null) materialBlock.free();
-        if (materialProgram != null) materialProgram.delete();
-        if (depthMapProgram != null) depthMapProgram.delete();
+        if (materialProgram != null) materialProgram.dispose();
+        if (depthMapProgram != null) depthMapProgram.dispose();
     }
 }

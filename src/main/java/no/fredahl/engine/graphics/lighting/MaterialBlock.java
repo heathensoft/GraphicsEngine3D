@@ -1,8 +1,6 @@
 package no.fredahl.engine.graphics.lighting;
 
 import no.fredahl.engine.graphics.BufferObject;
-import no.fredahl.engine.graphics.Color;
-import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -54,7 +52,6 @@ public class MaterialBlock {
     }
     
     public MaterialBlock(int bindingPoint, Material ...materials) {
-        
         this.count = materials.length;
         this.bindingPoint = bindingPoint;
         this.uniformBuffer = new BufferObject(GL_UNIFORM_BUFFER,GL_STATIC_DRAW);

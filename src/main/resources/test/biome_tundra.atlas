@@ -1,0 +1,216 @@
+
+biome_tundra.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+baseTile_water
+  rotate: false
+  xy: 448, 857
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+basetile_grass
+  rotate: false
+  xy: 416, 841
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+basetile_grassLight
+  rotate: false
+  xy: 128, 457
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+basetile_snow
+  rotate: false
+  xy: 256, 553
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+basetile_waterDeep
+  rotate: false
+  xy: 672, 976
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+basetile_waterShallow
+  rotate: false
+  xy: 544, 937
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cloud_large_new
+  rotate: false
+  xy: 0, 809
+  size: 416, 160
+  orig: 416, 160
+  offset: 0, 0
+  index: -1
+hud_test
+  rotate: false
+  xy: 0, 969
+  size: 640, 55
+  orig: 640, 55
+  offset: 0, 0
+  index: -1
+human_friendly_hover
+  rotate: false
+  xy: 0, 217
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_friendly_selected
+  rotate: false
+  xy: 992, 992
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_hostile_hover
+  rotate: false
+  xy: 640, 976
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_hostile_selected
+  rotate: false
+  xy: 416, 857
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_neutral_hover
+  rotate: false
+  xy: 544, 953
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_neutral_selected
+  rotate: false
+  xy: 992, 1008
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+human_shadow
+  rotate: false
+  xy: 384, 745
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+knight_yellow_explode
+  rotate: false
+  xy: 0, 761
+  size: 512, 48
+  orig: 512, 48
+  offset: 0, 0
+  index: -1
+knight_yellow_idle
+  rotate: false
+  xy: 0, 425
+  size: 128, 168
+  orig: 128, 168
+  offset: 0, 0
+  index: -1
+knight_yellow_selection
+  rotate: false
+  xy: 384, 737
+  size: 16, 8
+  orig: 16, 8
+  offset: 0, 0
+  index: -1
+knight_yellow_shadow
+  rotate: false
+  xy: 576, 961
+  size: 16, 8
+  orig: 16, 8
+  offset: 0, 0
+  index: -1
+knight_yellow_walk
+  rotate: false
+  xy: 0, 593
+  size: 128, 168
+  orig: 128, 168
+  offset: 0, 0
+  index: -1
+ripples_anim
+  rotate: false
+  xy: 640, 992
+  size: 352, 32
+  orig: 352, 32
+  offset: 0, 0
+  index: -1
+tileset_grass
+  rotate: false
+  xy: 0, 233
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_grassLight
+  rotate: false
+  xy: 256, 569
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_shoreGround
+  rotate: false
+  xy: 416, 873
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_shoreWater
+  rotate: false
+  xy: 0, 329
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_snow
+  rotate: false
+  xy: 128, 473
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_water
+  rotate: false
+  xy: 128, 665
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_waterDeep
+  rotate: false
+  xy: 128, 569
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+tileset_waterShallow
+  rotate: false
+  xy: 256, 665
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+white_pixel
+  rotate: false
+  xy: 640, 975
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1

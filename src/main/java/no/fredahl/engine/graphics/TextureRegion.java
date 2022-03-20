@@ -1,5 +1,6 @@
 package no.fredahl.engine.graphics;
 
+import no.fredahl.engine.math.MathLib;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -124,22 +125,24 @@ public class TextureRegion {
         texUVs.w = texUVs.w * yRatio + v;
     }
     
-    private final static Vector4f tmpV4f = new Vector4f();
-    
     /**
      * @param index sub-region index
      * @return the sub-region coordinates
      */
     public Vector4f subRegionUVs(int index) {
+        Vector4f v4 = MathLib.vec4();
+        subRegionUVs(index, v4);
+        return v4;
+    }
+    
+    public void subRegionUVs(int index, Vector4f dest) {
         final int i = index % e;
         final int col = i % c;
         final int row = i / c;
         final float x = u + col * sw;
         final float y = v + row * sh;
-        return tmpV4f.set(x,y,x+sw,y+sh);
+        dest.set(x,y,x+sw,y+sh);
     }
-    
-    private final static Vector2f tmpV2f = new Vector2f();
     
     /**
      * If you have the uv-coordinates for the region at index 0,
@@ -150,10 +153,11 @@ public class TextureRegion {
      * @return the offset from index 0 to index argument
      */
     public Vector2f uvOffset(int index) {
+        Vector2f v2 = MathLib.vec2();
         final int i = index % e;
         final int col = i % c;
         final int row = i / c;
-        return tmpV2f.set(u + col * sw, v + row * sh);
+        return v2.set(u + col * sw, v + row * sh);
     }
     
     public TextureRegion subRegion(int index) {

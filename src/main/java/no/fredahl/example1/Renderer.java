@@ -1,7 +1,7 @@
 package no.fredahl.example1;
 
 import no.fredahl.engine.graphics.ShaderProgram;
-import no.fredahl.engine.math.ICamera;
+import no.fredahl.example2.ICamera;
 import no.fredahl.engine.utility.FileUtility;
 import org.joml.Matrix4f;
 
@@ -54,6 +54,6 @@ public class Renderer {
     }
     
     public void dispose() {
-        if (program != null) program.delete();
+        if (program != null) program.dispose();
     }
 }

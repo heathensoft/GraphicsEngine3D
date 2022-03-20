@@ -51,6 +51,37 @@ struct SpotLight {
     float outerCutoff;
 };
 
+
+layout(std140, binding = 0) uniform Lights {
+    // floatBuffer
+    DirectionalLight dl[];
+    PointLight pl[];
+    SpotLight sl[];
+    // intbuffer
+    int dl_count;
+    int pl_count;
+    int sl_count;
+    int flags;
+    } ubo_lights;
+
+layout(std140, binding = 0) uniform ShadowCasters {
+    // floatBuffer
+    DirectionalLight dl[];
+    PointLight pl[];
+    SpotLight sl[];
+    mat4 dl_lightSpace[];
+    mat4 sl_lightSpace[];
+    // intbuffer
+    samplerCube[4] pl_depthMaps;
+    sampler2D[4] dl_depthMaps;
+    sampler2D[4] sl_depthMaps;
+    int dl_count;
+    int pl_count;
+    int sl_count;
+    int flags;
+} ubo_shadowCasters;
+
+
 const float PI = 3.14159265;
 
 vec3 calc_dir_light(DirectionalLight l, vec3 eye, vec3 norm) {

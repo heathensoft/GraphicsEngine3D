@@ -4,6 +4,8 @@ import no.fredahl.engine.window.Options;
 import no.fredahl.engine.window.Window;
 import org.lwjgl.Version;
 
+import java.util.concurrent.*;
+
 import static java.lang.System.nanoTime;
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -21,6 +23,7 @@ public class Engine {
     private static final boolean SLEEP_ON_SYNC = true;
     
     private static Engine instance;
+    private final ExecutorService executor;
     private final Thread GLContext;
     private final Object lock;
     public final Time time;
@@ -28,7 +31,16 @@ public class Engine {
     private Application application;
     private boolean running;
     
-    private Engine() {
+    private Engine(int threadPool) {
+        
+        threadPool = Math.max(0,threadPool);
+        executor = new ThreadPoolExecutor(
+                threadPool,
+                threadPool * 2,
+                3000,
+                TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(64)
+        );
         window = new Window();
         lock = new Object();
         time = new Time();
@@ -125,6 +137,7 @@ public class Engine {
                 e.printStackTrace();
             }finally {
                 window.terminate();
+                executor.shutdown();
             }
         }
     }
@@ -149,14 +162,22 @@ public class Engine {
         }
     }
     
-    
     public synchronized static Engine get() {
-        return instance == null ? instance = new Engine() : instance;
+        return instance == null ? instance = new Engine(1) : instance;
     }
     
-    public synchronized void requestTask(Runnable runnable) {
+    public synchronized static Engine get(int threadPool) {
+        return instance == null ? instance = new Engine(threadPool) : instance;
+    }
+    
+    public void execute(Runnable runnable) {
+        try {
+            executor.submit(runnable);
+        } catch (Exception e) {
+            System.out.println("Engine: could not execute task..");
+            exit();
+        }
         
-        // new Thread().start();
     }
     
     public void exit() {

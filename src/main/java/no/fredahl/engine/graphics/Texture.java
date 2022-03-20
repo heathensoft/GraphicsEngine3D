@@ -1,15 +1,17 @@
 package no.fredahl.engine.graphics;
 
+import no.fredahl.engine.utility.Disposable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
+import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL42.glTexStorage3D;
 
 /**
  * @author Frederik Dahl
@@ -29,7 +31,10 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
  
 
 
-public class Texture {
+public class Texture implements Disposable {
+    
+    // Todo: implement methods for: https://docs.gl/gl4/glTexParameter
+    //  support additional formats formats.
     
     private final static GLBindings bindings = GLBindings.get();
     
@@ -48,6 +53,51 @@ public class Texture {
         this.width = 0;
         this.height = 0;
         this.depth = 0;
+    }
+    
+    public void tex2DArray(Image... images) {
+        if (target != GL_TEXTURE_2D_ARRAY)
+            throw new RuntimeException("Target must be: GL_TEXTURE_2D_ARRAY");
+        if (images == null || images.length < 2)
+            throw new IllegalArgumentException("Invalid method argument");
+        int width = images[0].width();
+        int height = images[0].height();
+        int channels = images[0].channels();
+        for (int i = 1; i < images.length; i++) {
+            if (width != images[i].width()
+            || height != images[i].height()
+            || channels != images[i].channels()) {
+                throw new RuntimeException("Texture Array images must equal in dimensions");
+            }
+        }
+        this.width = width;
+        this.height = height;
+        this.depth = images.length;
+        int internalFormat; // GPU side
+        int format; // client memory
+        int stride = 4;
+    
+        switch (channels) {
+            case 3:
+                internalFormat = format = GL_RGB;
+                if ((width & 3) != 0) {
+                    stride = 2 - (width & 1);
+                }break;
+            case 4:
+                format = GL_RGBA;
+                internalFormat = GL_RGBA8;
+                break;
+            default:
+                throw new RuntimeException("Unsupported format");
+        }
+    
+        glPixelStorei(GL_UNPACK_ALIGNMENT,stride);
+        
+        glTexStorage3D(target,0,internalFormat,width,height,depth);
+    
+        for (int i = 0; i < depth; i++) {
+            glTexSubImage3D(target,0,0,0,i,width,height,depth,format,GL_UNSIGNED_BYTE,images[i].get());
+        }
     }
     
     
@@ -123,6 +173,16 @@ public class Texture {
         this.height = height;
     }
     
+    public void cubeMap(int level, int internalFormat, int width, int height, int texelFormat, int type) {
+        for (int i = 0; i < 6; i++) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,level,internalFormat,width,height,0,texelFormat,type,(ByteBuffer) null);
+        }
+    }
+    
+    public void depthCubeMap(int width, int height) {
+        cubeMap(0,GL_DEPTH_COMPONENT,width,height,GL_DEPTH_COMPONENT,GL_FLOAT);
+    }
+    
     public void magFilter(int magFilter) {
         glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
     }
@@ -190,7 +250,7 @@ public class Texture {
         bindings.bindTexture(target,id);
     }
     
-    public void bind(int textureUnit) {
+    public void bindAndSetActive(int textureUnit) {
         glActiveTexture(textureUnit);
         bind();
     }
@@ -199,7 +259,8 @@ public class Texture {
         bindings.bindTexture(target,0);
     }
     
-    public void delete() {
+    @Override
+    public void dispose() {
         glDeleteTextures(id);
     }
     

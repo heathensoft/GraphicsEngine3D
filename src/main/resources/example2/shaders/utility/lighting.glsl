@@ -17,7 +17,7 @@ struct DirectionalLight {
 
 struct PointLight {
     vec3 color;
-    float intensity;
+    float farPlane;
     vec3 position;
     float ambient;
     float diffuse;
@@ -59,6 +59,25 @@ float energyConservation(float shine) {
     return ( 16.0 + shine ) / ( 16.0 * 3.14159265 );
 }
 
+float calc_shadow(vec4 pos, vec3 norm, vec3 dir, sampler2D shadowMap) {
+    vec3 coords = pos.xyz / pos.w;
+    float shadowFactor = 0.0;
+    float bias = max(0.05 * (1.0 - dot(norm, dir)), 0.005);
+    vec2 inc = 1.0 / textureSize(shadowMap,0);
+    coords = coords * 0.5 + 0.5;
+    for(int r = -2; r <= 2; ++r){
+        for(int c = -2; c <= 2; ++c){
+            float textDepth = texture(shadowMap, coords.xy + vec2(r,c) * inc).r;
+            shadowFactor += coords.z - bias > textDepth ? 1.0 : 0.0;
+        }
+    }
+    shadowFactor /= 25.0;
+    if(coords.z > 1.0) {
+        shadowFactor = 0.0;
+    }
+    return (1 - shadowFactor);
+}
+
 float calc_shadow(vec4 pos, sampler2D shadowMap) {
     vec3 coords = pos.xyz / pos.w;
     float shadowFactor = 0.0;
@@ -71,7 +90,7 @@ float calc_shadow(vec4 pos, sampler2D shadowMap) {
             shadowFactor += coords.z - bias > textDepth ? 1.0 : 0.0;
         }
     }
-    shadowFactor /= (25.0 * 1);
+    shadowFactor /= 25.0;
     if(coords.z > 1.0) {
         shadowFactor = 0.0;
     }

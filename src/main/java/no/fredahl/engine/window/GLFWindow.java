@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Frederik Dahl
@@ -47,6 +48,8 @@ public interface GLFWindow {
     void toggleVsync(boolean on);
     void lockAspectRatio(boolean lock);
     void updateViewport(Application app);
+    void borrowViewport(int x, int y, int w, int h);
+    void returnViewport();
     void centerWindow();
     void windowed(int width, int height);
     void fullscreen(int width, int height);

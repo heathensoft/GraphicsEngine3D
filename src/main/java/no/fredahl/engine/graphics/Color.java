@@ -18,7 +18,16 @@ public class Color {
     public static final Vector3f WHITE_RGB = new Vector3f(1.0f,1.0f,1.0f);
     public static final Vector3f BLACK_RGB = new Vector3f(0.0f,0.0f,0.0f);
     
-    // todo: Mixing with influence
+    // todo: Just clean up this class in general + Mixing with influence
+    
+    public static float packed(float r, float g, float b, float a) {
+        final int red = rgba(clamp(r));
+        final int gre = rgba(clamp(g));
+        final int blu = rgba(clamp(b));
+        final int alp = rgba(clamp(a));
+        final int i = alp << 24 | blu << 16 | gre << 8 | red;
+        return Float.intBitsToFloat(i & 0xfeffffff);
+    }
     
     public static float packed(Vector4f color) {
         final int r = rgba(clamp(color.x));

@@ -1,6 +1,6 @@
 package no.fredahl.engine.graphics;
 
-import no.fredahl.engine.graphics.lighting.*;
+import no.fredahl.engine.utility.Disposable;
 import org.joml.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
  */
 
 
-public class ShaderProgram {
+public class ShaderProgram implements Disposable {
     
     private final int program;
     private final Map<String,Integer> uniforms;
@@ -86,7 +86,7 @@ public class ShaderProgram {
                 throw new Exception("Failed to link shaders: \n"
                 + glGetProgramInfoLog(program));
         } catch (Exception e) {
-            delete();
+            dispose();
             throw new Exception(e.getMessage());
         }
         disposeShaders();
@@ -413,19 +413,19 @@ public class ShaderProgram {
     }
     
     public void bind() {
-        bindings.useShaderProgram(program);
+        bindings.useShader(program);
     }
     
     public void unBind() {
-        bindings.useShaderProgram(0);
+        bindings.useShader(0);
     }
     
     public int id() {
         return program;
     }
     
-    public void delete() {
-        unBind();
+    @Override
+    public void dispose() {
         if (glGetProgrami(program,GL_ATTACHED_SHADERS) > 0)
             disposeShaders();
         if (glGetProgrami(program,GL_DELETE_STATUS) == GL_FALSE)

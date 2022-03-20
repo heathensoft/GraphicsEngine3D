@@ -15,7 +15,7 @@ import java.util.Map;
  * But you could also write a .atlas manually.
  * I am not using all the values in the .atlas.
  * The important values are the filename,
- * the x and y start of the region in pixels,
+ * the x and y start of the region in pixels (y0 at top),
  * the regions width and height,
  * and the region name.
  * we skip the rest.
@@ -107,6 +107,10 @@ public class TextureAtlas {
         }
     }
     
+    
+    public Map<String, TextureRegion> regions() {
+        return regions;
+    }
     
     public TextureRegion get(String region) {
         return regions.get(region);
