@@ -56,12 +56,25 @@ public class Color {
         return color;
     }
     
+    public void fromRGBA(int r, int g, int b, int a, Vector4f dest) {
+        dest.x = normalize(clamp(r));
+        dest.y = normalize(clamp(g));
+        dest.z = normalize(clamp(b));
+        dest.w = normalize(clamp(a));
+    }
+    
     public Vector3f fromRGB(int r, int g, int b) {
         Vector3f color = new Vector3f();
         color.x = normalize(clamp(r));
         color.y = normalize(clamp(g));
         color.z = normalize(clamp(b));
         return color;
+    }
+    
+    public void fromRGBA(int r, int g, int b, Vector3f dest) {
+        dest.x = normalize(clamp(r));
+        dest.y = normalize(clamp(g));
+        dest.z = normalize(clamp(b));
     }
     
     public Vector4f fromHex(String hex) {

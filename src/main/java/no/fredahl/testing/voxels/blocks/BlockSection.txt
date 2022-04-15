@@ -1,0 +1,968 @@
+package no.fredahl.testing.voxels.blocks;
+
+import no.fredahl.testing.voxels.Face;
+import org.joml.Vector4f;
+
+import java.nio.FloatBuffer;
+
+
+/**
+ * @author Frederik Dahl
+ * 25/01/2022
+ */
+
+
+public class BlockSection {
+    
+    
+    private final Map map;
+    private BlockBuffer buffer;
+    protected final int x0, y0;
+    protected final int[][] grid;
+    protected short blocks;
+    private short faces;
+    private boolean altered;
+    private boolean reUpload;
+    
+    
+    
+    
+    public BlockSection(int x0, int y0, Map map) {
+        int size = map.sectionSize().get();
+        this.grid = new int[size][size];
+        this.map = map;
+        this.x0 = x0;
+        this.y0 = y0;
+        this.altered = true;
+    }
+    
+    protected void render(FloatBuffer vertices) {
+        if (empty() || buffer == null) return;
+        if (altered) update();
+        if (reUpload) upload(vertices);
+        buffer.render(faces);
+    }
+    
+   
+    private void upload(FloatBuffer vertices) {
+        
+        vertices.clear();
+        faces = 0;
+        
+        /*
+        FACE VERTICES
+        
+        V1 - TOP_LEFT  - U, V
+        V2 - BOT_LEFT  - U, V2
+        V3 - BOT_RIGHT - U2,V2
+        V4 - TOP_RIGHT - U2, V
+         */
+        
+        BlockType type;
+        Face face;
+        Vector4f uv;
+        
+        final int size = map.sectionSize().get();
+        final int z0 = map.z0();
+        
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                
+                int block = grid[y][x];
+                
+                if (block != 0) { // not empty
+    
+                    int typeID = BlockState.type(block);
+                    int uvIdxFront = BlockState.uvIndex(block);
+                    type = map.getBlockType(typeID);
+                    uv = type.UVCoordinatesFront(uvIdxFront);
+                    
+                    final int pX = x0 + x;
+                    final int pY = y0 + y;
+                    final int pZ = z0;
+    
+                    float u = uv.x;
+                    float v = uv.y;
+                    float u2 = uv.z;
+                    float v2 = uv.w;
+                    
+                    face = Face.FRONT;
+                    vertices.put(face.x1 + pX).put(face.y1 + pY).put(face.z1 + pZ).put(u).put(v);
+                    vertices.put(face.x2 + pX).put(face.y2 + pY).put(face.z2 + pZ).put(u).put(v2);
+                    vertices.put(face.x3 + pX).put(face.y3 + pY).put(face.z3 + pZ).put(u2).put(v2);
+                    vertices.put(face.x4 + pX).put(face.y4 + pY).put(face.z4 + pZ).put(u2).put(v);
+                    faces++;
+                    
+                    if (!BlockState.renderFrontOnly(block)) {
+                        
+                        uv = type.UVCoordinatesSides();
+                        
+                        u = uv.x;
+                        v = uv.y;
+                        u2 = uv.z;
+                        v2 = uv.w;
+    
+                        if (BlockState.renderTop(block)) {
+                            face = Face.TOP;
+                            vertices.put(face.x1 + pX).put(face.y1 + pY).put(face.z1 + pZ).put(u).put(v);
+                            vertices.put(face.x2 + pX).put(face.y2 + pY).put(face.z2 + pZ).put(u).put(v2);
+                            vertices.put(face.x3 + pX).put(face.y3 + pY).put(face.z3 + pZ).put(u2).put(v2);
+                            vertices.put(face.x4 + pX).put(face.y4 + pY).put(face.z4 + pZ).put(u2).put(v);
+                            faces++;
+                        }
+                        if (BlockState.renderLeft(block)) {
+                            face = Face.LEFT;
+                            vertices.put(face.x1 + pX).put(face.y1 + pY).put(face.z1 + pZ).put(u).put(v);
+                            vertices.put(face.x2 + pX).put(face.y2 + pY).put(face.z2 + pZ).put(u).put(v2);
+                            vertices.put(face.x3 + pX).put(face.y3 + pY).put(face.z3 + pZ).put(u2).put(v2);
+                            vertices.put(face.x4 + pX).put(face.y4 + pY).put(face.z4 + pZ).put(u2).put(v);
+                            faces++;
+                        }
+                        if (BlockState.renderRight(block)) {
+                            face = Face.RIGHT;
+                            vertices.put(face.x1 + pX).put(face.y1 + pY).put(face.z1 + pZ).put(u).put(v);
+                            vertices.put(face.x2 + pX).put(face.y2 + pY).put(face.z2 + pZ).put(u).put(v2);
+                            vertices.put(face.x3 + pX).put(face.y3 + pY).put(face.z3 + pZ).put(u2).put(v2);
+                            vertices.put(face.x4 + pX).put(face.y4 + pY).put(face.z4 + pZ).put(u2).put(v);
+                            faces++;
+                        }
+                        if (BlockState.renderBottom(block)) {
+                            face = Face.BOTTOM;
+                            vertices.put(face.x1 + pX).put(face.y1 + pY).put(face.z1 + pZ).put(u).put(v);
+                            vertices.put(face.x2 + pX).put(face.y2 + pY).put(face.z2 + pZ).put(u).put(v2);
+                            vertices.put(face.x3 + pX).put(face.y3 + pY).put(face.z3 + pZ).put(u2).put(v2);
+                            vertices.put(face.x4 + pX).put(face.y4 + pY).put(face.z4 + pZ).put(u2).put(v);
+                            faces++;
+                        }
+                    }
+                }
+            }
+        }
+        vertices.flip();
+        buffer.upload(vertices);
+        reUpload = false;
+    }
+    
+    private void update() {
+        
+        final int size = map.sectionSize().get();
+        final int sizeMinusOne = size - 1;
+        final int sizeMinusTwo = size - 2;
+        final int emptyBlock = 0;
+        int adjacentBlock;
+        int currentBlock;
+        int faceMask;
+        int uvMask;
+        
+        // Corners
+        
+        // [0,0]
+        
+        currentBlock = grid[0][0];
+        
+        if (currentBlock != emptyBlock) {
+    
+            faceMask = 0;
+            uvMask = 0;
+            
+            // TOP LEFT
+    
+            adjacentBlock = map.getBlock(x0 - 1, y0 + 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 1;
+            }
+    
+            // TOP
+            
+            adjacentBlock = grid[0][1];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 1;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 2;
+            }
+    
+            // TOP RIGHT
+    
+            adjacentBlock = grid[1][1];
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 4;
+            }
+    
+            // LEFT
+    
+            adjacentBlock = map.getBlock(x0 - 1, y0);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 2;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 8;
+            }
+    
+            // RIGHT
+    
+            adjacentBlock = grid[0][1];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 4;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 16;
+            }
+    
+            // BOTTOM LEFT
+    
+            adjacentBlock = map.getBlock(x0 - 1, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 32;
+            }
+    
+            // BOTTOM
+    
+            adjacentBlock = map.getBlock(x0, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 8;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 64;
+            }
+    
+            // BOTTOM RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + 1, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 128;
+            }
+    
+            currentBlock = BlockState.setFaceMask(currentBlock,faceMask);
+            currentBlock = BlockState.setUVMask(currentBlock,uvMask);
+            grid[0][0] = currentBlock;
+            
+        }
+    
+        // [0,sizeMinusOne]
+    
+        currentBlock = grid[0][sizeMinusOne];
+    
+        if (currentBlock != emptyBlock) {
+        
+            faceMask = 0;
+            uvMask = 0;
+        
+            // TOP LEFT
+        
+            adjacentBlock = grid[1][sizeMinusTwo];
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 1;
+            }
+        
+            // TOP
+        
+            adjacentBlock = grid[1][sizeMinusOne];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 1;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 2;
+            }
+        
+            // TOP RIGHT
+        
+            adjacentBlock = map.getBlock(x0 + size, y0 + 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 4;
+            }
+        
+            // LEFT
+        
+            adjacentBlock = grid[0][sizeMinusTwo];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 2;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 8;
+            }
+        
+            // RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + size, y0);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 4;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 16;
+            }
+        
+            // BOTTOM LEFT
+        
+            adjacentBlock = map.getBlock(x0 + sizeMinusTwo, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 32;
+            }
+        
+            // BOTTOM
+        
+            adjacentBlock = map.getBlock(x0 + sizeMinusOne, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 8;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 64;
+            }
+        
+            // BOTTOM RIGHT
+        
+            adjacentBlock = map.getBlock(x0 + size, y0 - 1);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 128;
+            }
+        
+            currentBlock = BlockState.setFaceMask(currentBlock,faceMask);
+            currentBlock = BlockState.setUVMask(currentBlock,uvMask);
+            grid[0][sizeMinusOne] = currentBlock;
+        
+        }
+        
+        // [sizeMinusOne,0]
+    
+        currentBlock = grid[sizeMinusOne][0];
+    
+        if (currentBlock != emptyBlock) {
+        
+            faceMask = 0;
+            uvMask = 0;
+        
+            // TOP LEFT
+        
+            adjacentBlock = map.getBlock(x0 - 1, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 1;
+            }
+        
+            // TOP
+    
+            adjacentBlock = map.getBlock(x0, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 1;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 2;
+            }
+        
+            // TOP RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + 1, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 4;
+            }
+        
+            // LEFT
+    
+            adjacentBlock = map.getBlock(x0 - 1, y0 + sizeMinusOne);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 2;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 8;
+            }
+        
+            // RIGHT
+        
+            adjacentBlock = grid[sizeMinusOne][1];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 4;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 16;
+            }
+        
+            // BOTTOM LEFT
+        
+            adjacentBlock = map.getBlock(x0 - 1, y0 + sizeMinusTwo);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 32;
+            }
+        
+            // BOTTOM
+    
+            adjacentBlock = grid[sizeMinusTwo][0];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 8;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 64;
+            }
+        
+            // BOTTOM RIGHT
+    
+            adjacentBlock = grid[sizeMinusTwo][1];
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 128;
+            }
+        
+            currentBlock = BlockState.setFaceMask(currentBlock,faceMask);
+            currentBlock = BlockState.setUVMask(currentBlock,uvMask);
+            grid[sizeMinusOne][0] = currentBlock;
+        
+        }
+    
+        // [sizeMinusOne,sizeMinusOne]
+    
+        currentBlock = grid[sizeMinusOne][sizeMinusOne];
+    
+        if (currentBlock != emptyBlock) {
+        
+            faceMask = 0;
+            uvMask = 0;
+        
+            // TOP LEFT
+        
+            adjacentBlock = map.getBlock(x0 + sizeMinusTwo, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 1;
+            }
+        
+            // TOP
+    
+            adjacentBlock = map.getBlock(x0 + sizeMinusOne, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 1;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 2;
+            }
+        
+            // TOP RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + size, y0 + size);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 4;
+            }
+        
+            // LEFT
+    
+            adjacentBlock = grid[sizeMinusOne][sizeMinusTwo];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 2;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 8;
+            }
+        
+            // RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + size, y0 + sizeMinusOne);
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 4;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 16;
+            }
+        
+            // BOTTOM LEFT
+    
+            adjacentBlock = grid[sizeMinusTwo][sizeMinusTwo];
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 32;
+            }
+        
+            // BOTTOM
+    
+            adjacentBlock = grid[sizeMinusTwo][sizeMinusOne];
+            if (adjacentBlock != emptyBlock) {
+                faceMask += 8;
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 64;
+            }
+        
+            // BOTTOM RIGHT
+    
+            adjacentBlock = map.getBlock(x0 + size, y0 + sizeMinusTwo);
+            if (adjacentBlock != emptyBlock) {
+                if (BlockState.sameType(currentBlock,adjacentBlock))
+                    uvMask += 128;
+            }
+        
+            currentBlock = BlockState.setFaceMask(currentBlock,faceMask);
+            currentBlock = BlockState.setUVMask(currentBlock,uvMask);
+            grid[sizeMinusOne][sizeMinusOne] = currentBlock;
+        
+        }
+    
+        // Sides
+        
+        // BOTTOM-SIDE
+        
+        for (int col = 1; col < sizeMinusOne; col++) {
+            
+            currentBlock = grid[0][col];
+    
+            if (currentBlock != emptyBlock) {
+    
+                faceMask = 0;
+                uvMask = 0;
+    
+                // TOP LEFT
+    
+                adjacentBlock = grid[1][col - 1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 1;
+                }
+    
+                // TOP
+    
+                adjacentBlock = grid[1][col];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 1;
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 2;
+                }
+    
+                // TOP RIGHT
+    
+                adjacentBlock = grid[1][col + 1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 4;
+                }
+    
+                // LEFT
+    
+                adjacentBlock = grid[0][col - 1];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 2;
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 8;
+                }
+    
+                // RIGHT
+    
+                adjacentBlock = grid[0][col + 1];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 4;
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 16;
+                }
+    
+                // BOTTOM LEFT
+    
+                adjacentBlock = map.getBlock(col - 1 + x0, y0 - 1);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 32;
+                }
+    
+                // BOTTOM
+    
+                adjacentBlock = map.getBlock(col + x0, y0 - 1);
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 8;
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 64;
+                }
+    
+                // BOTTOM RIGHT
+    
+                adjacentBlock = map.getBlock(col + 1 + x0, y0 - 1);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock,adjacentBlock))
+                        uvMask += 128;
+                }
+    
+                currentBlock = BlockState.setFaceMask(currentBlock,faceMask);
+                currentBlock = BlockState.setUVMask(currentBlock,uvMask);
+                grid[0][col] = currentBlock;
+            }
+        }
+    
+        // TOP-SIDE
+    
+        for (int col = 1; col < sizeMinusOne; col++) {
+    
+            currentBlock = grid[sizeMinusOne][col];
+    
+            if (currentBlock != emptyBlock) {
+        
+                faceMask = 0;
+                uvMask = 0;
+        
+                // TOP LEFT
+    
+                adjacentBlock = map.getBlock(col - 1 + x0, y0 + size);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 1;
+                }
+        
+                // TOP
+    
+                adjacentBlock = map.getBlock(col + x0, y0 + size);
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 1;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 2;
+                }
+        
+                // TOP RIGHT
+    
+                adjacentBlock = map.getBlock(col + 1 + x0, y0 + size);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 4;
+                }
+        
+                // LEFT
+        
+                adjacentBlock = grid[sizeMinusOne][col - 1];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 2;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 8;
+                }
+        
+                // RIGHT
+        
+                adjacentBlock = grid[sizeMinusOne][col + 1];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 4;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 16;
+                }
+        
+                // BOTTOM LEFT
+    
+                adjacentBlock = grid[sizeMinusTwo][col - 1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 32;
+                }
+        
+                // BOTTOM
+    
+                adjacentBlock = grid[sizeMinusTwo][col];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 8;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 64;
+                }
+        
+                // BOTTOM RIGHT
+    
+                adjacentBlock = grid[sizeMinusTwo][col + 1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 128;
+                }
+        
+                currentBlock = BlockState.setFaceMask(currentBlock, faceMask);
+                currentBlock = BlockState.setUVMask(currentBlock, uvMask);
+                grid[sizeMinusOne][col] = currentBlock;
+            }
+        }
+    
+        // LEFT-SIDE
+    
+        for (int row = 1; row < sizeMinusOne; row++) {
+        
+            currentBlock = grid[row][0];
+        
+            if (currentBlock != emptyBlock) {
+            
+                faceMask = 0;
+                uvMask = 0;
+            
+                // TOP LEFT
+            
+                adjacentBlock = map.getBlock(x0 - 1, row + 1 + y0);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 1;
+                }
+            
+                // TOP
+    
+                adjacentBlock = grid[row + 1][0];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 1;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 2;
+                }
+            
+                // TOP RIGHT
+    
+                adjacentBlock = grid[row + 1][1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 4;
+                }
+            
+                // LEFT
+    
+                adjacentBlock = map.getBlock(x0 - 1, row + y0);
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 2;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 8;
+                }
+            
+                // RIGHT
+    
+                adjacentBlock = grid[row][1];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 4;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 16;
+                }
+            
+                // BOTTOM LEFT
+    
+                adjacentBlock = map.getBlock(x0 - 1, row - 1 + y0);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 32;
+                }
+            
+                // BOTTOM
+    
+                adjacentBlock = grid[row - 1][0];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 8;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 64;
+                }
+            
+                // BOTTOM RIGHT
+    
+                adjacentBlock = grid[row - 1][1];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 128;
+                }
+            
+                currentBlock = BlockState.setFaceMask(currentBlock, faceMask);
+                currentBlock = BlockState.setUVMask(currentBlock, uvMask);
+                grid[row][0] = currentBlock;
+            }
+        }
+    
+        // RIGHT-SIDE
+    
+        for (int row = 1; row < sizeMinusOne; row++) {
+        
+            currentBlock = grid[row][sizeMinusOne];
+        
+            if (currentBlock != emptyBlock) {
+            
+                faceMask = 0;
+                uvMask = 0;
+            
+                // TOP LEFT
+                
+                adjacentBlock = grid[row + 1][sizeMinusTwo];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 1;
+                }
+            
+                // TOP
+    
+                adjacentBlock = grid[row + 1][sizeMinusOne];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 1;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 2;
+                }
+            
+                // TOP RIGHT
+                
+                adjacentBlock = map.getBlock(x0 + size, row + 1 + y0);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 4;
+                }
+            
+                // LEFT
+    
+                adjacentBlock = grid[row][sizeMinusTwo];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 2;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 8;
+                }
+            
+                // RIGHT
+                
+                adjacentBlock = map.getBlock(x0 + size, row + y0);
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 4;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 16;
+                }
+            
+                // BOTTOM LEFT
+    
+                adjacentBlock = grid[row - 1][sizeMinusTwo];
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 32;
+                }
+            
+                // BOTTOM
+            
+                adjacentBlock = grid[row - 1][sizeMinusOne];
+                if (adjacentBlock != emptyBlock) {
+                    faceMask += 8;
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 64;
+                }
+            
+                // BOTTOM RIGHT
+    
+                adjacentBlock = map.getBlock(x0 + size, row - 1 + y0);
+                if (adjacentBlock != emptyBlock) {
+                    if (BlockState.sameType(currentBlock, adjacentBlock))
+                        uvMask += 128;
+                }
+            
+                currentBlock = BlockState.setFaceMask(currentBlock, faceMask);
+                currentBlock = BlockState.setUVMask(currentBlock, uvMask);
+                grid[row][sizeMinusOne] = currentBlock;
+            }
+        }
+        
+        // MIDDLE
+    
+        for (int row = 1; row < sizeMinusOne; row++) {
+            for (int col = 1; col < sizeMinusOne; col++) {
+    
+                currentBlock = grid[row][col];
+    
+                if (currentBlock != emptyBlock) {
+    
+                    faceMask = 0;
+                    uvMask = 0;
+    
+                    // TOP LEFT
+    
+                    adjacentBlock = grid[row + 1][col - 1];
+                    if (adjacentBlock != emptyBlock) {
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 1;
+                    }
+    
+                    // TOP
+    
+                    adjacentBlock = grid[row + 1][col];
+                    if (adjacentBlock != emptyBlock) {
+                        faceMask += 1;
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 2;
+                    }
+    
+                    // TOP RIGHT
+    
+                    adjacentBlock = grid[row + 1][col + 1];
+                    if (adjacentBlock != emptyBlock) {
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 4;
+                    }
+    
+                    // LEFT
+    
+                    adjacentBlock = grid[row][col - 1];
+                    if (adjacentBlock != emptyBlock) {
+                        faceMask += 2;
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 8;
+                    }
+    
+                    // RIGHT
+    
+                    adjacentBlock = grid[row][col + 1];
+                    if (adjacentBlock != emptyBlock) {
+                        faceMask += 4;
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 16;
+                    }
+    
+                    // BOTTOM LEFT
+    
+                    adjacentBlock = grid[row - 1][col - 1];
+                    if (adjacentBlock != emptyBlock) {
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 32;
+                    }
+    
+                    // BOTTOM
+    
+                    adjacentBlock = grid[row - 1][col];
+                    if (adjacentBlock != emptyBlock) {
+                        faceMask += 8;
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 64;
+                    }
+    
+                    // BOTTOM RIGHT
+    
+                    adjacentBlock = grid[row - 1][col + 1];
+                    if (adjacentBlock != emptyBlock) {
+                        if (BlockState.sameType(currentBlock, adjacentBlock))
+                            uvMask += 128;
+                    }
+    
+                    currentBlock = BlockState.setFaceMask(currentBlock, faceMask);
+                    currentBlock = BlockState.setUVMask(currentBlock, uvMask);
+                    grid[row][col] = currentBlock;
+                }
+            }
+        }
+        altered = false;
+        reUpload = true;
+    }
+    
+    protected void giveBuffer(BlockBuffer buffer) {
+        if (this.buffer != buffer) {
+            this.buffer = buffer;
+            reUpload = true;
+        }
+    }
+    
+    protected BlockBuffer retrieveBuffer() {
+        BlockBuffer buffer = this.buffer;
+        this.buffer = null;
+        return buffer;
+    }
+    
+    protected int get(int x, int y) {
+        return grid[y][x];
+    }
+    
+    protected void putUnchecked(int type, int x, int y) {
+        grid[y][x] = type;
+    }
+    
+    protected void put(int type, int x, int y) {
+        if (type == 0) remove(x,y);
+        else {
+            int currentBlock = grid[y][x];
+            if (currentBlock == 0) blocks++;
+            else if (BlockState.sameType(currentBlock,type)) return;
+            grid[y][x] = BlockState.setType(currentBlock,type);
+            altered = true;
+        }
+    }
+    
+    protected void remove(int x, int y) {
+        int currentBlock = grid[y][x];
+        if (currentBlock == 0) return;
+        grid[y][x] = 0;
+        blocks--;
+        altered = true;
+    }
+    
+    protected boolean empty() {
+        return blocks == 0;
+    }
+    
+    
+}

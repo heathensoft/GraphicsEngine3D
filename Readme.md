@@ -11,24 +11,22 @@ Modern [OpenGL](https://www.opengl.org/) through the [LWJGL 3](https://www.lwjgl
 Dividing window events and graphics into separate threads for seamless rendering.
 
 I'm running it on Windows, but it should also support macOS and Linux.
-_Requires OpenGL version: 4.3_
+_Requires OpenGL version: 4.3 +_
 
-Currently, there are two examples to run. Example1 and Example2.
-They show how you could set up simple applications and show some graphics.
-Keep in mind the examples are also where I am doing my testing.
-So the packages contain some old and redundant classes while figuring
-things out :)
+There are a few test environments provided as examples on how
+you could set up and run an Application in the Engine.
+The code is found under the "testing" package.
 
-Use the mouse to pan camera, WASD to move around.
-
-
-From example2 (Lighting, Shadow and Materials) :
+From "LightingTest" (Lighting, Shadow and Materials):
 
 ![1](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap02.png?raw=true)
 
+From "LevelOfDetail" (Dynamic LOD-rendering of procedural-generated terrain):
 
+![2](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/levelOfDetail00.png?raw=true)
 
-![2](https://github.com/fre-dahl/GraphicsEngine3D/blob/main/screenshots/heightmap01.png?raw=true)
+You can move around in the environment with WASD or right-clicking on the terrain.
+Left-drag to pan around and scroll to zoom.
 
 ### On the technical side:
 

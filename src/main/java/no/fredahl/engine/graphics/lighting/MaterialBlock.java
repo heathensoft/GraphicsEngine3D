@@ -98,7 +98,7 @@ public class MaterialBlock {
     }
     
     public void free() {
-        uniformBuffer.unbind();
+        uniformBuffer.unbind_();
         uniformBuffer.free();
     }
 

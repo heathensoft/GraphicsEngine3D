@@ -1,0 +1,8 @@
+
+Major:
+
+* GLFW not working properly. Monitor related. Works fine on tv-monitor, native laptop has stuttering etc.
+  But for some reason the engine fps / ups count does not pick this up.
+  Input also lagging behind.
+
+* Bugs in Mouse.java. Not working properly in full-screen mode

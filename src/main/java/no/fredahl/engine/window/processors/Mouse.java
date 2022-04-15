@@ -33,6 +33,8 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Mouse {
     
+    /*Todo: Bugged in full-screen mode for some reason.*/
+    
     public static final int BUTTONS = 3;
     
     public static final int LEFT  = GLFW_MOUSE_BUTTON_LEFT;
@@ -96,7 +98,7 @@ public class Mouse {
             prevScreen.set(currentScreen);
             currentScreen.set(hoverEvents.x(),window.windowH() - hoverEvents.y());
         }
-        if (!fpsMode) {
+        if (!fpsMode) { // todo: removing this (set to false) fixes something
             currentScreen.x = Math.min(window.windowW(),Math.max(currentScreen.x,0));
             currentScreen.y = Math.min(window.windowH(),Math.max(currentScreen.y,0));
         }

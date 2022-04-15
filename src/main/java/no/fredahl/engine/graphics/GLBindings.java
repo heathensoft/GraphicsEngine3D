@@ -47,6 +47,12 @@ public class GLBindings {
         glBindBuffer(target, boundBufferObject = id);
     }
     
+    public void freeBufferObject(int id) {
+        if (id == boundBufferObject) {
+            boundBufferObject = 0;
+        }
+    }
+    
     public void unbindBufferObject(int target) {
         bindBufferObject(target,0);
     }

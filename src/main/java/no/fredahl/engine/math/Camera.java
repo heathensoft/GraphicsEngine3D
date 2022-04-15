@@ -1,13 +1,19 @@
 package no.fredahl.engine.math;
 
 import org.joml.FrustumIntersection;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.primitives.Rayf;
 
 /**
+ *
+ * Utility class. Multipurpose Camera without "roll".
+ * Direction, "pitch" and "yaw" is set by a function of position and a point of focus.
+ * No quaternions. Avoiding "gimbal-lock" is up to the implementer.
+ *
  * @author Frederik Dahl
- * 09/01/2022
+ * 28/03/2022
  */
 
 
@@ -15,21 +21,49 @@ public abstract class Camera {
     
     protected final FrustumIntersection frustumIntersection = new FrustumIntersection();
     
-    protected Matrix4f projection = new Matrix4f();
-    protected Matrix4f view = new Matrix4f();
+    protected final Matrix4f view = new Matrix4f();
+    protected final Matrix4f projection = new Matrix4f();
+    protected final Matrix4f combined = new Matrix4f();
+    protected final Matrix4f viewINV = new Matrix4f();
+    protected final Matrix4f projectionINV = new Matrix4f();
+    protected final Matrix4f combinedINV = new Matrix4f();
     
-    protected Vector3f position = new Vector3f();
-    protected Vector3f direction = new Vector3f();
-    protected Vector3f up = new Vector3f(0,1,0);
+    protected final Vector3f position = new Vector3f();
+    protected final Vector3f direction = new Vector3f();
+    protected final Vector3f right = new Vector3f();
+    protected final Vector3f up = new Vector3f(0,1,0);
     
-    protected float aspectRatio;
-    protected float fieldOfView;
-    protected float nearPlane;
-    protected float farPlane;
+    protected float fieldOfView = Math.toRadians(60);
+    protected float aspectRatio = 16/9f;
+    protected float nearPlane = 1.0f;
+    protected float farPlane = 1000.0f;
     
     
+    public void updateProjection() {
+        projection.identity().setPerspective(
+                fieldOfView, aspectRatio,
+                Math.abs(nearPlane),
+                Math.abs(farPlane),
+                false);
+        projectionINV.set(projection);
+        projectionINV.invert();
+        combined.set(projection).mul(view);
+        combinedINV.set(combined).invert();
+    }
     
-    public abstract void updateProjection();
+    /**
+     * Camera will turn around to face the point
+     * @param point The point of focus
+     */
+    public void lookAt(Vector3f point) {
+        direction.set(point).sub(position).normalize();
+        right.set(direction).cross(MathLib.UP_VECTOR).normalize();
+        up.set(right).cross(direction);
+        view.identity().lookAt(position,point,up);
+        viewINV.set(view).invert();
+        combined.set(projection).mul(view);
+        combinedINV.set(combined).invert();
+    }
     
     public void frustum(FrustumIntersection dest) {
         dest.set(combined());
@@ -63,17 +97,25 @@ public abstract class Camera {
         return projection;
     }
     
-    public abstract Matrix4f projectionINV();
+    public Matrix4f projectionINV() {
+        return projectionINV;
+    }
     
     public Matrix4f view() {
         return view;
     }
     
-    public abstract Matrix4f viewINV();
+    public Matrix4f viewINV() {
+        return viewINV;
+    }
     
-    public abstract Matrix4f combined();
+    public Matrix4f combined() {
+        return combined;
+    }
     
-    public abstract Matrix4f combinedINV();
+    public Matrix4f combinedINV() {
+        return combinedINV;
+    }
     
     public Vector3f position() {
         return position;
@@ -81,6 +123,10 @@ public abstract class Camera {
     
     public Vector3f direction() {
         return direction;
+    }
+    
+    public Vector3f right() {
+        return right;
     }
     
     public float aspectRatio() {

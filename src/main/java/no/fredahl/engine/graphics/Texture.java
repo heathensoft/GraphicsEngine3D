@@ -100,6 +100,39 @@ public class Texture implements Disposable {
         }
     }
     
+    public void tex1D(Image image) {
+        this.width = image.width();
+        this.height = image.height();
+        int internalFormat; // GPU side
+        int format; // client memory
+        int stride = 4;
+    
+        switch (image.channels()) {
+            case 3:
+                internalFormat = format = GL_RGB;
+                if ((width & 3) != 0) {
+                    stride = 2 - (width & 1);
+                }break;
+            case 4:
+                format = GL_RGBA;
+                internalFormat = GL_RGBA8;
+                break;
+            default:
+                throw new RuntimeException("Unsupported format");
+        }
+    
+        glPixelStorei(GL_UNPACK_ALIGNMENT,stride);
+        glTexImage1D(target,
+                0,
+                internalFormat,
+                width,
+                0,
+                format,
+                GL_UNSIGNED_BYTE,
+                image.get());
+        
+        
+    }
     
     public void tex2D(Image image) {
         

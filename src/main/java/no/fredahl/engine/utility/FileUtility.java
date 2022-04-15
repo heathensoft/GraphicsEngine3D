@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,18 +159,18 @@ public class FileUtility {
         private ResourceUtility() {}
         
         
-        public ByteBuffer toBuffer(String file, int size) throws IOException {
+        public ByteBuffer toBuffer(String file, int byteSize) throws IOException {
             ByteBuffer result;
             try (InputStream is = stream(file)){
                 if (is == null) throw new IOException("Unable to read: " + file);
                 try (ReadableByteChannel bc = Channels.newChannel(is)){
-                    result = BufferUtils.createByteBuffer(Math.max(128,size));
+                    result = BufferUtils.createByteBuffer(Math.max(128,byteSize));
                     while (true) {
                         int bytes = bc.read(result);
                         if (bytes == -1) break;
                         if (result.remaining() == 0) {
-                            size = result.capacity() * 2;
-                            ByteBuffer b = BufferUtils.createByteBuffer(size);
+                            byteSize = result.capacity() * 2;
+                            ByteBuffer b = BufferUtils.createByteBuffer(byteSize);
                             result = b.put(result.flip());
                         }
                     }
@@ -196,6 +197,10 @@ public class FileUtility {
         public Image image(String file, boolean flip) throws IOException {
             int size = 1024 * 16; // 16kb default. It doesn't matter.
             return image(file,size,flip);
+        }
+    
+        public Image image(String file,int size) throws IOException {
+            return image(file,size,false);
         }
         
         public Image image(String file) throws IOException {

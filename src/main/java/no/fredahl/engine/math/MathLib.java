@@ -17,6 +17,8 @@ import org.joml.primitives.Rayf;
  * a cyclical array of objects and returns the next object at idx++.
  * Not compatible with multiple threads.
  *
+ * Also: General Utility at the bottom of the file
+ *
  * @author Frederik Dahl
  * 10/01/2022
  */
@@ -56,6 +58,10 @@ public class MathLib {
     private static final Rayf[] ray;
     private static final RayAabIntersection[] rayAabIntersection;
     private static final FrustumIntersection[] frustum;
+    
+    
+    private static final int[] logTable;
+    
     
     static {
         
@@ -116,6 +122,11 @@ public class MathLib {
         for (int i = 0; i < frustum.length; i++) {
             frustum[i] = new FrustumIntersection();
         }
+        
+        logTable = new int[256];
+        logTable[0] = logTable[1] = 0;
+        for (int i=2; i<256; i++) logTable[i] = 1 + logTable[i/2];
+        logTable[0] = -1;
     }
     
     public static Vector4f vec4() {
@@ -438,6 +449,17 @@ public class MathLib {
         
     }
     
+    // General Utility
     
+    public static int log2(float f) {
+        int x = Float.floatToIntBits(f);
+        int c = x >> 23;
+        if (c != 0) return c - 127; //Compute directly from exponent.
+        else { //Subnormal, must compute from mantissa.
+            int t = x >> 16;
+            if (t != 0) return logTable[t] - 133;
+            else return (x >> 8 != 0) ? logTable[t] - 141 : logTable[x] - 149;
+        }
+    }
     
 }

@@ -33,6 +33,8 @@ public class Engine {
     
     private Engine(int threadPool) {
         
+        /*Todo: remove the thread pools. This has nothing to do with the engine*/
+        
         threadPool = Math.max(0,threadPool);
         executor = new ThreadPoolExecutor(
                 threadPool,
@@ -186,7 +188,7 @@ public class Engine {
     }
     
     
-    private static class Time {
+    public static class Time {
         
         private double initTime;
         private double lastFrame;
@@ -228,6 +230,8 @@ public class Engine {
         public double timeSeconds() { return nanoTime() / 1_000_000_000.0; }
         
         public double runTime() { return nanoTime() - initTime; }
+    
+        public double runTimeSeconds() { return (nanoTime() - initTime) / 1_000_000_000.0 ; }
         
         protected void incFpsCount() { fpsCount++; }
         

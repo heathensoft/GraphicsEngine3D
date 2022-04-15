@@ -132,11 +132,12 @@ public class BufferObject {
         bindings.bindBufferObject(target,id);
     }
     
-    public void unbind() {
+    public void unbind_() {
         bindings.bindBufferObject(target,0);
     }
     
     public void free() {
+        bindings.freeBufferObject(id);
         glDeleteBuffers(id);
     }
     
